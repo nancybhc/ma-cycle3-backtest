@@ -220,9 +220,8 @@ function maDirectionHtml(direction, run) {
   const up = direction === "向上";
   const down = direction === "向下";
   const cls = up ? "up" : down ? "down" : "flat";
-  const arrow = up ? "↑" : down ? "↓" : "→";
   const signedRun = Number(run) || 0;
-  const runText = signedRun === 0 ? "走平" : `${arrow}${Math.abs(signedRun)}天`;
+  const runText = signedRun === 0 ? "走平" : `${Math.abs(signedRun)}天`;
   return `
     <span class="ma-cell">
       <strong class="${cls}">${escapeHtml(direction || "—")}</strong>
