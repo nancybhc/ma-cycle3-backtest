@@ -1,0 +1,1324 @@
+const state = {
+  data: null,
+  candidateScope: "buy",
+  trades: [],
+  filteredTrades: [],
+  page: 1,
+  pageSize: 40,
+  drawerType: "",
+  drawerId: "",
+  charts: {},
+};
+
+const COLOR = {
+  text: "#e8f2f7",
+  soft: "#9cb1c1",
+  dim: "#627b8e",
+  cyan: "#48e1d1",
+  red: "#ff5b6e",
+  green: "#20c98c",
+  amber: "#f6b94b",
+  blue: "#5a9bff",
+  grid: "rgba(131,173,207,0.08)",
+  axis: "rgba(131,173,207,0.18)",
+  panel: "#0a1726",
+};
+
+const FONT_MONO = '"Cascadia Code","Consolas",monospace';
+const FONT_SANS = '"Microsoft YaHei UI","PingFang SC",sans-serif';
+
+document.addEventListener("DOMContentLoaded", init);
+
+async function init() {
+  try {
+    if (location.protocol === "file:") {
+      throw new Error("请通过本地网址打开看板，不能直接双击 index.html。");
+    }
+    const response = await fetch("data/backtest.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`数据读取失败：HTTP ${response.status}`);
+    state.data = await response.json();
+    state.trades = [...state.data.trades].sort((a, b) =>
+      b.entryDate.localeCompare(a.entryDate)
+    );
+    state.filteredTrades = [...state.trades];
+    populateOverview();
+    populateCandidates();
+    populateFilters();
+    populateTradeTable();
+    populateHoldingBars();
+    bindInteractions();
+    renderAllCharts();
+    setupNavigation();
+    window.addEventListener("resize", resizeCharts);
+    document.getElementById("loadingScreen").classList.add("hidden");
+  } catch (error) {
+    console.error(error);
+    const screen = document.getElementById("loadingScreen");
+    screen.innerHTML = `
+      <div class="loading-mark">!</div>
+      <div class="loading-copy">
+        <strong>看板装载失败</strong>
+        <span>${escapeHtml(error.message || String(error))}</span>
+      </div>`;
+  }
+}
+
+function populateOverview() {
+  const { meta, funnel, portfolio, stats } = state.data;
+  setText("topDataDate", `${meta.dataEnd} · 收盘后更新`);
+  setText("heroRange", `${meta.start} → ${meta.end}`);
+  setText("heroUpdated", meta.runTime);
+  setText("heroSamples", `${formatInt(stats.all.count)} 笔`);
+
+  const last = state.data.equity[state.data.equity.length - 1];
+  const nominal = 1000000;
+  const account = nominal * last.equity;
+  setText("accountValue", `¥${formatAmount(account)}`);
+  setText("accountReturn", formatPct(portfolio.totalReturnPct, true));
+  setText("accountDrawdown", formatPct(portfolio.maxDrawdownPct, true));
+  setText("accountSharpe", formatNumber(portfolio.sharpe, 2));
+  toneElement("accountReturn", portfolio.totalReturnPct);
+  toneElement("accountDrawdown", portfolio.maxDrawdownPct);
+
+  setText("funnelSignals", formatInt(funnel.signals));
+  setText("funnelLimit", formatInt(funnel.limitSkipped));
+  setText("funnelBuyable", formatInt(funnel.buyable));
+  setText("funnelProjected", formatInt(funnel.projected));
+  setText("funnelRate", `${formatNumber(funnel.projectedRatePct, 1)}% 成功率`);
+  setText("funnelBacktested", formatInt(funnel.backtested));
+  setText("funnelPending", `另 ${formatInt(funnel.pending)} 个待回测`);
+
+  setText("kpiTotalReturn", formatPct(portfolio.totalReturnPct, true));
+  setText("kpiAnnualized", formatPct(portfolio.annualizedPct, true));
+  setText("kpiWinRate", formatPct(stats.all.winRatePct, false));
+  setText("kpiTradeCount", formatInt(stats.all.count));
+  setText("kpiAvgReturn", formatPct(stats.all.avgReturnPct, true));
+  setText("kpiMedian", formatPct(stats.all.medianReturnPct, true));
+  setText("kpiPf", formatNumber(stats.all.profitFactor, 2));
+  setText("kpiDrawdown", formatPct(portfolio.maxDrawdownPct, true));
+  setText("kpiHolding", `${formatNumber(stats.all.avgHoldingDays, 1)} 天`);
+  setText("kpiMfe", formatPct(stats.all.avgMfePct, true));
+  setText("kpiMae", formatPct(stats.all.avgMaePct, true));
+  setText("kpiActive", `${formatNumber(portfolio.avgActive, 1)} 笔`);
+  setText("kpiMaxActive", `${formatInt(portfolio.maxActive)} 笔`);
+  setText("kpiDayWin", formatPct(portfolio.positiveDaysPct, false));
+  setText("kpiDays", formatInt(portfolio.tradingDays));
+  toneElement("kpiTotalReturn", portfolio.totalReturnPct);
+  toneElement("kpiAnnualized", portfolio.annualizedPct);
+  toneElement("kpiAvgReturn", stats.all.avgReturnPct);
+  toneElement("kpiDrawdown", portfolio.maxDrawdownPct);
+  toneElement("kpiMfe", stats.all.avgMfePct);
+  toneElement("kpiMae", stats.all.avgMaePct);
+
+  setText("trainValue", formatPct(stats.train.avgReturnPct, true));
+  setText("testValue", formatPct(stats.test.avgReturnPct, true));
+  const maxSplit = Math.max(
+    Math.abs(stats.train.avgReturnPct),
+    Math.abs(stats.test.avgReturnPct),
+    1
+  );
+  document.getElementById("trainBar").style.width =
+    `${Math.max(5, Math.abs(stats.train.avgReturnPct) / maxSplit * 100)}%`;
+  document.getElementById("testBar").style.width =
+    `${Math.max(5, Math.abs(stats.test.avgReturnPct) / maxSplit * 100)}%`;
+  toneElement("trainValue", stats.train.avgReturnPct);
+  toneElement("testValue", stats.test.avgReturnPct);
+
+  setText("candidateDateChip", meta.candidateDate);
+  setText("candidateRunTime", meta.candidateRunTime || `回测更新 ${meta.runTime}`);
+  setText("rawSummary", meta.summaryText || "无原始摘要");
+  setText(
+    "footerGenerated",
+    `生成 ${meta.generatedAt} · 行情缓存 ${meta.barsUpdated || "—"}`
+  );
+}
+
+function populateCandidates() {
+  const signals = state.data.signals || [];
+  const buys = signals.filter((row) => row.isBuy);
+  const limits = signals.filter((row) => row.limitUp);
+  const failures = signals.filter(
+    (row) => !row.isBuy && !row.limitUp && !row.projectedSuccess
+  );
+  setText("todayBuyCount", formatInt(buys.length));
+  setText("todaySignalCount", formatInt(signals.length));
+  setText("todayLimitCount", formatInt(limits.length));
+  setText("todayFailCount", formatInt(failures.length));
+  setText("scopeBuyCount", formatInt(buys.length));
+  setText("scopeAllCount", formatInt(signals.length));
+  renderCandidateTable();
+}
+
+function renderCandidateTable() {
+  const allSignals = state.data.signals || [];
+  const rows =
+    state.candidateScope === "buy"
+      ? allSignals.filter((row) => row.isBuy)
+      : allSignals;
+  const body = document.getElementById("candidateTableBody");
+  body.innerHTML = rows
+    .map((row) => {
+      const statusClass = row.isBuy ? "buy" : "skip";
+      const statusText = row.isBuy ? "买入候选" : row.reason;
+      return `
+        <tr class="clickable ${row.isBuy ? "buy-row" : ""}" data-code="${escapeAttr(row.code)}">
+          <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
+          <td class="sticky-col col-name">
+            <span class="name-cell">
+              <strong>${escapeHtml(row.name)}</strong>
+              <small>${escapeHtml(row.group || "未分组")}</small>
+            </span>
+          </td>
+          <td>${pricePairHtml(row.close, row.changePct)}</td>
+          <td><span class="trend-badge">${escapeHtml(row.trend || "—")}</span></td>
+          <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
+          <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
+          <td>${levelHtml(row.ma10Rebound, row.ma10ReboundPct)}</td>
+          <td>${maDirectionHtml(row.ma5Dir, row.ma5Run)}</td>
+          <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
+          <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
+          <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
+        </tr>`;
+    })
+    .join("");
+
+  body.querySelectorAll("tr").forEach((row) => {
+    row.addEventListener("click", () => openSignal(row.dataset.code));
+  });
+}
+
+function pricePairHtml(price, changePct) {
+  return `
+    <span class="price-pair">
+      <strong>${formatPrice(price)}</strong>
+      <small class="${pctClass(changePct)}">${formatPct(changePct, true)}</small>
+    </span>`;
+}
+
+function levelHtml(price, pct) {
+  if (price === null || price === undefined) return `<span class="flat">—</span>`;
+  return `
+    <span class="ma-level">
+      <strong>${formatPrice(price)}</strong>
+      <small class="${pctClass(pct)}">${formatPct(pct, true)}</small>
+    </span>`;
+}
+
+function maDirectionHtml(direction, run) {
+  const up = direction === "向上";
+  const down = direction === "向下";
+  const cls = up ? "up" : down ? "down" : "flat";
+  const arrow = up ? "↑" : down ? "↓" : "→";
+  const signedRun = Number(run) || 0;
+  const runText = signedRun === 0 ? "走平" : `${arrow}${Math.abs(signedRun)}天`;
+  return `
+    <span class="ma-cell">
+      <strong class="${cls}">${escapeHtml(direction || "—")}</strong>
+      <span>${runText}</span>
+    </span>`;
+}
+
+function populateFilters() {
+  const groupSelect = document.getElementById("groupFilter");
+  const groups = [...new Set(state.trades.map((row) => row.group).filter(Boolean))].sort(
+    (a, b) => a.localeCompare(b, "zh-CN")
+  );
+  groups.forEach((group) => {
+    const option = document.createElement("option");
+    option.value = group;
+    option.textContent = group;
+    groupSelect.appendChild(option);
+  });
+
+  const monthSelect = document.getElementById("monthFilter");
+  const months = [
+    ...new Set(state.trades.map((row) => row.entryDate.slice(0, 7))),
+  ].sort((a, b) => b.localeCompare(a));
+  months.forEach((month) => {
+    const option = document.createElement("option");
+    option.value = month;
+    option.textContent = month;
+    monthSelect.appendChild(option);
+  });
+}
+
+function bindInteractions() {
+  document.querySelectorAll("#candidateScope button").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.candidateScope = button.dataset.scope;
+      document
+        .querySelectorAll("#candidateScope button")
+        .forEach((item) => item.classList.toggle("active", item === button));
+      renderCandidateTable();
+    });
+  });
+
+  const search = document.getElementById("tradeSearch");
+  search.addEventListener("input", () => {
+    state.page = 1;
+    applyTradeFilters();
+  });
+  ["groupFilter", "resultFilter", "monthFilter"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", () => {
+      state.page = 1;
+      applyTradeFilters();
+    });
+  });
+  document.getElementById("resetFilters").addEventListener("click", () => {
+    search.value = "";
+    document.getElementById("groupFilter").value = "";
+    document.getElementById("resultFilter").value = "";
+    document.getElementById("monthFilter").value = "";
+    state.page = 1;
+    applyTradeFilters();
+  });
+  document.getElementById("exportTrades").addEventListener("click", exportFilteredTrades);
+
+  document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+  document.getElementById("drawerBackdrop").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && document.getElementById("drawer").classList.contains("open")) {
+      closeDrawer();
+    }
+  });
+}
+
+function applyTradeFilters() {
+  const query = document.getElementById("tradeSearch").value.trim().toLowerCase();
+  const group = document.getElementById("groupFilter").value;
+  const result = document.getElementById("resultFilter").value;
+  const month = document.getElementById("monthFilter").value;
+  state.filteredTrades = state.trades.filter((row) => {
+    if (query) {
+      const haystack = `${row.code} ${row.name} ${row.group}`.toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+    if (group && row.group !== group) return false;
+    if (month && !row.entryDate.startsWith(month)) return false;
+    if (result === "win" && row.returnPct <= 0) return false;
+    if (result === "loss" && row.returnPct >= 0) return false;
+    if (result === "open" && row.status !== "持有中") return false;
+    return true;
+  });
+  populateTradeTable();
+}
+
+function populateTradeTable() {
+  const total = state.filteredTrades.length;
+  const pageCount = Math.max(1, Math.ceil(total / state.pageSize));
+  state.page = Math.min(state.page, pageCount);
+  const start = (state.page - 1) * state.pageSize;
+  const rows = state.filteredTrades.slice(start, start + state.pageSize);
+  const body = document.getElementById("tradeTableBody");
+
+  if (!rows.length) {
+    body.innerHTML = `
+      <tr><td colspan="12" style="padding:42px;text-align:center;color:var(--text-dim)">
+        当前筛选条件下没有交易
+      </td></tr>`;
+  } else {
+    body.innerHTML = rows
+      .map((trade) => {
+        const statusClass =
+          trade.status === "持有中" ? "buy" : trade.returnPct >= 0 ? "buy" : "skip";
+        return `
+          <tr class="clickable" data-id="${escapeAttr(trade.id)}">
+            <td>${escapeHtml(trade.entryDate)}</td>
+            <td class="code-cell">${escapeHtml(trade.code)}</td>
+            <td><strong style="color:var(--text);font-weight:600">${escapeHtml(trade.name)}</strong></td>
+            <td>${escapeHtml(trade.group)}</td>
+            <td class="num">${formatPrice(trade.entryPrice)}</td>
+            <td>${escapeHtml(trade.exitDate)}</td>
+            <td class="num">${formatPrice(trade.exitPrice)}</td>
+            <td class="num ${pctClass(trade.returnPct)}"><strong style="font-weight:600">${formatPct(trade.returnPct, true)}</strong></td>
+            <td class="num">${formatInt(trade.holdingDays)} 天</td>
+            <td class="num">
+              <span class="mfe-pair">
+                <span class="up">${formatPct(trade.mfePct, true, 1)}</span>
+                <span class="down">${formatPct(trade.maePct, true, 1)}</span>
+              </span>
+            </td>
+            <td><span class="status-badge ${statusClass}">${escapeHtml(trade.status)}</span></td>
+            <td><button class="row-action" type="button" aria-label="查看详情">›</button></td>
+          </tr>`;
+      })
+      .join("");
+  }
+
+  body.querySelectorAll("tr[data-id]").forEach((row) => {
+    row.addEventListener("click", () => openTrade(row.dataset.id));
+  });
+  setText(
+    "tradeCountLabel",
+    `当前 ${formatInt(total)} 笔 · 第 ${state.page} / ${pageCount} 页`
+  );
+  renderPagination(pageCount);
+}
+
+function renderPagination(pageCount) {
+  const container = document.getElementById("pagination");
+  const pages = [];
+  const current = state.page;
+  pages.push(
+    `<button type="button" data-page="${current - 1}" ${current <= 1 ? "disabled" : ""}>‹</button>`
+  );
+  const candidates = new Set([1, pageCount, current - 2, current - 1, current, current + 1, current + 2]);
+  const visible = [...candidates]
+    .filter((page) => page >= 1 && page <= pageCount)
+    .sort((a, b) => a - b);
+  let previous = 0;
+  visible.forEach((page) => {
+    if (previous && page - previous > 1) pages.push(`<span style="color:var(--text-dim)">…</span>`);
+    pages.push(
+      `<button type="button" data-page="${page}" class="${page === current ? "active" : ""}">${page}</button>`
+    );
+    previous = page;
+  });
+  pages.push(
+    `<button type="button" data-page="${current + 1}" ${current >= pageCount ? "disabled" : ""}>›</button>`
+  );
+  container.innerHTML = pages.join("");
+  container.querySelectorAll("button[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const page = Number(button.dataset.page);
+      if (!Number.isFinite(page) || page < 1 || page > pageCount) return;
+      state.page = page;
+      populateTradeTable();
+      document.getElementById("trades").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
+function populateHoldingBars() {
+  const rows = state.data.holdingBuckets || [];
+  const container = document.getElementById("holdingBars");
+  const maxCount = Math.max(...rows.map((row) => row.count), 1);
+  container.innerHTML = rows
+    .map(
+      (row) => `
+        <div class="holding-card">
+          <span>${escapeHtml(row.label)}</span>
+          <strong>${formatPct(row.avgReturnPct, true)}</strong>
+          <div class="holding-meta">
+            <span>胜率 ${formatPct(row.winRatePct, false)}</span>
+            <span>${formatInt(row.count)} 笔</span>
+          </div>
+          <div class="holding-track"><i style="width:${Math.max(4, row.count / maxCount * 100)}%"></i></div>
+        </div>`
+    )
+    .join("");
+}
+
+function renderAllCharts() {
+  renderEquityChart();
+  renderDrawdownChart();
+  renderMonthlyChart();
+  renderDistributionChart();
+  renderGroupChart();
+  renderScatterChart();
+  renderExitReasonChart();
+}
+
+function chartBase() {
+  return {
+    animationDuration: 650,
+    animationEasing: "cubicOut",
+    textStyle: { fontFamily: FONT_SANS },
+    tooltip: {
+      backgroundColor: "rgba(5,15,24,0.96)",
+      borderColor: "rgba(131,173,207,0.22)",
+      borderWidth: 1,
+      textStyle: { color: COLOR.text, fontSize: 10, fontFamily: FONT_SANS },
+      extraCssText: "box-shadow:0 14px 40px rgba(0,0,0,.35);border-radius:9px;",
+    },
+  };
+}
+
+function renderEquityChart() {
+  const chart = getChart("equityChart");
+  const points = state.data.equity;
+  const dates = points.map((point) => point.date);
+  const values = points.map((point) => point.equity);
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 52, right: 20, top: 28, bottom: 62 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      formatter(params) {
+        const point = points[params[0].dataIndex];
+        return `
+          <div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${point.date}</div>
+          <div style="margin-top:7px;font-size:12px;color:${COLOR.text}">
+            净值 <b style="float:right;margin-left:24px;color:${point.equity >= 1 ? COLOR.red : COLOR.green}">${point.equity.toFixed(4)}</b>
+          </div>
+          <div style="margin-top:3px;color:${COLOR.soft};font-size:10px">
+            当日 <b style="float:right;margin-left:24px;color:${point.dailyReturnPct >= 0 ? COLOR.red : COLOR.green}">${signed(point.dailyReturnPct)}%</b>
+          </div>
+          <div style="margin-top:3px;color:${COLOR.dim};font-size:9px">
+            在场持仓 <b style="float:right;margin-left:24px;color:${COLOR.soft}">${point.active} 笔</b>
+          </div>`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: dates,
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 9,
+        fontFamily: FONT_MONO,
+        formatter: (value) => value.slice(5),
+        hideOverlap: true,
+      },
+    },
+    yAxis: {
+      type: "value",
+      scale: true,
+      splitNumber: 4,
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 9,
+        fontFamily: FONT_MONO,
+        formatter: (value) => value.toFixed(2),
+      },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    dataZoom: [
+      { type: "inside", start: 0, end: 100 },
+      {
+        type: "slider",
+        height: 16,
+        bottom: 14,
+        borderColor: "transparent",
+        backgroundColor: "rgba(131,173,207,0.04)",
+        fillerColor: "rgba(72,225,209,0.08)",
+        handleStyle: { color: COLOR.cyan, borderColor: COLOR.cyan },
+        textStyle: { color: COLOR.dim, fontSize: 8 },
+        dataBackground: {
+          lineStyle: { color: "rgba(72,225,209,0.3)" },
+          areaStyle: { color: "rgba(72,225,209,0.06)" },
+        },
+      },
+    ],
+    series: [
+      {
+        name: "组合净值",
+        type: "line",
+        data: values,
+        symbol: "none",
+        lineStyle: { width: 2, color: COLOR.cyan },
+        itemStyle: { color: COLOR.cyan },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "rgba(72,225,209,0.28)" },
+            { offset: 0.7, color: "rgba(72,225,209,0.04)" },
+            { offset: 1, color: "rgba(72,225,209,0)" },
+          ]),
+        },
+        markLine: {
+          silent: true,
+          symbol: ["none", "none"],
+          label: { show: false },
+          lineStyle: { color: "rgba(131,173,207,0.2)", width: 1, type: "dashed" },
+          data: [{ yAxis: 1 }],
+        },
+      },
+      {
+        name: "训练/测试切分",
+        type: "line",
+        data: [],
+        markLine: {
+          silent: true,
+          symbol: ["none", "none"],
+          lineStyle: { color: "rgba(246,185,75,0.35)", width: 1, type: "dashed" },
+          label: {
+            show: true,
+            formatter: "训练 / 测试",
+            color: COLOR.amber,
+            fontSize: 8,
+            position: "insideEndTop",
+          },
+          data: [{ xAxis: "2026-07-01" }],
+        },
+      },
+    ],
+  });
+}
+
+function renderDrawdownChart() {
+  const chart = getChart("drawdownChart");
+  const points = state.data.equity;
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 48, right: 14, top: 20, bottom: 30 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      formatter(params) {
+        const point = points[params[0].dataIndex];
+        return `<div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${point.date}</div>
+          <div style="margin-top:5px;color:${COLOR.green}">回撤 <b style="float:right;margin-left:18px">${signed(point.drawdownPct)}%</b></div>`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: points.map((point) => point.date),
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 8,
+        formatter: (value) => value.slice(5),
+        hideOverlap: true,
+      },
+    },
+    yAxis: {
+      type: "value",
+      max: 0,
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 8,
+        formatter: (value) => `${value}%`,
+      },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    series: [
+      {
+        type: "line",
+        data: points.map((point) => point.drawdownPct),
+        symbol: "none",
+        lineStyle: { width: 1.5, color: COLOR.green },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "rgba(32,201,140,0.05)" },
+            { offset: 1, color: "rgba(32,201,140,0.3)" },
+          ]),
+        },
+        markLine: {
+          silent: true,
+          symbol: ["none", "none"],
+          lineStyle: { color: "rgba(32,201,140,0.3)", type: "dashed" },
+          label: { show: false },
+          data: [{ yAxis: state.data.portfolio.maxDrawdownPct }],
+        },
+      },
+    ],
+  });
+}
+
+function renderMonthlyChart() {
+  const chart = getChart("monthlyChart");
+  const rows = state.data.monthly;
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 52, right: 20, top: 28, bottom: 40 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      formatter(params) {
+        const row = rows[params[0].dataIndex];
+        return `<div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${row.month}</div>
+          <div style="margin-top:5px;color:${row.returnPct >= 0 ? COLOR.red : COLOR.green}">
+            组合收益 <b style="float:right;margin-left:18px">${signed(row.returnPct)}%</b>
+          </div>
+          <div style="margin-top:2px;color:${COLOR.dim};font-size:9px">${row.days} 个交易日</div>`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      data: rows.map((row) => row.month),
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      axisTick: { show: false },
+      axisLabel: { color: COLOR.dim, fontSize: 9, formatter: (value) => value.slice(5) },
+    },
+    yAxis: {
+      type: "value",
+      axisLabel: { color: COLOR.dim, fontSize: 8, formatter: (value) => `${value}%` },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    series: [
+      {
+        type: "bar",
+        barWidth: "45%",
+        data: rows.map((row) => ({
+          value: row.returnPct,
+          itemStyle: {
+            color: row.returnPct >= 0 ? "rgba(255,91,110,0.72)" : "rgba(32,201,140,0.72)",
+            borderRadius: row.returnPct >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4],
+          },
+        })),
+        label: {
+          show: true,
+          position: "top",
+          color: COLOR.soft,
+          fontFamily: FONT_MONO,
+          fontSize: 8,
+          formatter: (params) => `${params.value >= 0 ? "+" : ""}${params.value.toFixed(1)}%`,
+        },
+      },
+    ],
+  });
+}
+
+function renderDistributionChart() {
+  const chart = getChart("distributionChart");
+  const rows = state.data.distribution;
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 45, right: 20, top: 28, bottom: 54 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      formatter(params) {
+        const row = rows[params[0].dataIndex];
+        return `<div style="color:${COLOR.soft};font-size:9px">收益区间 ${row.label}</div>
+          <div style="margin-top:5px;color:${COLOR.text}">交易数 <b style="float:right;margin-left:18px">${row.count}</b></div>`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      data: rows.map((row) => row.label.replace("~", "\n")),
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      axisTick: { show: false },
+      axisLabel: { color: COLOR.dim, fontSize: 8, interval: 0, rotate: 30 },
+    },
+    yAxis: {
+      type: "value",
+      axisLabel: { color: COLOR.dim, fontSize: 8 },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    series: [
+      {
+        type: "bar",
+        barWidth: "68%",
+        data: rows.map((row) => ({
+          value: row.count,
+          itemStyle: {
+            color: row.lo >= 0 ? "rgba(255,91,110,0.7)" : "rgba(32,201,140,0.62)",
+            borderRadius: [3, 3, 0, 0],
+          },
+        })),
+        label: {
+          show: true,
+          position: "top",
+          color: COLOR.dim,
+          fontFamily: FONT_MONO,
+          fontSize: 7,
+        },
+      },
+    ],
+  });
+}
+
+function renderGroupChart() {
+  const chart = getChart("groupChart");
+  const rows = state.data.groups
+    .filter((row) => row.count >= 10)
+    .sort((a, b) => b.avgReturnPct - a.avgReturnPct)
+    .slice(0, 12)
+    .reverse();
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 105, right: 48, top: 18, bottom: 30 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      formatter(params) {
+        const row = rows[params[0].dataIndex];
+        return `<div style="color:${COLOR.text};font-size:11px">${row.group}</div>
+          <div style="margin-top:5px;color:${row.avgReturnPct >= 0 ? COLOR.red : COLOR.green}">平均单笔 <b style="float:right;margin-left:18px">${signed(row.avgReturnPct)}%</b></div>
+          <div style="margin-top:2px;color:${COLOR.soft};font-size:9px">胜率 <b style="float:right;margin-left:18px">${row.winRatePct.toFixed(1)}%</b></div>
+          <div style="margin-top:2px;color:${COLOR.dim};font-size:9px">样本 <b style="float:right;margin-left:18px">${row.count} 笔</b></div>`;
+      },
+    },
+    xAxis: {
+      type: "value",
+      axisLabel: { color: COLOR.dim, fontSize: 8, formatter: (value) => `${value}%` },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    yAxis: {
+      type: "category",
+      data: rows.map((row) => row.group),
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: COLOR.soft, fontSize: 9, width: 84, overflow: "truncate" },
+    },
+    series: [
+      {
+        type: "bar",
+        barWidth: "58%",
+        data: rows.map((row) => ({
+          value: row.avgReturnPct,
+          itemStyle: {
+            color: row.avgReturnPct >= 0 ? "rgba(255,91,110,0.68)" : "rgba(32,201,140,0.62)",
+            borderRadius: row.avgReturnPct >= 0 ? [0, 3, 3, 0] : [3, 0, 0, 3],
+          },
+        })),
+        label: {
+          show: true,
+          position: "right",
+          color: COLOR.dim,
+          fontFamily: FONT_MONO,
+          fontSize: 8,
+          formatter: (params) => {
+            const row = rows[params.dataIndex];
+            return `${params.value >= 0 ? "+" : ""}${Number(params.value).toFixed(1)}%  ·  ${row.count}笔`;
+          },
+        },
+      },
+    ],
+  });
+}
+
+function renderScatterChart() {
+  const chart = getChart("scatterChart");
+  const trades = state.data.trades;
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 52, right: 18, top: 20, bottom: 38 },
+    tooltip: {
+      ...chartBase().tooltip,
+      formatter(params) {
+        if (params.seriesType === "line") return "";
+        const [mae, mfe, ret, code, name, date] = params.value;
+        return `<div style="color:${COLOR.text};font-size:11px">${name} <span style="color:${COLOR.dim};font-family:${FONT_MONO}">${code}</span></div>
+          <div style="margin-top:4px;color:${COLOR.dim};font-size:9px">${date}</div>
+          <div style="margin-top:6px;color:${ret >= 0 ? COLOR.red : COLOR.green}">最终收益 <b style="float:right;margin-left:18px">${signed(ret)}%</b></div>
+          <div style="margin-top:2px;color:${COLOR.soft};font-size:9px">MFE <b style="float:right;margin-left:18px">${signed(mfe)}%</b></div>
+          <div style="margin-top:2px;color:${COLOR.soft};font-size:9px">MAE <b style="float:right;margin-left:18px">${signed(mae)}%</b></div>`;
+      },
+    },
+    xAxis: {
+      type: "value",
+      name: "MAE %",
+      nameTextStyle: { color: COLOR.dim, fontSize: 8 },
+      axisLabel: { color: COLOR.dim, fontSize: 8 },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      min: -30,
+      max: 2,
+    },
+    yAxis: {
+      type: "value",
+      name: "MFE %",
+      nameTextStyle: { color: COLOR.dim, fontSize: 8 },
+      axisLabel: { color: COLOR.dim, fontSize: 8 },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+      min: 0,
+      max: 70,
+    },
+    series: [
+      {
+        type: "scatter",
+        data: trades.map((trade) => [
+          Math.max(-30, trade.maePct),
+          Math.min(70, trade.mfePct),
+          trade.returnPct,
+          trade.code,
+          trade.name,
+          trade.entryDate,
+        ]),
+        symbolSize(value) {
+          return Math.max(3, Math.min(10, Math.abs(value[2]) * 0.32 + 3));
+        },
+        itemStyle: {
+          color(params) {
+            return params.value[2] >= 0
+              ? "rgba(255,91,110,0.46)"
+              : "rgba(32,201,140,0.42)";
+          },
+          borderWidth: 0,
+        },
+        emphasis: {
+          itemStyle: { opacity: 1, borderColor: COLOR.text, borderWidth: 1 },
+        },
+      },
+      {
+        type: "line",
+        data: [
+          [-30, 30],
+          [-20, 20],
+          [-10, 10],
+          [0, 0],
+        ],
+        symbol: "none",
+        silent: true,
+        lineStyle: { color: "rgba(246,185,75,0.28)", type: "dashed", width: 1 },
+      },
+    ],
+  });
+}
+
+function renderExitReasonChart() {
+  const chart = getChart("exitReasonChart");
+  const rows = state.data.exitReasons || [];
+  const ma10Led = rows
+    .filter((row) => row.reason.includes("MA10"))
+    .reduce((total, row) => total + row.count, 0);
+  const total = rows.reduce((sum, row) => sum + row.count, 0);
+  setText(
+    "exitMixTip",
+    `MA10 参与触发 ${formatInt(ma10Led)} 笔 · ${formatPct(
+      total ? ma10Led / total * 100 : 0,
+      false
+    )}`
+  );
+  const ordered = [...rows].reverse();
+  const colorFor = (reason) => {
+    if (reason.includes("+MA10")) return COLOR.red;
+    if (reason === "MA10拐头") return COLOR.amber;
+    if (reason === "跌破MA5") return COLOR.cyan;
+    return COLOR.dim;
+  };
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 155, right: 130, top: 20, bottom: 28 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      axisPointer: { type: "shadow" },
+      formatter(params) {
+        const row = ordered[params[0].dataIndex];
+        return `<div style="color:${COLOR.text};font-size:11px">${row.reason}</div>
+          <div style="margin-top:5px;color:${COLOR.soft};font-size:9px">笔数 <b style="float:right;margin-left:18px">${row.count}</b></div>
+          <div style="margin-top:2px;color:${COLOR.dim};font-size:9px">占比 <b style="float:right;margin-left:18px">${row.sharePct.toFixed(1)}%</b></div>
+          <div style="margin-top:2px;color:${row.avgReturnPct >= 0 ? COLOR.red : COLOR.green};font-size:9px">平均收益 <b style="float:right;margin-left:18px">${signed(row.avgReturnPct)}%</b></div>
+          <div style="margin-top:2px;color:${COLOR.dim};font-size:9px">平均持有 <b style="float:right;margin-left:18px">${row.avgHoldingDays.toFixed(1)} 天</b></div>`;
+      },
+    },
+    xAxis: {
+      type: "value",
+      axisLabel: { color: COLOR.dim, fontSize: 8 },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    yAxis: {
+      type: "category",
+      data: ordered.map((row) => row.reason),
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: COLOR.soft, fontSize: 9 },
+    },
+    series: [
+      {
+        type: "bar",
+        barWidth: "52%",
+        data: ordered.map((row) => ({
+          value: row.count,
+          itemStyle: {
+            color: colorFor(row.reason),
+            opacity: row.reason === "数据末尾" ? 0.35 : 0.72,
+            borderRadius: [0, 3, 3, 0],
+          },
+        })),
+        label: {
+          show: true,
+          position: "right",
+          color: COLOR.soft,
+          fontFamily: FONT_MONO,
+          fontSize: 8,
+          formatter: (params) => {
+            const row = ordered[params.dataIndex];
+            return `${row.count} 笔 · ${row.sharePct.toFixed(1)}%`;
+          },
+        },
+      },
+    ],
+  });
+}
+
+function getChart(id) {
+  if (!state.charts[id]) {
+    state.charts[id] = echarts.init(document.getElementById(id), null, {
+      renderer: "canvas",
+    });
+  }
+  return state.charts[id];
+}
+
+function resizeCharts() {
+  Object.values(state.charts).forEach((chart) => chart.resize());
+}
+
+function openTrade(id) {
+  const trade = state.data.trades.find((row) => row.id === id);
+  if (!trade) return;
+  state.drawerType = "trade";
+  state.drawerId = id;
+  setText("drawerKicker", "TRADE DETAIL / 逐笔复盘");
+  setText("drawerTitle", `${trade.name} · ${trade.code}`);
+  document.getElementById("drawerTags").innerHTML = `
+    <span class="tag trend-badge">${escapeHtml(trade.group)}</span>
+    <span class="tag ${trade.returnPct >= 0 ? "status-badge buy" : "status-badge skip"}">${formatPct(trade.returnPct, true)}</span>
+    <span class="tag status-badge">${escapeHtml(trade.exitReason)}</span>`;
+  document.getElementById("drawerMetrics").innerHTML = [
+    metricHtml("最终收益", formatPct(trade.returnPct, true), trade.returnPct),
+    metricHtml("持有交易日", `${trade.holdingDays} 天`),
+    metricHtml("MFE", formatPct(trade.mfePct, true), trade.mfePct),
+    metricHtml("MAE", formatPct(trade.maePct, true), trade.maePct),
+  ].join("");
+  document.getElementById("drawerDetails").innerHTML = detailTable([
+    ["入场", `${trade.entryDate} / ${formatPrice(trade.entryPrice)}`],
+    ["出场", `${trade.exitDate} / ${formatPrice(trade.exitPrice)}`],
+    ["推演 5破10 日", trade.projectedDate],
+    ["实际次日 5破10", trade.actualSuccess ? "成功" : "未成功"],
+    ["状态", trade.status],
+    ["分组", trade.group],
+  ]);
+  openDrawer();
+  window.setTimeout(() => renderTradeChart(trade), 90);
+}
+
+function openSignal(code) {
+  const signal = state.data.signals.find((row) => row.code === code);
+  if (!signal) return;
+  state.drawerType = "signal";
+  state.drawerId = code;
+  setText("drawerKicker", "SIGNAL DETAIL / 尾盘选股");
+  setText("drawerTitle", `${signal.name} · ${signal.code}`);
+  document.getElementById("drawerTags").innerHTML = `
+    <span class="tag trend-badge">${escapeHtml(signal.trend || "—")}</span>
+    <span class="tag ${signal.isBuy ? "status-badge buy" : "status-badge skip"}">${escapeHtml(signal.reason)}</span>
+    <span class="tag status-badge">${escapeHtml(signal.group)}</span>`;
+  document.getElementById("drawerMetrics").innerHTML = [
+    metricHtml("收盘价", formatPrice(signal.close)),
+    metricHtml("当日涨幅", formatPct(signal.changePct, true), signal.changePct),
+    metricHtml("MA10 连续", `${signal.ma10Dir} ${Math.abs(signal.ma10Run)}天`, signal.ma10Dir === "向上" ? 1 : -1),
+    metricHtml("MA5 连续", `${signal.ma5Dir} ${Math.abs(signal.ma5Run)}天`, signal.ma5Dir === "向上" ? 1 : -1),
+  ].join("");
+  document.getElementById("drawerDetails").innerHTML = detailTable([
+    ["信号日期", signal.date],
+    ["5-10 间距", formatPct(signal.gapPct, true)],
+    ["推演次日 MA5", formatPrice(signal.projectedMa5)],
+    ["推演次日 MA10", formatPrice(signal.projectedMa10)],
+    ["MA10 拐头 / 回踩", `${formatPrice(signal.ma10Turn)} / ${formatPrice(signal.ma10Rebound)}`],
+    ["MA5 拐头 / 回踩", `${formatPrice(signal.ma5Turn)} / ${formatPrice(signal.ma5Rebound)}`],
+  ]);
+  openDrawer();
+  window.setTimeout(() => renderTradeChart(signal), 90);
+}
+
+function metricHtml(label, value, tone) {
+  const cls = tone === undefined ? "" : tone >= 0 ? "up" : "down";
+  return `<div class="drawer-metric"><span>${escapeHtml(label)}</span><strong class="${cls}">${escapeHtml(value)}</strong></div>`;
+}
+
+function detailTable(rows) {
+  return `<div class="detail-table">${rows
+    .map(
+      ([label, value]) => `
+        <div class="detail-cell">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value || "—")}</strong>
+        </div>`
+    )
+    .join("")}</div>`;
+}
+
+function openDrawer() {
+  document.body.classList.add("no-scroll");
+  document.getElementById("drawerBackdrop").classList.add("open");
+  const drawer = document.getElementById("drawer");
+  drawer.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
+}
+
+function closeDrawer() {
+  document.body.classList.remove("no-scroll");
+  document.getElementById("drawerBackdrop").classList.remove("open");
+  const drawer = document.getElementById("drawer");
+  drawer.classList.remove("open");
+  drawer.setAttribute("aria-hidden", "true");
+}
+
+function renderTradeChart(item) {
+  const bars = state.data.chartBars[item.code];
+  const element = document.getElementById("tradeChart");
+  if (!bars || !bars.dates.length) {
+    element.innerHTML =
+      '<div style="padding:80px;text-align:center;color:var(--text-dim);font-size:10px">该标的暂无本地行情缓存</div>';
+    return;
+  }
+  if (state.charts.tradeChart) {
+    state.charts.tradeChart.dispose();
+  }
+  element.innerHTML = "";
+  const chart = echarts.init(element, null, { renderer: "canvas" });
+  state.charts.tradeChart = chart;
+  const isTrade = state.drawerType === "trade";
+  const entryDate = isTrade ? item.entryDate : item.date;
+  const exitDate = isTrade ? item.exitDate : null;
+  const entryPrice = isTrade
+    ? item.entryPrice
+    : bars.ohlc[bars.dates.indexOf(item.date)]?.[1];
+  const exitPrice = isTrade
+    ? item.exitPrice
+    : bars.ohlc[bars.dates.indexOf(item.date)]?.[1];
+  const points = [];
+  if (entryDate && entryPrice) {
+    points.push({
+      name: isTrade ? "买" : "今",
+      coord: [entryDate, entryPrice],
+      value: isTrade ? "买" : "今",
+      itemStyle: { color: isTrade ? COLOR.red : COLOR.cyan },
+      label: { color: isTrade ? COLOR.red : COLOR.cyan, fontSize: 9, fontWeight: 600 },
+    });
+  }
+  if (isTrade && exitDate && exitPrice) {
+    points.push({
+      name: "卖",
+      coord: [exitDate, exitPrice],
+      value: "卖",
+      itemStyle: { color: COLOR.green },
+      label: { color: COLOR.green, fontSize: 9, fontWeight: 600 },
+    });
+  }
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 48, right: 14, top: 30, bottom: 48 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      axisPointer: { type: "cross", crossStyle: { color: COLOR.axis } },
+      formatter(params) {
+        const candle = params.find((param) => param.seriesType === "candlestick");
+        if (!candle) return "";
+        const [open, close, low, high] = candle.value.slice(1);
+        const line = (name, value) =>
+          value === null || value === undefined
+            ? ""
+            : `<div style="margin-top:2px;color:${COLOR.soft};font-size:9px">${name} <b style="float:right;margin-left:18px">${Number(value).toFixed(2)}</b></div>`;
+        return `<div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${candle.axisValue}</div>
+          <div style="margin-top:5px;color:${COLOR.text};font-size:10px">
+            收 <b style="float:right;margin-left:18px;color:${close >= open ? COLOR.red : COLOR.green}">${close.toFixed(2)}</b>
+          </div>
+          ${line("开", open)}${line("高", high)}${line("低", low)}
+          ${line("MA5", params.find((param) => param.seriesName === "MA5")?.value)}
+          ${line("MA10", params.find((param) => param.seriesName === "MA10")?.value)}`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      data: bars.dates,
+      boundaryGap: true,
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 8,
+        formatter: (value) => value.slice(5),
+        hideOverlap: true,
+      },
+    },
+    yAxis: {
+      scale: true,
+      splitNumber: 4,
+      axisLabel: { color: COLOR.dim, fontSize: 8, fontFamily: FONT_MONO },
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
+    dataZoom: [
+      { type: "inside", start: bars.dates.length > 75 ? 25 : 0, end: 100 },
+    ],
+    series: [
+      {
+        name: "K线",
+        type: "candlestick",
+        data: bars.ohlc,
+        itemStyle: {
+          color: COLOR.red,
+          color0: COLOR.green,
+          borderColor: COLOR.red,
+          borderColor0: COLOR.green,
+        },
+        markPoint: {
+          symbol: "pin",
+          symbolSize: 28,
+          data: points,
+        },
+      },
+      {
+        name: "MA5",
+        type: "line",
+        data: bars.ma5,
+        symbol: "none",
+        smooth: true,
+        lineStyle: { width: 1, color: COLOR.red, opacity: 0.72 },
+      },
+      {
+        name: "MA10",
+        type: "line",
+        data: bars.ma10,
+        symbol: "none",
+        smooth: true,
+        lineStyle: { width: 1.2, color: COLOR.amber, opacity: 0.78 },
+      },
+    ],
+  });
+}
+
+function exportFilteredTrades() {
+  const headers = [
+    "代码",
+    "名称",
+    "分组",
+    "入场日期",
+    "入场价",
+    "推演5破10日",
+    "出场日期",
+    "出场价",
+    "收益%",
+    "持有交易日",
+    "出场原因",
+    "状态",
+    "MFE%",
+    "MAE%",
+  ];
+  const lines = [headers.join(",")];
+  state.filteredTrades.forEach((row) => {
+    const values = [
+      row.code,
+      row.name,
+      row.group,
+      row.entryDate,
+      row.entryPrice,
+      row.projectedDate,
+      row.exitDate,
+      row.exitPrice,
+      row.returnPct,
+      row.holdingDays,
+      row.exitReason,
+      row.status,
+      row.mfePct,
+      row.maePct,
+    ];
+    lines.push(values.map(csvCell).join(","));
+  });
+  const blob = new Blob([`\ufeff${lines.join("\r\n")}`], {
+    type: "text/csv;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `进度3_5破10_双条件离场_交易明细_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${state.filteredTrades.length} 笔交易`);
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function setupNavigation() {
+  const links = [...document.querySelectorAll(".main-nav a")];
+  const sections = links
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      links.forEach((link) =>
+        link.classList.toggle(
+          "active",
+          link.getAttribute("href") === `#${visible.target.id}`
+        )
+      );
+    },
+    { rootMargin: "-20% 0px -65% 0px", threshold: [0.05, 0.2, 0.5] }
+  );
+  sections.forEach((section) => observer.observe(section));
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2400);
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value ?? "—";
+}
+
+function formatInt(value) {
+  return new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 0 }).format(
+    Number(value) || 0
+  );
+}
+
+function formatAmount(value) {
+  return new Intl.NumberFormat("zh-CN", {
+    maximumFractionDigits: 0,
+  }).format(Number(value) || 0);
+}
+
+function formatNumber(value, digits = 2) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
+  return Number(value).toFixed(digits);
+}
+
+function formatPrice(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
+  const number = Number(value);
+  return number >= 100 ? number.toFixed(2) : number.toFixed(2);
+}
+
+function signed(value, digits = 2) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "—";
+  return `${number >= 0 ? "+" : ""}${number.toFixed(digits)}`;
+}
+
+function formatPct(value, withSign = true, digits = 2) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
+  const number = Number(value);
+  const sign = withSign && number >= 0 ? "+" : "";
+  return `${sign}${number.toFixed(digits)}%`;
+}
+
+function pctClass(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "flat";
+  return Number(value) >= 0 ? "up" : "down";
+}
+
+function toneElement(id, value) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.classList.remove("up", "down", "flat");
+  element.classList.add(pctClass(value));
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value);
+}

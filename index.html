@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111d">
+  <title>进度3 · 5破10回测面板</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-mark">M3</div>
+    <div class="loading-copy">
+      <strong>正在装载回测引擎</strong>
+      <span>读取交易明细、行情与尾盘汇总</span>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="#overview" aria-label="返回顶部">
+      <span class="brand-mark">M3</span>
+      <span class="brand-copy">
+        <strong>MA CYCLE LAB</strong>
+        <small>A-SHARE RESEARCH TERMINAL</small>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="页面导航">
+      <a href="#overview">总览</a>
+      <a href="#today">今日信号</a>
+      <a href="#analytics">统计分析</a>
+      <a href="#trades">交易明细</a>
+      <a href="#rules">策略口径</a>
+    </nav>
+    <div class="top-status">
+      <span class="status-dot"></span>
+      <span id="topDataDate">数据装载中</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero section" id="overview">
+      <div class="hero-copy">
+        <div class="eyebrow"><span>QUANT RESEARCH</span><i></i><span>A股 / 日线</span></div>
+        <h1>进度3 <em>·</em> 推演 0% <span>5破10</span></h1>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，尾盘买入；此后收盘跌破 MA5 或 MA10 向下拐头，任一先触发即卖出。</p>
+        <div class="hero-meta">
+          <span><b>信号区间</b><strong id="heroRange">—</strong></span>
+          <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
+          <span><b>样本</b><strong id="heroSamples">—</strong></span>
+        </div>
+      </div>
+      <div class="hero-account">
+        <div class="account-head">
+          <span>模拟组合权益</span>
+          <span class="research-badge">研究回测 · 非实盘</span>
+        </div>
+        <div class="account-value" id="accountValue">—</div>
+        <div class="account-bottom">
+          <div>
+            <span>累计收益</span>
+            <strong id="accountReturn">—</strong>
+          </div>
+          <div>
+            <span>最大回撤</span>
+            <strong id="accountDrawdown">—</strong>
+          </div>
+          <div>
+            <span>Sharpe</span>
+            <strong id="accountSharpe">—</strong>
+          </div>
+        </div>
+        <p>以 100 万名义本金换算 · 每日持仓等权</p>
+      </div>
+    </section>
+
+    <section class="funnel-strip" aria-label="信号漏斗">
+      <div class="funnel-title">
+        <span>信号漏斗</span>
+        <small>进度3 → 可回测样本</small>
+      </div>
+      <div class="funnel-step">
+        <span>原始进度3</span>
+        <strong id="funnelSignals">—</strong>
+        <small>个信号</small>
+      </div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step">
+        <span>尾盘涨停剔除</span>
+        <strong id="funnelLimit">—</strong>
+        <small>买不进</small>
+      </div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step">
+        <span>可买信号</span>
+        <strong id="funnelBuyable">—</strong>
+        <small>个</small>
+      </div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step accent">
+        <span>推演 0% 成功</span>
+        <strong id="funnelProjected">—</strong>
+        <small id="funnelRate">—</small>
+      </div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step result">
+        <span>已纳入回测</span>
+        <strong id="funnelBacktested">—</strong>
+        <small id="funnelPending">—</small>
+      </div>
+    </section>
+
+    <section class="kpi-grid" aria-label="核心指标">
+      <article class="kpi-card" data-tone="cyan">
+        <div class="kpi-head"><span>组合累计收益</span><i>01</i></div>
+        <strong id="kpiTotalReturn">—</strong>
+        <p><span id="kpiAnnualized">—</span> 年化 · 每日等权</p>
+      </article>
+      <article class="kpi-card" data-tone="red">
+        <div class="kpi-head"><span>单笔胜率</span><i>02</i></div>
+        <strong id="kpiWinRate">—</strong>
+        <p><span id="kpiTradeCount">—</span> 笔已完成样本</p>
+      </article>
+      <article class="kpi-card" data-tone="cyan">
+        <div class="kpi-head"><span>平均单笔</span><i>03</i></div>
+        <strong id="kpiAvgReturn">—</strong>
+        <p>中位数 <span id="kpiMedian">—</span></p>
+      </article>
+      <article class="kpi-card" data-tone="amber">
+        <div class="kpi-head"><span>Profit Factor</span><i>04</i></div>
+        <strong id="kpiPf">—</strong>
+        <p>盈利总额 / 亏损总额</p>
+      </article>
+      <article class="kpi-card" data-tone="red">
+        <div class="kpi-head"><span>最大回撤</span><i>05</i></div>
+        <strong id="kpiDrawdown">—</strong>
+        <p>峰谷口径 · 收盘价</p>
+      </article>
+      <article class="kpi-card" data-tone="cyan">
+        <div class="kpi-head"><span>平均持有</span><i>06</i></div>
+        <strong id="kpiHolding">—</strong>
+        <p>平均 MFE <span id="kpiMfe">—</span> / MAE <span id="kpiMae">—</span></p>
+      </article>
+      <article class="kpi-card" data-tone="amber">
+        <div class="kpi-head"><span>日均持仓</span><i>07</i></div>
+        <strong id="kpiActive">—</strong>
+        <p>最多同时持有 <span id="kpiMaxActive">—</span> 笔</p>
+      </article>
+      <article class="kpi-card" data-tone="cyan">
+        <div class="kpi-head"><span>日内胜率</span><i>08</i></div>
+        <strong id="kpiDayWin">—</strong>
+        <p><span id="kpiDays">—</span> 个交易日</p>
+      </article>
+    </section>
+
+    <section class="section chart-section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span>PERFORMANCE</span><i></i><span>资金曲线</span></div>
+          <h2>组合净值与风险路径</h2>
+        </div>
+        <div class="section-note">每日对在场交易等权计算 · 不计手续费、印花税、滑点</div>
+      </div>
+      <div class="performance-grid">
+        <article class="panel chart-panel curve-panel">
+          <div class="panel-head">
+            <div>
+              <span class="panel-kicker">EQUITY CURVE</span>
+              <h3>策略净值</h3>
+            </div>
+            <div class="legend-inline">
+              <span><i class="legend-line cyan"></i>组合净值</span>
+              <span><i class="legend-line dim"></i>1.00 基准</span>
+            </div>
+          </div>
+          <div class="chart-xl" id="equityChart" role="img" aria-label="策略净值曲线"></div>
+        </article>
+        <article class="panel risk-panel">
+          <div class="panel-head">
+            <div>
+              <span class="panel-kicker">RISK</span>
+              <h3>回撤与样本切分</h3>
+            </div>
+          </div>
+          <div class="chart-md" id="drawdownChart" role="img" aria-label="策略回撤曲线"></div>
+          <div class="split-compare">
+            <div class="split-row">
+              <span>训练集</span>
+              <div><i id="trainBar"></i></div>
+              <strong id="trainValue">—</strong>
+            </div>
+            <div class="split-row">
+              <span>测试集</span>
+              <div><i id="testBar"></i></div>
+              <strong id="testValue">—</strong>
+            </div>
+            <small>以 2026-07-01 切分，训练/测试平均单笔收益</small>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="today">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span>LIVE SIGNALS</span><i></i><span>尾盘选股</span></div>
+          <h2>今日买入候选</h2>
+        </div>
+        <div class="today-head-meta">
+          <span class="date-chip" id="candidateDateChip">—</span>
+          <span id="candidateRunTime">—</span>
+        </div>
+      </div>
+
+      <div class="today-summary">
+        <div class="today-count">
+          <span>入选</span>
+          <strong id="todayBuyCount">—</strong>
+          <small>尾盘可买候选</small>
+        </div>
+        <div class="today-split">
+          <div><span>今日进度3信号</span><strong id="todaySignalCount">—</strong></div>
+          <div><span>尾盘涨停剔除</span><strong id="todayLimitCount">—</strong></div>
+          <div><span>推演未过</span><strong id="todayFailCount">—</strong></div>
+        </div>
+        <div class="today-note">
+          <strong>与 Excel 汇总页同口径</strong>
+          <p>展示收盘价 / 涨幅、趋势方向、MA10 / MA5 连续天数、拐头价和回踩价。点击任意标的查看 K 线与关键价位。</p>
+        </div>
+      </div>
+
+      <article class="panel table-panel">
+        <div class="table-toolbar">
+          <div>
+            <span class="panel-kicker">TAIL PICK SUMMARY</span>
+            <h3>5破10推演 · 尾盘选股汇总</h3>
+          </div>
+          <div class="segmented" id="candidateScope">
+            <button class="active" data-scope="buy">买入候选 <b id="scopeBuyCount">—</b></button>
+            <button data-scope="all">全部信号 <b id="scopeAllCount">—</b></button>
+          </div>
+        </div>
+        <div class="table-scroll candidate-scroll">
+          <table class="data-table candidate-table">
+            <thead>
+              <tr>
+                <th class="sticky-col col-code">代码</th>
+                <th class="sticky-col col-name">名称</th>
+                <th>收盘价 / 涨幅</th>
+                <th>趋势</th>
+                <th>MA10方向 / 连续</th>
+                <th>MA10拐头价</th>
+                <th>MA10回踩价</th>
+                <th>MA5方向 / 连续</th>
+                <th>MA5拐头价</th>
+                <th>MA5回踩价</th>
+                <th>入选状态</th>
+              </tr>
+            </thead>
+            <tbody id="candidateTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="analytics">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span>ANALYTICS</span><i></i><span>收益结构</span></div>
+          <h2>这张策略画像说明了什么</h2>
+        </div>
+        <div class="section-note">单笔收益分布、月度贡献、板块表现与路径盈亏</div>
+      </div>
+      <div class="analytics-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div><span class="panel-kicker">MONTHLY</span><h3>月度收益</h3></div>
+            <span class="panel-tip">组合口径</span>
+          </div>
+          <div class="chart-lg" id="monthlyChart"></div>
+        </article>
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div><span class="panel-kicker">DISTRIBUTION</span><h3>单笔收益分布</h3></div>
+            <span class="panel-tip">1262 笔</span>
+          </div>
+          <div class="chart-lg" id="distributionChart"></div>
+        </article>
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div><span class="panel-kicker">SECTOR</span><h3>板块平均收益</h3></div>
+            <span class="panel-tip">样本数 ≥ 10</span>
+          </div>
+          <div class="chart-lg" id="groupChart"></div>
+        </article>
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div><span class="panel-kicker">PATH</span><h3>MFE / MAE 路径</h3></div>
+            <span class="panel-tip">持有期内最高 / 最低</span>
+          </div>
+          <div class="chart-lg" id="scatterChart"></div>
+        </article>
+        <article class="panel chart-panel exit-panel">
+          <div class="panel-head">
+            <div><span class="panel-kicker">EXIT MIX</span><h3>出场原因构成</h3></div>
+            <span class="panel-tip" id="exitMixTip">跌破 MA5 或 MA10 拐头，先触发先卖</span>
+          </div>
+          <div class="chart-lg" id="exitReasonChart"></div>
+        </article>
+      </div>
+      <article class="panel holding-panel">
+        <div class="panel-head">
+          <div><span class="panel-kicker">HOLDING PERIOD</span><h3>持有天数与胜率</h3></div>
+        </div>
+        <div class="holding-bars" id="holdingBars"></div>
+      </article>
+    </section>
+
+    <section class="section" id="trades">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span>TRADE LEDGER</span><i></i><span>逐笔复盘</span></div>
+          <h2>回测交易明细</h2>
+        </div>
+        <button class="ghost-button" id="exportTrades" type="button">
+          <span>导出当前筛选</span>
+          <small>CSV</small>
+        </button>
+      </div>
+
+      <article class="panel table-panel trade-panel">
+        <div class="filter-bar">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="tradeSearch" type="search" placeholder="搜索代码、名称或分组" autocomplete="off">
+          </label>
+          <label class="select-box">
+            <span>分组</span>
+            <select id="groupFilter"><option value="">全部</option></select>
+          </label>
+          <label class="select-box">
+            <span>结果</span>
+            <select id="resultFilter">
+              <option value="">全部</option>
+              <option value="win">盈利</option>
+              <option value="loss">亏损</option>
+              <option value="open">持有中</option>
+            </select>
+          </label>
+          <label class="select-box">
+            <span>月份</span>
+            <select id="monthFilter"><option value="">全部</option></select>
+          </label>
+          <button class="text-button" id="resetFilters" type="button">重置</button>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table trade-table">
+            <thead>
+              <tr>
+                <th>入场日期</th>
+                <th>代码</th>
+                <th>名称</th>
+                <th>分组</th>
+                <th class="num">入场价</th>
+                <th>出场日期</th>
+                <th class="num">出场价</th>
+                <th class="num">收益</th>
+                <th class="num">持有</th>
+                <th class="num">MFE / MAE</th>
+                <th>状态</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tradeTableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="tradeCountLabel">—</span>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" id="rules">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span>PLAYBOOK</span><i></i><span>策略口径</span></div>
+          <h2>信号是怎么变成交易的</h2>
+        </div>
+        <div class="section-note">先看规则，再看收益；避免把研究回测当成实盘承诺</div>
+      </div>
+      <div class="rules-grid">
+        <article class="panel playbook-panel">
+          <div class="playbook-step">
+            <span class="step-number">01</span>
+            <div>
+              <h3>空转多进度3首次出现</h3>
+              <p>MA5 已掉头向上、仍在 MA10 下方；按信号日收盘价视为尾盘买入。</p>
+            </div>
+          </div>
+          <div class="playbook-step">
+            <span class="step-number">02</span>
+            <div>
+              <h3>推演次日 0%</h3>
+              <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。</p>
+            </div>
+          </div>
+          <div class="playbook-step">
+            <span class="step-number">03</span>
+            <div>
+              <h3>真实行情持有</h3>
+              <p>只买推演成功子集，从下一交易日起按真实收盘价持有。</p>
+            </div>
+          </div>
+          <div class="playbook-step">
+            <span class="step-number">04</span>
+            <div>
+              <h3>跌破 MA5 或 MA10 拐头卖出</h3>
+              <p>收盘跌破 MA5，或 MA10 今天低于昨天且昨天不低于前天，任一先出现即当天卖出；数据末尾未触发的 3 笔标为持有中。</p>
+            </div>
+          </div>
+        </article>
+        <article class="panel caveat-panel">
+          <span class="panel-kicker">READ BEFORE USE</span>
+          <h3>使用边界</h3>
+          <div class="caveat-list">
+            <div><i>01</i><p>未计手续费、印花税、滑点，也未处理停牌。</p></div>
+            <div><i>02</i><p>当前固定分组成员存在事后幸存者偏差。</p></div>
+            <div><i>03</i><p>组合净值按每日在场交易等权计算，是研究示意，不是可成交账户。</p></div>
+            <div><i>04</i><p>今日候选只是收盘后选股结果，不代表保证成交或未来收益。</p></div>
+          </div>
+          <details class="raw-summary">
+            <summary>查看原始回测摘要</summary>
+            <pre id="rawSummary"></pre>
+          </details>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <span class="brand-mark small">M3</span>
+      <p>研究看板 · 数据来自本地回测结果与收盘后行情缓存</p>
+    </div>
+    <div class="footer-meta">
+      <span id="footerGenerated">—</span>
+      <span>仅供策略研究，不构成投资建议</span>
+    </div>
+  </footer>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <button class="drawer-close" id="drawerClose" type="button" aria-label="关闭详情">×</button>
+    <div class="drawer-head">
+      <span class="panel-kicker" id="drawerKicker">TRADE DETAIL</span>
+      <h2 id="drawerTitle">—</h2>
+      <div class="drawer-tags" id="drawerTags"></div>
+    </div>
+    <div class="drawer-metrics" id="drawerMetrics"></div>
+    <div class="drawer-chart-wrap">
+      <div class="drawer-chart-head">
+        <span>K 线路径</span>
+        <div class="legend-inline compact">
+          <span><i class="legend-line red"></i>MA5</span>
+          <span><i class="legend-line amber"></i>MA10</span>
+        </div>
+      </div>
+      <div class="drawer-chart" id="tradeChart"></div>
+    </div>
+    <div class="drawer-details" id="drawerDetails"></div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+  <script src="assets/echarts.min.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
