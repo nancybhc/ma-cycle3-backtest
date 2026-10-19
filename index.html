@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111d">
-  <title>进度3 · 5破10回测面板</title>
+  <title>进度3 · 5破10 + 间距增幅回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/app.css">
 </head>
@@ -30,6 +30,7 @@
       <a href="#today">今日信号</a>
       <a href="#analytics">统计分析</a>
       <a href="#trades">交易明细</a>
+      <a href="#stages">多空进度</a>
       <a href="#rules">策略口径</a>
     </nav>
     <div class="top-status">
@@ -42,8 +43,8 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <div class="eyebrow"><span>QUANT RESEARCH</span><i></i><span>A股 / 日线</span></div>
-        <h1>进度3 <em>·</em> 推演 0% <span>5破10</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，尾盘买入；此后收盘跌破 MA5 或 MA10 向下拐头，任一先触发即卖出。</p>
+        <h1>进度3 <em>·</em> 推演 0% <span>5破10</span> · 间距增幅</h1>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且推演次日 5-10 间距较当日增幅超过 1.5 个百分点，尾盘买入；此后收盘跌破 MA5 或 MA10 向下拐头，任一先触发即卖出。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -77,7 +78,7 @@
     <section class="funnel-strip" aria-label="信号漏斗">
       <div class="funnel-title">
         <span>信号漏斗</span>
-        <small>进度3 → 可回测样本</small>
+        <small>进度3 → 双条件 → 可回测样本</small>
       </div>
       <div class="funnel-step">
         <span>原始进度3</span>
@@ -101,6 +102,12 @@
         <span>推演 0% 成功</span>
         <strong id="funnelProjected">—</strong>
         <small id="funnelRate">—</small>
+      </div>
+      <div class="funnel-arrow">→</div>
+      <div class="funnel-step accent">
+        <span>间距增幅 &gt; 1.5pp</span>
+        <strong id="funnelGap">—</strong>
+        <small id="funnelGapRate">—</small>
       </div>
       <div class="funnel-arrow">→</div>
       <div class="funnel-step result">
@@ -222,10 +229,11 @@
           <div><span>今日进度3信号</span><strong id="todaySignalCount">—</strong></div>
           <div><span>尾盘涨停剔除</span><strong id="todayLimitCount">—</strong></div>
           <div><span>推演未过</span><strong id="todayFailCount">—</strong></div>
+          <div><span>间距未过</span><strong id="todayGapFailCount">—</strong></div>
         </div>
         <div class="today-note">
           <strong>与 Excel 汇总页同口径</strong>
-          <p>展示收盘价 / 涨幅、趋势方向、MA10 / MA5 连续天数、拐头价和回踩价。点击任意标的查看 K 线与关键价位。</p>
+          <p>展示收盘价 / 涨幅、趋势方向、MA10 / MA5 连续天数、拐头价、回踩价，以及推演次日 5-10 间距与间距增幅。点击任意标的查看 K 线与关键价位。</p>
         </div>
       </div>
 
@@ -254,6 +262,7 @@
                 <th>MA5方向 / 连续</th>
                 <th>MA5拐头价</th>
                 <th>MA5回踩价</th>
+                <th>推演次日5-10 / 增量</th>
                 <th>入选状态</th>
               </tr>
             </thead>
@@ -282,7 +291,7 @@
         <article class="panel chart-panel">
           <div class="panel-head">
             <div><span class="panel-kicker">DISTRIBUTION</span><h3>单笔收益分布</h3></div>
-            <span class="panel-tip">1262 笔</span>
+            <span class="panel-tip" id="distributionSampleTip">—</span>
           </div>
           <div class="chart-lg" id="distributionChart"></div>
         </article>
@@ -362,6 +371,7 @@
                 <th>名称</th>
                 <th>分组</th>
                 <th class="num">入场价</th>
+                <th>推演次日5-10 / 增量</th>
                 <th>出场日期</th>
                 <th class="num">出场价</th>
                 <th class="num">收益</th>
@@ -379,6 +389,105 @@
           <div class="pagination" id="pagination"></div>
         </div>
       </article>
+    </section>
+
+    <section class="section" id="stages">
+      <div class="stage-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow"><span>MARKET STRUCTURE</span><i></i><span>MA5 / MA10</span></div>
+            <h2>多转空与空转多：各三步</h2>
+          </div>
+          <div class="section-note">用 MA5 是否拐头、MA5 与 MA10 的上下关系、MA10 是否同向确认，拆成可跟踪的进度</div>
+        </div>
+
+        <div class="stage-base-grid">
+          <div class="stage-base long">
+            <span class="stage-base-label">多</span>
+            <strong>MA5 ↑ · MA10 ↑ · MA5 &gt; MA10</strong>
+            <small>完整多头：两条均线都向上，5 在 10 上方</small>
+          </div>
+          <div class="stage-base short">
+            <span class="stage-base-label">空</span>
+            <strong>MA5 ↓ · MA10 ↓ · MA5 &lt; MA10</strong>
+            <small>完整空头：两条均线都向下，5 在 10 下方</small>
+          </div>
+        </div>
+
+        <div class="stage-grid">
+          <article class="panel stage-panel to-short">
+            <div class="stage-panel-head">
+              <div>
+                <span class="panel-kicker">MULTI → SHORT</span>
+                <h3>多转空 · MA5 先向下拐头</h3>
+              </div>
+              <span class="stage-sort">排序：进度 1 → 3</span>
+            </div>
+            <div class="stage-flow">
+              <div class="stage-step">
+                <span class="stage-step-no">01</span>
+                <strong>MA5 拐头</strong>
+                <p>MA5 向下，MA10 仍向上，MA5 还在 MA10 上方。</p>
+                <small>刚开始转弱，10 日线铁律未转</small>
+              </div>
+              <span class="stage-arrow">→</span>
+              <div class="stage-step">
+                <span class="stage-step-no">02</span>
+                <strong>5 跌破 10</strong>
+                <p>MA5 已跌破 MA10，但 MA10 仍保持向上。</p>
+                <small>5 已转弱，10 日线尚未确认</small>
+              </div>
+              <span class="stage-arrow">→</span>
+              <div class="stage-step">
+                <span class="stage-step-no">03</span>
+                <strong>MA10 拐头</strong>
+                <p>MA10 也转为向下，10 日线铁律转空。</p>
+                <small>趋势转空确认，等待 5 落到 10 下方</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel stage-panel to-long">
+            <div class="stage-panel-head">
+              <div>
+                <span class="panel-kicker">SHORT → MULTI</span>
+                <h3>空转多 · MA5 先向上拐头</h3>
+              </div>
+              <span class="stage-sort">排序：进度 3 → 1</span>
+            </div>
+            <div class="stage-flow">
+              <div class="stage-step">
+                <span class="stage-step-no">01</span>
+                <strong>MA5 拐头</strong>
+                <p>MA5 向上，MA10 仍向下，MA5 还在 MA10 下方。</p>
+                <small>刚开始修复，10 日线还没转</small>
+              </div>
+              <span class="stage-arrow">→</span>
+              <div class="stage-step">
+                <span class="stage-step-no">02</span>
+                <strong>5 上穿 10</strong>
+                <p>MA5 已上穿 MA10，即“5破10”，但 MA10 仍向下。</p>
+                <small>短均线先转强，等待 10 日线确认</small>
+              </div>
+              <span class="stage-arrow">→</span>
+              <div class="stage-step">
+                <span class="stage-step-no">03</span>
+                <strong>MA10 拐头</strong>
+                <p>MA10 也转为向上，只等 MA5 最终站到 MA10 上方。</p>
+                <small>本策略的信号起点</small>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="stage-reading">
+          <div class="stage-reading-icon">3</div>
+          <div>
+            <strong>本页策略的“进度3”是空转多进度 3</strong>
+            <p>信号日先取空转多进度 3 的首次出现；随后假设次日收盘价持平，重算 MA5 / MA10。只有推演结果变为 MA5 &gt; MA10（5破10）才进入买入候选。多转空进度 1→3 则用于观察持仓转弱，尤其是 MA10 拐头后的离场风险。</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="section" id="rules">
@@ -401,22 +510,29 @@
           <div class="playbook-step">
             <span class="step-number">02</span>
             <div>
-              <h3>推演次日 0%</h3>
+              <h3>推演次日 0% 完成 5破10</h3>
               <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。</p>
             </div>
           </div>
           <div class="playbook-step">
             <span class="step-number">03</span>
             <div>
-              <h3>真实行情持有</h3>
-              <p>只买推演成功子集，从下一交易日起按真实收盘价持有。</p>
+              <h3>间距增幅 &gt; 1.5pp</h3>
+              <p>推演次日 5-10 间距% 减当日 5-10 间距%，保留正负号；增量必须大于 1.5 个百分点。</p>
             </div>
           </div>
           <div class="playbook-step">
             <span class="step-number">04</span>
             <div>
+              <h3>真实行情持有</h3>
+              <p>只买同时满足推演 5破10 与间距增幅的子集，从下一交易日起按真实收盘价持有。</p>
+            </div>
+          </div>
+          <div class="playbook-step">
+            <span class="step-number">05</span>
+            <div>
               <h3>跌破 MA5 或 MA10 拐头卖出</h3>
-              <p>收盘跌破 MA5，或 MA10 今天低于昨天且昨天不低于前天，任一先出现即当天卖出；数据末尾未触发的 3 笔标为持有中。</p>
+              <p>收盘跌破 MA5，或 MA10 今天低于昨天且昨天不低于前天，任一先出现即当天卖出；数据末尾未触发的交易标为持有中。</p>
             </div>
           </div>
         </article>

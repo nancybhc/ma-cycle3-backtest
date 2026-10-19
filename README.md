@@ -1,6 +1,7 @@
 # MA Cycle 3 Backtest Dashboard
 
-Static research dashboard for the A-share cycle-3 5/10 cross backtest.
+Static research dashboard for the A-share cycle-3 5/10 cross backtest with
+projected next-day 5/10 gap expansion greater than 1.5 percentage points.
 
 Exit rule: close below MA5, or MA10 turns down, whichever occurs first.
 
