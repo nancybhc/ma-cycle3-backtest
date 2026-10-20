@@ -268,7 +268,6 @@ function populatePositionRules() {
         fundCap: AI_HARDWARE_GROUPS.has(key)
           ? Number(representative.aiTargetPct || 20)
           : 20,
-        available: null,
         candidateCount: 0,
         stageKey,
       });
@@ -287,7 +286,6 @@ function populatePositionRules() {
   signals.forEach((row) => {
     const group = ensureGroup(row.group);
     group.fundCap = Number(row.fundCapPct || group.fundCap);
-    group.available = Number(row.availablePositionPct || 0);
     group.candidateCount = Math.max(
       group.candidateCount,
       Number(row.groupCandidates || 0)
@@ -320,52 +318,15 @@ function populatePositionRules() {
       return a.name.localeCompare(b.name, "zh-CN");
     })
     .map((group) => {
-      const candidates = [...group.candidates.values()];
-      const pending = candidates.filter(
-        (row) => !holdingCodes.has(row.code)
-      );
-      const candidateText = candidates.length
-        ? candidates
-            .map((row) => {
-              const held = holdingCodes.has(row.code);
-              return `${row.name} ${formatNumber(row.suggestedPositionPct, 1)}%${
-                held ? "（已买）" : ""
-              }`;
-            })
-            .join(" · ")
-        : "—";
       const currentText = group.currentNames.length
         ? `${formatNumber(group.currentWeight, 1)}% · ${group.currentNames.length}只`
         : "0%";
-      const status = pending.length
-        ? "待买入"
-        : candidates.length
-          ? "已计入持仓"
-          : group.currentWeight > 0
-            ? "继续持有"
-            : "观察";
-      const statusClass = status === "待买入" ? "skip" : "buy";
       return `
         <tr>
           <td><strong>${escapeHtml(group.name)}</strong></td>
           <td title="${escapeAttr(group.currentNames.join(" · "))}">${currentText}</td>
-          <td><span class="allocation-candidates">${escapeHtml(candidateText)}</span></td>
-          <td class="num">${formatNumber(
-            candidates.reduce(
-              (sum, row) => sum + Number(row.suggestedPositionPct || 0),
-              0
-            ),
-            1
-          )}%</td>
           <td class="num">${formatNumber(group.fundCap, 0)}%</td>
-          <td class="num">${
-            group.available === null
-              ? "—"
-              : `${formatNumber(group.available, 1)}%`
-          }</td>
           <td class="num">${formatInt(group.candidateCount)} / 2</td>
-          <td>${escapeHtml(group.stageKey || "—")}</td>
-          <td><span class="status-badge ${statusClass}">${status}</span></td>
         </tr>`;
     })
     .join("");

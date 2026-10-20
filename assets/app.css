@@ -879,14 +879,7 @@ main {
 }
 
 .allocation-table {
-  min-width: 1050px;
-}
-
-.allocation-candidates {
-  display: block;
-  max-width: 260px;
-  color: var(--text-soft);
-  line-height: 1.55;
+  min-width: 620px;
 }
 
 .table-panel {
