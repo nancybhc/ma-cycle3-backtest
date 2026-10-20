@@ -280,9 +280,8 @@
             <span class="panel-kicker">POSITION SIZING</span>
             <h3>今日仓位管理明细</h3>
           </div>
-          <span class="panel-tip">现有持仓先占额度 · 新候选只分剩余资金池</span>
         </div>
-        <div class="allocation-summary">
+        <div class="allocation-facts">
           <div>
             <span>指数状态</span>
             <strong id="positionIndexState">—</strong>
@@ -294,48 +293,6 @@
           <div>
             <span>当前持仓</span>
             <strong id="positionCurrentTotal">—</strong>
-          </div>
-          <div>
-            <span>待买候选</span>
-            <strong id="positionPendingTotal">—</strong>
-          </div>
-          <div>
-            <span>执行后计划仓位</span>
-            <strong id="positionPlannedTotal">—</strong>
-          </div>
-          <div>
-            <span>剩余仓位空间</span>
-            <strong id="positionHeadroom">—</strong>
-          </div>
-        </div>
-        <div class="allocation-rule-grid">
-          <div class="allocation-rule">
-            <span>01</span>
-            <div>
-              <strong>先确定资金池</strong>
-              <p>上证指数阶段决定 AI 硬件可用资金，其余普通分组固定单组上限。</p>
-            </div>
-          </div>
-          <div class="allocation-rule">
-            <span>02</span>
-            <div>
-              <strong>持仓先占额度</strong>
-              <p id="allocationStageHint">当前持仓先消耗对应资金池，剩余空间才分给新候选。</p>
-            </div>
-          </div>
-          <div class="allocation-rule">
-            <span>03</span>
-            <div>
-              <strong>同组评分筛选</strong>
-              <p>普通分组上限 20%；同一判定分组按综合评分最多保留 2 只。</p>
-            </div>
-          </div>
-          <div class="allocation-rule">
-            <span>04</span>
-            <div>
-              <strong>组合总仓位封顶</strong>
-              <p>所有分组与标的重叠后，执行后计划仓位最高不超过 100%。</p>
-            </div>
           </div>
         </div>
         <div class="table-scroll">
