@@ -189,6 +189,7 @@ function renderCandidateTable() {
           <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
           <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
           <td>${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
+          <td>${scorePositionHtml(row.score, row.suggestedPositionPct)}</td>
           <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
         </tr>`;
     })
@@ -197,6 +198,21 @@ function renderCandidateTable() {
   body.querySelectorAll("tr").forEach((row) => {
     row.addEventListener("click", () => openSignal(row.dataset.code));
   });
+}
+
+function scorePositionHtml(score, positionPct) {
+  if (score === null || score === undefined) {
+    return `<span class="flat">—</span>`;
+  }
+  const pos =
+    positionPct === null || positionPct === undefined
+      ? "—"
+      : `${formatNumber(positionPct, 1)}%`;
+  return `
+    <span class="price-pair">
+      <strong>${formatNumber(score, 3)}</strong>
+      <small>仓位 ${pos}</small>
+    </span>`;
 }
 
 function pricePairHtml(price, changePct) {

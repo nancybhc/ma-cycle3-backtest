@@ -1,9 +1,14 @@
-# MA Cycle 3 Backtest Dashboard
+# 5破10推演量化策略 Dashboard
 
-Static research dashboard for the A-share cycle-3 5/10 cross backtest with
-projected next-day 5/10 gap expansion greater than 1.5 percentage points.
+Static research dashboard for the A-share 5/10 projection quant strategy.
 
-Exit rule: close below MA5, or MA10 turns down, whichever occurs first.
+Signal: cycle-3 first appearance, projected next-day 5/10 cross, and projected
+5/10 gap expansion greater than 1.5 percentage points.
+
+Exit: a next-day MA5 pullback conditional sell order.
+
+Portfolio overlay: Shanghai Composite MA5/MA10 regime controls total exposure
+(80% / 20% / 50%), with at most two names per sector group.
 
 The site is generated from local research output. It is a backtest visualization,
-not investment advice and not a live trading system.
+not investment advice or a live trading system.

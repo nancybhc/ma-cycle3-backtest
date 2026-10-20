@@ -4,25 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111d">
-  <title>进度3 · 5破10 + 间距增幅回测面板</title>
+  <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
-    <div class="loading-mark">M3</div>
+    <div class="loading-mark">510</div>
     <div class="loading-copy">
-      <strong>正在装载回测引擎</strong>
-      <span>读取交易明细、行情与尾盘汇总</span>
+      <strong>正在装载 5破10推演量化策略</strong>
+      <span>读取交易明细、指数仓位与今日信号</span>
     </div>
   </div>
 
   <header class="topbar">
     <a class="brand" href="#overview" aria-label="返回顶部">
-      <span class="brand-mark">M3</span>
+      <span class="brand-mark">510</span>
       <span class="brand-copy">
-        <strong>MA CYCLE LAB</strong>
-        <small>A-SHARE RESEARCH TERMINAL</small>
+        <strong>5/10 QUANT LAB</strong>
+        <small>5破10推演量化策略</small>
       </span>
     </a>
     <nav class="main-nav" aria-label="页面导航">
@@ -43,8 +43,8 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <div class="eyebrow"><span>QUANT RESEARCH</span><i></i><span>A股 / 日线</span></div>
-        <h1>进度3 <em>·</em> 推演 0% <span>5破10</span> · 间距增幅</h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且推演次日 5-10 间距较当日增幅超过 1.5 个百分点，尾盘买入；此后收盘跌破 MA5 或 MA10 向下拐头，任一先触发即卖出。</p>
+        <h1>5破10 <span>推演量化策略</span></h1>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点，按信号日收盘买入。离场改为每日挂 MA5 回踩价条件单；上证指数双上 80%、双下 20%、混合 50% 总仓位，同组最多保留 2 只。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -71,14 +71,14 @@
             <strong id="accountSharpe">—</strong>
           </div>
         </div>
-        <p>以 100 万名义本金换算 · 每日持仓等权</p>
+        <p>以 100 万名义本金换算 · 按指数目标仓位与建议单票仓位计</p>
       </div>
     </section>
 
     <section class="funnel-strip" aria-label="信号漏斗">
       <div class="funnel-title">
         <span>信号漏斗</span>
-        <small>进度3 → 双条件 → 可回测样本</small>
+        <small>进度3 → 双条件 → 组合控制</small>
       </div>
       <div class="funnel-step">
         <span>原始进度3</span>
@@ -166,7 +166,7 @@
           <div class="eyebrow"><span>PERFORMANCE</span><i></i><span>资金曲线</span></div>
           <h2>组合净值与风险路径</h2>
         </div>
-        <div class="section-note">每日对在场交易等权计算 · 不计手续费、印花税、滑点</div>
+        <div class="section-note">按指数目标仓位与建议单票仓位计算 · 重叠持仓总仓位封顶 100%</div>
       </div>
       <div class="performance-grid">
         <article class="panel chart-panel curve-panel">
@@ -210,8 +210,8 @@
     <section class="section" id="today">
       <div class="section-head">
         <div>
-          <div class="eyebrow"><span>LIVE SIGNALS</span><i></i><span>尾盘选股</span></div>
-          <h2>今日买入候选</h2>
+          <div class="eyebrow"><span>LIVE SIGNALS</span><i></i><span>今日信号</span></div>
+          <h2>今日候选与建议仓位</h2>
         </div>
         <div class="today-head-meta">
           <span class="date-chip" id="candidateDateChip">—</span>
@@ -223,7 +223,7 @@
         <div class="today-count">
           <span>入选</span>
           <strong id="todayBuyCount">—</strong>
-          <small>尾盘可买候选</small>
+          <small>同组上限后候选</small>
         </div>
         <div class="today-split">
           <div><span>今日进度3信号</span><strong id="todaySignalCount">—</strong></div>
@@ -233,7 +233,7 @@
         </div>
         <div class="today-note">
           <strong>与 Excel 汇总页同口径</strong>
-          <p>展示收盘价 / 涨幅、趋势方向、MA10 / MA5 连续天数、拐头价、回踩价，以及推演次日 5-10 间距与间距增幅。点击任意标的查看 K 线与关键价位。</p>
+          <p>展示综合评分、组内排名、指数状态与建议单票仓位；价格、均线和推演列仍可逐项复核。点击任意标的查看 K 线与关键价位。</p>
         </div>
       </div>
 
@@ -241,7 +241,7 @@
         <div class="table-toolbar">
           <div>
             <span class="panel-kicker">TAIL PICK SUMMARY</span>
-            <h3>5破10推演 · 尾盘选股汇总</h3>
+            <h3>5破10推演量化策略 · 今日候选</h3>
           </div>
           <div class="segmented" id="candidateScope">
             <button class="active" data-scope="buy">买入候选 <b id="scopeBuyCount">—</b></button>
@@ -263,6 +263,7 @@
                 <th>MA5拐头价</th>
                 <th>MA5回踩价</th>
                 <th>推演次日5-10 / 增量</th>
+                <th>评分 / 建议仓位</th>
                 <th>入选状态</th>
               </tr>
             </thead>
@@ -483,8 +484,8 @@
         <div class="stage-reading">
           <div class="stage-reading-icon">3</div>
           <div>
-            <strong>本页策略的“进度3”是空转多进度 3</strong>
-            <p>信号日先取空转多进度 3 的首次出现；随后假设次日收盘价持平，重算 MA5 / MA10。只有推演结果变为 MA5 &gt; MA10（5破10）才进入买入候选。多转空进度 1→3 则用于观察持仓转弱，尤其是 MA10 拐头后的离场风险。</p>
+            <strong>本策略的信号起点是空转多进度 3</strong>
+            <p>信号日先取空转多进度 3 的首次出现；随后假设次日收盘价持平，重算 MA5 / MA10。只有推演结果变为 MA5 &gt; MA10（5破10）且间距增幅达标才进入候选。候选再经过指数仓位和同组综合评分上限。</p>
           </div>
         </div>
       </div>
@@ -504,7 +505,7 @@
             <span class="step-number">01</span>
             <div>
               <h3>空转多进度3首次出现</h3>
-              <p>MA5 已掉头向上、仍在 MA10 下方；按信号日收盘价视为尾盘买入。</p>
+              <p>MA5 已掉头向上、仍在 MA10 下方；信号日只入选，按当天收盘价作为买入价。</p>
             </div>
           </div>
           <div class="playbook-step">
@@ -524,15 +525,15 @@
           <div class="playbook-step">
             <span class="step-number">04</span>
             <div>
-              <h3>真实行情持有</h3>
-              <p>只买同时满足推演 5破10 与间距增幅的子集，从下一交易日起按真实收盘价持有。</p>
+              <h3>指数仓位与同组上限</h3>
+              <p>上证指数 MA5、MA10 双上总仓位 80%，双下 20%，一上一下 50%；同一判定分组最多保留综合评分最高的 2 只。</p>
             </div>
           </div>
           <div class="playbook-step">
             <span class="step-number">05</span>
             <div>
-              <h3>跌破 MA5 或 MA10 拐头卖出</h3>
-              <p>收盘跌破 MA5，或 MA10 今天低于昨天且昨天不低于前天，任一先出现即当天卖出；数据末尾未触发的交易标为持有中。</p>
+              <h3>MA5 回踩价条件单离场</h3>
+              <p>每日收盘后按次日 MA5 回踩价挂条件卖单，盘中触及即成交；超出次日涨跌停价带时不挂单。MA10 拐头不再单独触发离场。</p>
             </div>
           </div>
         </article>
@@ -542,7 +543,7 @@
           <div class="caveat-list">
             <div><i>01</i><p>未计手续费、印花税、滑点，也未处理停牌。</p></div>
             <div><i>02</i><p>当前固定分组成员存在事后幸存者偏差。</p></div>
-            <div><i>03</i><p>组合净值按每日在场交易等权计算，是研究示意，不是可成交账户。</p></div>
+            <div><i>03</i><p>组合净值按指数目标仓位和建议单票仓位计算，是研究示意，不是可成交账户。</p></div>
             <div><i>04</i><p>今日候选只是收盘后选股结果，不代表保证成交或未来收益。</p></div>
           </div>
           <details class="raw-summary">
@@ -556,7 +557,7 @@
 
   <footer class="footer">
     <div>
-      <span class="brand-mark small">M3</span>
+      <span class="brand-mark small">510</span>
       <p>研究看板 · 数据来自本地回测结果与行情缓存（收盘或盘中快照）</p>
     </div>
     <div class="footer-meta">
