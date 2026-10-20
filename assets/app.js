@@ -130,6 +130,19 @@ function populateOverview() {
   setText("candidateDateChip", meta.candidateDate);
   setText("candidateRunTime", meta.candidateRunTime || `回测更新 ${meta.runTime}`);
   setText("rawSummary", meta.summaryText || "无原始摘要");
+  const holdings = state.data.currentHoldings || [];
+  const holdingTotal = holdings.reduce(
+    (sum, row) => sum + Number(row.weightPct || 0),
+    0
+  );
+  setText(
+    "currentHoldingsLine",
+    holdings.length
+      ? `当前持仓：${holdings
+          .map((row) => `${row.name} ${formatNumber(row.weightPct, 1)}%`)
+          .join(" · ")} · 合计 ${formatNumber(holdingTotal, 1)}%`
+      : "当前持仓：无"
+  );
   setText(
     "footerGenerated",
     `生成 ${meta.generatedAt} · 行情缓存 ${meta.barsUpdated || "—"}`
@@ -389,7 +402,14 @@ function populateTradeTable() {
                 <span class="down">${formatPct(trade.maePct, true, 1)}</span>
               </span>
             </td>
-            <td><span class="status-badge ${statusClass}">${escapeHtml(trade.status)}</span></td>
+            <td>
+              <span class="status-badge ${statusClass}">${escapeHtml(trade.status)}</span>
+              ${
+                trade.status === "持有中" && Number(trade.holdingWeightPct) > 0
+                  ? `<small style="display:block;margin-top:4px;color:var(--text-dim)">占总仓位 ${formatNumber(trade.holdingWeightPct, 1)}%</small>`
+                  : ""
+              }
+            </td>
             <td><button class="row-action" type="button" aria-label="查看详情">›</button></td>
           </tr>`;
       })
