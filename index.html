@@ -211,7 +211,7 @@
       <div class="section-head">
         <div>
           <div class="eyebrow"><span>LIVE SIGNALS</span><i></i><span>今日信号</span></div>
-          <h2>今日候选与建议仓位</h2>
+          <h2>今日持仓与候选</h2>
         </div>
         <div class="today-head-meta">
           <span class="date-chip" id="candidateDateChip">—</span>
@@ -226,6 +226,7 @@
           <small>同组上限后候选</small>
         </div>
         <div class="today-split">
+          <div><span>当前持仓</span><strong id="todayHoldCount">—</strong></div>
           <div><span>今日进度3信号</span><strong id="todaySignalCount">—</strong></div>
           <div><span>尾盘涨停剔除</span><strong id="todayLimitCount">—</strong></div>
           <div><span>推演未过</span><strong id="todayFailCount">—</strong></div>
@@ -241,10 +242,10 @@
         <div class="table-toolbar">
           <div>
             <span class="panel-kicker">TAIL PICK SUMMARY</span>
-            <h3>5破10推演量化策略 · 今日候选</h3>
+            <h3>5破10推演量化策略 · 今日持仓与候选</h3>
           </div>
           <div class="segmented" id="candidateScope">
-            <button class="active" data-scope="buy">买入候选 <b id="scopeBuyCount">—</b></button>
+            <button class="active" data-scope="buy">持仓 + 候选 <b id="scopeBuyCount">—</b></button>
             <button data-scope="all">全部信号 <b id="scopeAllCount">—</b></button>
           </div>
         </div>
@@ -310,13 +311,6 @@
             <span class="panel-tip">持有期内最高 / 最低</span>
           </div>
           <div class="chart-lg" id="scatterChart"></div>
-        </article>
-        <article class="panel chart-panel exit-panel">
-          <div class="panel-head">
-            <div><span class="panel-kicker">EXIT MIX</span><h3>出场原因构成</h3></div>
-            <span class="panel-tip" id="exitMixTip">跌破 MA5 或 MA10 拐头，先触发先卖</span>
-          </div>
-          <div class="chart-lg" id="exitReasonChart"></div>
         </article>
       </div>
       <article class="panel holding-panel">
