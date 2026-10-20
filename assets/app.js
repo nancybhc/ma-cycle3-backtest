@@ -425,7 +425,7 @@ function populateTradeTable() {
               <span class="status-badge ${statusClass}">${escapeHtml(trade.status)}</span>
               ${
                 trade.status === "持有中" && Number(trade.holdingWeightPct) > 0
-                  ? `<small style="display:block;margin-top:4px;color:var(--text-dim)">占总仓位 ${formatNumber(trade.holdingWeightPct, 1)}%</small>`
+                  ? `<small style="display:block;margin-top:4px;color:var(--text-dim)">今日 ${formatPct(trade.todayReturnPct, true)} · 占总仓位 ${formatNumber(trade.holdingWeightPct, 1)}%</small>`
                   : ""
               }
             </td>
