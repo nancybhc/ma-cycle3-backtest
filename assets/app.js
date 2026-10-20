@@ -85,6 +85,8 @@ function populateOverview() {
   setText("funnelBuyable", formatInt(funnel.buyable));
   setText("funnelProjected", formatInt(funnel.projected));
   setText("funnelRate", `${formatNumber(funnel.projectedRatePct, 1)}% 成功率`);
+  setText("funnelGap", formatInt(funnel.gapPassed));
+  setText("funnelGapRate", `${formatNumber(funnel.gapRatePct, 1)}% 进入回测`);
   setText("funnelBacktested", formatInt(funnel.backtested));
   setText("funnelPending", `另 ${formatInt(funnel.pending)} 个待回测`);
 
@@ -103,6 +105,7 @@ function populateOverview() {
   setText("kpiMaxActive", `${formatInt(portfolio.maxActive)} 笔`);
   setText("kpiDayWin", formatPct(portfolio.positiveDaysPct, false));
   setText("kpiDays", formatInt(portfolio.tradingDays));
+  setText("distributionSampleTip", `${formatInt(stats.all.count)} 笔`);
   toneElement("kpiTotalReturn", portfolio.totalReturnPct);
   toneElement("kpiAnnualized", portfolio.annualizedPct);
   toneElement("kpiAvgReturn", stats.all.avgReturnPct);
@@ -140,10 +143,18 @@ function populateCandidates() {
   const failures = signals.filter(
     (row) => !row.isBuy && !row.limitUp && !row.projectedSuccess
   );
+  const gapFailures = signals.filter(
+    (row) =>
+      !row.isBuy &&
+      !row.limitUp &&
+      row.projectedSuccess &&
+      !(Number(row.gapDeltaPct) > 1.5)
+  );
   setText("todayBuyCount", formatInt(buys.length));
   setText("todaySignalCount", formatInt(signals.length));
   setText("todayLimitCount", formatInt(limits.length));
   setText("todayFailCount", formatInt(failures.length));
+  setText("todayGapFailCount", formatInt(gapFailures.length));
   setText("scopeBuyCount", formatInt(buys.length));
   setText("scopeAllCount", formatInt(signals.length));
   renderCandidateTable();
@@ -177,6 +188,9 @@ function renderCandidateTable() {
           <td>${maDirectionHtml(row.ma5Dir, row.ma5Run)}</td>
           <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
           <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
+          <td>${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
+          <td>${scorePositionHtml(row.score, row.suggestedPositionPct)}</td>
+          <td>${positionContextHtml(row)}</td>
           <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
         </tr>`;
     })
@@ -185,6 +199,34 @@ function renderCandidateTable() {
   body.querySelectorAll("tr").forEach((row) => {
     row.addEventListener("click", () => openSignal(row.dataset.code));
   });
+}
+
+function scorePositionHtml(score, positionPct) {
+  if (score === null || score === undefined) {
+    return `<span class="flat">—</span>`;
+  }
+  const pos =
+    positionPct === null || positionPct === undefined
+      ? "—"
+      : `${formatNumber(positionPct, 1)}%`;
+  return `
+    <span class="price-pair">
+      <strong>${formatNumber(score, 3)}</strong>
+      <small>仓位 ${pos}</small>
+    </span>`;
+}
+
+function positionContextHtml(row) {
+  const existing = Number(row.existingHoldingsPct || 0);
+  const available = Number(row.availablePositionPct || 0);
+  const stage = row.indexStage
+    ? `${row.indexStage}${row.indexProgress ? row.indexProgress : ""}`
+    : "—";
+  return `
+    <span class="price-pair">
+      <strong>持仓 ${formatNumber(existing, 1)}%</strong>
+      <small>${escapeHtml(stage)} · 可用 ${formatNumber(available, 1)}%</small>
+    </span>`;
 }
 
 function pricePairHtml(price, changePct) {
@@ -208,13 +250,21 @@ function maDirectionHtml(direction, run) {
   const up = direction === "向上";
   const down = direction === "向下";
   const cls = up ? "up" : down ? "down" : "flat";
-  const arrow = up ? "↑" : down ? "↓" : "→";
   const signedRun = Number(run) || 0;
-  const runText = signedRun === 0 ? "走平" : `${arrow}${Math.abs(signedRun)}天`;
+  const runText = signedRun === 0 ? "走平" : `${Math.abs(signedRun)}天`;
   return `
     <span class="ma-cell">
       <strong class="${cls}">${escapeHtml(direction || "—")}</strong>
       <span>${runText}</span>
+    </span>`;
+}
+
+function gapProjectionHtml(projectedGap, gapDelta) {
+  const pass = Number(gapDelta) > 1.5;
+  return `
+    <span class="ma-cell">
+      <strong class="${pctClass(projectedGap)}">${formatPct(projectedGap, true)}</strong>
+      <span class="${pass ? "up" : "flat"}">增量 ${formatPct(gapDelta, true)}</span>
     </span>`;
 }
 
@@ -313,7 +363,7 @@ function populateTradeTable() {
 
   if (!rows.length) {
     body.innerHTML = `
-      <tr><td colspan="12" style="padding:42px;text-align:center;color:var(--text-dim)">
+      <tr><td colspan="13" style="padding:42px;text-align:center;color:var(--text-dim)">
         当前筛选条件下没有交易
       </td></tr>`;
   } else {
@@ -328,6 +378,7 @@ function populateTradeTable() {
             <td><strong style="color:var(--text);font-weight:600">${escapeHtml(trade.name)}</strong></td>
             <td>${escapeHtml(trade.group)}</td>
             <td class="num">${formatPrice(trade.entryPrice)}</td>
+            <td>${gapProjectionHtml(trade.projectedGapPct, trade.gapDeltaPct)}</td>
             <td>${escapeHtml(trade.exitDate)}</td>
             <td class="num">${formatPrice(trade.exitPrice)}</td>
             <td class="num ${pctClass(trade.returnPct)}"><strong style="font-weight:600">${formatPct(trade.returnPct, true)}</strong></td>
@@ -972,6 +1023,8 @@ function openTrade(id) {
   ].join("");
   document.getElementById("drawerDetails").innerHTML = detailTable([
     ["入场", `${trade.entryDate} / ${formatPrice(trade.entryPrice)}`],
+    ["当日 5-10 间距", formatPct(trade.gapPct, true)],
+    ["推演次日 5-10 / 增量", `${formatPct(trade.projectedGapPct, true)} / ${formatPct(trade.gapDeltaPct, true)}`],
     ["出场", `${trade.exitDate} / ${formatPrice(trade.exitPrice)}`],
     ["推演 5破10 日", trade.projectedDate],
     ["实际次日 5破10", trade.actualSuccess ? "成功" : "未成功"],
@@ -1002,6 +1055,8 @@ function openSignal(code) {
   document.getElementById("drawerDetails").innerHTML = detailTable([
     ["信号日期", signal.date],
     ["5-10 间距", formatPct(signal.gapPct, true)],
+    ["推演次日 5-10 间距", formatPct(signal.projectedGapPct, true)],
+    ["间距增幅", formatPct(signal.gapDeltaPct, true)],
     ["推演次日 MA5", formatPrice(signal.projectedMa5)],
     ["推演次日 MA10", formatPrice(signal.projectedMa10)],
     ["MA10 拐头 / 回踩", `${formatPrice(signal.ma10Turn)} / ${formatPrice(signal.ma10Rebound)}`],
@@ -1177,7 +1232,10 @@ function exportFilteredTrades() {
     "分组",
     "入场日期",
     "入场价",
+    "当日5-10间距%",
     "推演5破10日",
+    "推演次日5-10间距%",
+    "间距增幅pp",
     "出场日期",
     "出场价",
     "收益%",
@@ -1195,7 +1253,10 @@ function exportFilteredTrades() {
       row.group,
       row.entryDate,
       row.entryPrice,
+      row.gapPct,
       row.projectedDate,
+      row.projectedGapPct,
+      row.gapDeltaPct,
       row.exitDate,
       row.exitPrice,
       row.returnPct,
@@ -1213,7 +1274,7 @@ function exportFilteredTrades() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `进度3_5破10_双条件离场_交易明细_${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = `进度3_5破10_间距增幅_交易明细_${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();
