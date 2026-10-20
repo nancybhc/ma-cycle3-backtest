@@ -152,7 +152,8 @@ function populateOverview() {
 function populateCandidates() {
   const signals = state.data.signals || [];
   const holdings = state.data.currentHoldings || [];
-  const buys = signals.filter((row) => row.isBuy);
+  const holdingCodes = new Set(holdings.map((row) => row.code));
+  const buys = signals.filter((row) => row.isBuy && !holdingCodes.has(row.code));
   const limits = signals.filter((row) => row.limitUp);
   const failures = signals.filter(
     (row) => !row.isBuy && !row.limitUp && !row.projectedSuccess
@@ -178,11 +179,17 @@ function populateCandidates() {
 function renderCandidateTable() {
   const allSignals = state.data.signals || [];
   const holdings = state.data.currentHoldings || [];
-  const buys = allSignals.filter((row) => row.isBuy);
+  const holdingCodes = new Set(holdings.map((row) => row.code));
+  const buys = allSignals.filter(
+    (row) => row.isBuy && !holdingCodes.has(row.code)
+  );
+  const nonHoldingSignals = allSignals.filter(
+    (row) => !holdingCodes.has(row.code)
+  );
   const rows =
     state.candidateScope === "buy"
       ? [...holdings, ...buys]
-      : [...holdings, ...allSignals];
+      : [...holdings, ...nonHoldingSignals];
   const body = document.getElementById("candidateTableBody");
   body.innerHTML = rows
     .map((row) => {
@@ -1075,8 +1082,8 @@ function openTrade(id) {
 
 function openSignal(code) {
   const signal =
-    state.data.signals.find((row) => row.code === code) ||
-    (state.data.currentHoldings || []).find((row) => row.code === code);
+    (state.data.currentHoldings || []).find((row) => row.code === code) ||
+    state.data.signals.find((row) => row.code === code);
   if (!signal) return;
   state.drawerType = "signal";
   state.drawerId = code;
