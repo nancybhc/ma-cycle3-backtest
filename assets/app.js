@@ -362,6 +362,7 @@ function renderCandidateTable() {
             </span>
           </td>
           <td>${pricePairHtml(row.close, row.changePct)}</td>
+          <td>${holdingReturnHtml(row)}</td>
           <td><span class="trend-badge">${escapeHtml(row.trend || "—")}</span></td>
           <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
           <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
@@ -380,6 +381,21 @@ function renderCandidateTable() {
   body.querySelectorAll("tr").forEach((row) => {
     row.addEventListener("click", () => openSignal(row.dataset.code));
   });
+}
+
+function holdingReturnHtml(row) {
+  if (!row.isHolding) return `<span class="flat">—</span>`;
+  const entry = Number(row.entryPrice);
+  const current = Number(row.close);
+  if (!(entry > 0) || !(current > 0)) {
+    return `<span class="flat">—</span>`;
+  }
+  const returnPct = (current / entry - 1) * 100;
+  return `
+    <span class="price-pair holding-return">
+      <strong class="${pctClass(returnPct)}">${formatPct(returnPct, true)}</strong>
+      <small>成本 ${formatPrice(entry)}</small>
+    </span>`;
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
