@@ -151,6 +151,7 @@ function populateOverview() {
 
 function populateCandidates() {
   const signals = state.data.signals || [];
+  const holdings = state.data.currentHoldings || [];
   const buys = signals.filter((row) => row.isBuy);
   const limits = signals.filter((row) => row.limitUp);
   const failures = signals.filter(
@@ -164,28 +165,32 @@ function populateCandidates() {
       !(Number(row.gapDeltaPct) > 1.5)
   );
   setText("todayBuyCount", formatInt(buys.length));
+  setText("todayHoldCount", formatInt(holdings.length));
   setText("todaySignalCount", formatInt(signals.length));
   setText("todayLimitCount", formatInt(limits.length));
   setText("todayFailCount", formatInt(failures.length));
   setText("todayGapFailCount", formatInt(gapFailures.length));
-  setText("scopeBuyCount", formatInt(buys.length));
-  setText("scopeAllCount", formatInt(signals.length));
+  setText("scopeBuyCount", formatInt(holdings.length + buys.length));
+  setText("scopeAllCount", formatInt(holdings.length + signals.length));
   renderCandidateTable();
 }
 
 function renderCandidateTable() {
   const allSignals = state.data.signals || [];
+  const holdings = state.data.currentHoldings || [];
+  const buys = allSignals.filter((row) => row.isBuy);
   const rows =
     state.candidateScope === "buy"
-      ? allSignals.filter((row) => row.isBuy)
-      : allSignals;
+      ? [...holdings, ...buys]
+      : [...holdings, ...allSignals];
   const body = document.getElementById("candidateTableBody");
   body.innerHTML = rows
     .map((row) => {
-      const statusClass = row.isBuy ? "buy" : "skip";
-      const statusText = row.isBuy ? "买入候选" : row.reason;
+      const isHolding = Boolean(row.isHolding);
+      const statusClass = row.isBuy || isHolding ? "buy" : "skip";
+      const statusText = isHolding ? "持有中" : row.isBuy ? "买入候选" : row.reason;
       return `
-        <tr class="clickable ${row.isBuy ? "buy-row" : ""}" data-code="${escapeAttr(row.code)}">
+        <tr class="clickable ${row.isBuy || isHolding ? "buy-row" : ""}" data-code="${escapeAttr(row.code)}">
           <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
           <td class="sticky-col col-name">
             <span class="name-cell">
@@ -202,7 +207,7 @@ function renderCandidateTable() {
           <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
           <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
           <td>${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
-          <td>${scorePositionHtml(row.score, row.suggestedPositionPct)}</td>
+          <td>${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
           <td>${positionContextHtml(row)}</td>
           <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
         </tr>`;
@@ -214,7 +219,14 @@ function renderCandidateTable() {
   });
 }
 
-function scorePositionHtml(score, positionPct) {
+function scorePositionHtml(score, positionPct, holdingWeightPct) {
+  if (Number(holdingWeightPct) > 0) {
+    return `
+      <span class="price-pair">
+        <strong>持有 ${formatNumber(holdingWeightPct, 1)}%</strong>
+        <small>不新增</small>
+      </span>`;
+  }
   if (score === null || score === undefined) {
     return `<span class="flat">—</span>`;
   }
@@ -230,6 +242,13 @@ function scorePositionHtml(score, positionPct) {
 }
 
 function positionContextHtml(row) {
+  if (row.isHolding) {
+    return `
+      <span class="price-pair">
+        <strong>持仓 ${formatNumber(row.holdingWeightPct, 1)}%</strong>
+        <small>当前持有</small>
+      </span>`;
+  }
   const existing = Number(row.existingHoldingsPct || 0);
   const available = Number(row.availablePositionPct || 0);
   const stage = row.indexStage
@@ -487,7 +506,6 @@ function renderAllCharts() {
   renderDistributionChart();
   renderGroupChart();
   renderScatterChart();
-  renderExitReasonChart();
 }
 
 function chartBase() {
@@ -1056,11 +1074,13 @@ function openTrade(id) {
 }
 
 function openSignal(code) {
-  const signal = state.data.signals.find((row) => row.code === code);
+  const signal =
+    state.data.signals.find((row) => row.code === code) ||
+    (state.data.currentHoldings || []).find((row) => row.code === code);
   if (!signal) return;
   state.drawerType = "signal";
   state.drawerId = code;
-  setText("drawerKicker", "SIGNAL DETAIL / 尾盘选股");
+  setText("drawerKicker", signal.isHolding ? "HOLDING DETAIL / 当前持仓" : "SIGNAL DETAIL / 今日候选");
   setText("drawerTitle", `${signal.name} · ${signal.code}`);
   document.getElementById("drawerTags").innerHTML = `
     <span class="tag trend-badge">${escapeHtml(signal.trend || "—")}</span>
