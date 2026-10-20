@@ -273,6 +273,64 @@
           </table>
         </div>
       </article>
+
+      <article class="panel allocation-panel">
+        <div class="panel-head">
+          <div>
+            <span class="panel-kicker">POSITION SIZING</span>
+            <h3>今日仓位管理明细</h3>
+          </div>
+          <span class="panel-tip">现有持仓先占额度 · 新候选只分剩余资金池</span>
+        </div>
+        <div class="allocation-summary">
+          <div>
+            <span>指数状态</span>
+            <strong id="positionIndexState">—</strong>
+          </div>
+          <div>
+            <span>当前阶段目标</span>
+            <strong id="positionStageTarget">—</strong>
+          </div>
+          <div>
+            <span>当前持仓</span>
+            <strong id="positionCurrentTotal">—</strong>
+          </div>
+          <div>
+            <span>待买候选</span>
+            <strong id="positionPendingTotal">—</strong>
+          </div>
+          <div>
+            <span>执行后计划仓位</span>
+            <strong id="positionPlannedTotal">—</strong>
+          </div>
+          <div>
+            <span>剩余仓位空间</span>
+            <strong id="positionHeadroom">—</strong>
+          </div>
+        </div>
+        <div class="allocation-note">
+          普通分组单组上限 20%；AI硬件资金池随上证指数阶段变化。已有持仓占用对应资金池额度，
+          同日同组按综合评分最多保留 2 只，所有分组与标的重叠后组合总仓位不超过 100%。
+        </div>
+        <div class="table-scroll">
+          <table class="data-table allocation-table">
+            <thead>
+              <tr>
+                <th>分组</th>
+                <th>当前持仓</th>
+                <th>今日候选</th>
+                <th>建议买入</th>
+                <th>资金池上限</th>
+                <th>资金池可用</th>
+                <th>同组候选 / 保留上限</th>
+                <th>指数阶段</th>
+                <th>执行状态</th>
+              </tr>
+            </thead>
+            <tbody id="allocationTableBody"></tbody>
+          </table>
+        </div>
+      </article>
     </section>
 
     <section class="section" id="analytics">
@@ -402,13 +460,24 @@
           <div class="stage-base long">
             <span class="stage-base-label">多</span>
             <strong>MA5 ↑ · MA10 ↑ · MA5 &gt; MA10</strong>
-            <small>完整多头：两条均线都向上，5 在 10 上方</small>
+            <small>完整多头：两条均线都向上，5 在 10 上方<br>AI硬件资金池 80%</small>
           </div>
           <div class="stage-base short">
             <span class="stage-base-label">空</span>
             <strong>MA5 ↓ · MA10 ↓ · MA5 &lt; MA10</strong>
-            <small>完整空头：两条均线都向下，5 在 10 下方</small>
+            <small>完整空头：两条均线都向下，5 在 10 下方<br>AI硬件资金池 20%</small>
           </div>
+        </div>
+
+        <div class="position-stage-ladder" id="positionStageLadder">
+          <div class="position-stage" data-stage-key="空"><span>空</span><strong>20%</strong></div>
+          <div class="position-stage" data-stage-key="空转多1"><span>空转多 · 进度1</span><strong>40%</strong></div>
+          <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>60%</strong></div>
+          <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
+          <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
+          <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1</span><strong>70%</strong></div>
+          <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2</span><strong>50%</strong></div>
+          <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3</span><strong>30%</strong></div>
         </div>
 
         <div class="stage-grid">
@@ -522,7 +591,7 @@
             <span class="step-number">04</span>
             <div>
               <h3>AI硬件资金池与分组上限</h3>
-              <p>AI硬件按上证指数 MA5/MA10 阶段使用 20%～80% 总仓位；普通分组每组最多 20%。已有持仓先占额度，剩余额度再分配给当天新候选；同组最多保留 2 只。</p>
+              <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 40%/60%/70%、多 80%、多转空1/2/3 70%/50%/30%。普通分组每组最多 20%；已有持仓先占额度，剩余额度再分配给当天新候选；同组最多保留 2 只，组合总仓位封顶 100%。</p>
             </div>
           </div>
           <div class="playbook-step">

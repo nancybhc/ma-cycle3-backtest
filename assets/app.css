@@ -818,6 +818,61 @@ main {
   line-height: 1.7;
 }
 
+.allocation-panel {
+  margin-top: 16px;
+  padding: 18px 20px 20px;
+}
+
+.allocation-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.allocation-summary > div {
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(5, 15, 25, 0.52);
+}
+
+.allocation-summary span {
+  display: block;
+  color: var(--text-dim);
+  font-size: 9px;
+}
+
+.allocation-summary strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.allocation-note {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-left: 2px solid rgba(72, 225, 209, 0.55);
+  background: rgba(72, 225, 209, 0.045);
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.allocation-table {
+  min-width: 1050px;
+}
+
+.allocation-candidates {
+  display: block;
+  max-width: 260px;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
 .table-panel {
   overflow: hidden;
 }
@@ -1364,6 +1419,47 @@ main {
   text-align: right;
 }
 
+.position-stage-ladder {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(108px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.position-stage {
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(9, 21, 34, 0.55);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.position-stage span {
+  display: block;
+  min-height: 28px;
+  color: var(--text-dim);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.position-stage strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.position-stage.current {
+  border-color: rgba(72, 225, 209, 0.5);
+  background: rgba(72, 225, 209, 0.1);
+}
+
+.position-stage.current strong {
+  color: var(--cyan);
+}
+
 .stage-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1863,6 +1959,14 @@ main {
   .today-note {
     grid-column: 1 / -1;
   }
+
+  .allocation-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .position-stage-ladder {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
@@ -1915,6 +2019,10 @@ main {
     align-items: flex-start;
     flex-direction: column;
     gap: 5px;
+  }
+
+  .allocation-summary {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -1984,6 +2092,18 @@ main {
 
   .today-note {
     grid-column: auto;
+  }
+
+  .allocation-panel {
+    padding: 16px 14px;
+  }
+
+  .allocation-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .position-stage-ladder {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .table-toolbar {

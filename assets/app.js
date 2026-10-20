@@ -26,6 +26,26 @@ const COLOR = {
 
 const FONT_MONO = '"Cascadia Code","Consolas",monospace';
 const FONT_SANS = '"Microsoft YaHei UI","PingFang SC",sans-serif';
+const POSITION_STAGE_TARGETS = {
+  "空": 20,
+  "空转多1": 40,
+  "空转多2": 60,
+  "空转多3": 70,
+  "多": 80,
+  "多转空1": 70,
+  "多转空2": 50,
+  "多转空3": 30,
+};
+const AI_HARDWARE_GROUPS = new Set([
+  "PCB",
+  "CPO",
+  "光上游",
+  "半导体上游",
+  "半导体芯片",
+  "MLCC",
+  "算力",
+  "存储",
+]);
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -43,6 +63,7 @@ async function init() {
     state.filteredTrades = [...state.trades];
     populateOverview();
     populateCandidates();
+    populatePositionRules();
     populateFilters();
     populateTradeTable();
     populateHoldingBars();
@@ -174,6 +195,171 @@ function populateCandidates() {
   setText("scopeBuyCount", formatInt(holdings.length + buys.length));
   setText("scopeAllCount", formatInt(holdings.length + signals.length));
   renderCandidateTable();
+}
+
+function populatePositionRules() {
+  const signals = state.data.signals || [];
+  const holdings = state.data.currentHoldings || [];
+  const representative =
+    signals.find((row) => row.indexStage) || {};
+  const stage = String(representative.indexStage || "");
+  const progress = Number(representative.indexProgress || 0);
+  const stageKey =
+    stage === "多" || stage === "空"
+      ? stage
+      : stage
+        ? `${stage}${progress}`
+        : "";
+  const currentTotal = holdings.reduce(
+    (sum, row) => sum + Number(row.weightPct || 0),
+    0
+  );
+  const holdingCodes = new Set(holdings.map((row) => row.code));
+  const pendingTotal = signals
+    .filter((row) => row.isBuy && !holdingCodes.has(row.code))
+    .reduce((sum, row) => sum + Number(row.suggestedPositionPct || 0), 0);
+  const plannedTotal = Math.min(100, currentTotal + pendingTotal);
+  const stageTarget =
+    POSITION_STAGE_TARGETS[stageKey] ??
+    Number(representative.aiTargetPct || 0);
+
+  setText(
+    "positionIndexState",
+    representative.indexState
+      ? `${representative.indexState} · ${stageKey || "—"}`
+      : "—"
+  );
+  setText(
+    "positionStageTarget",
+    stageTarget > 0 ? `${formatNumber(stageTarget, 0)}%` : "—"
+  );
+  setText("positionCurrentTotal", `${formatNumber(currentTotal, 1)}%`);
+  setText("positionPendingTotal", `${formatNumber(pendingTotal, 1)}%`);
+  setText("positionPlannedTotal", `${formatNumber(plannedTotal, 1)}%`);
+  setText(
+    "positionHeadroom",
+    `${formatNumber(Math.max(0, 100 - plannedTotal), 1)}%`
+  );
+
+  document
+    .querySelectorAll("#positionStageLadder .position-stage")
+    .forEach((node) => {
+      node.classList.toggle("current", node.dataset.stageKey === stageKey);
+    });
+
+  const groups = new Map();
+  const ensureGroup = (name) => {
+    const key = name || "未分组";
+    if (!groups.has(key)) {
+      groups.set(key, {
+        name: key,
+        currentWeight: 0,
+        currentNames: [],
+        candidates: new Map(),
+        fundCap: AI_HARDWARE_GROUPS.has(key)
+          ? Number(representative.aiTargetPct || 20)
+          : 20,
+        available: null,
+        candidateCount: 0,
+        stageKey,
+      });
+    }
+    return groups.get(key);
+  };
+
+  holdings.forEach((row) => {
+    const group = ensureGroup(row.group);
+    group.currentWeight += Number(row.weightPct || 0);
+    group.currentNames.push(
+      `${row.name} ${formatNumber(row.weightPct, 1)}%`
+    );
+  });
+
+  signals.forEach((row) => {
+    const group = ensureGroup(row.group);
+    group.fundCap = Number(row.fundCapPct || group.fundCap);
+    group.available = Number(row.availablePositionPct || 0);
+    group.candidateCount = Math.max(
+      group.candidateCount,
+      Number(row.groupCandidates || 0)
+    );
+    if (row.indexStage) {
+      const rowProgress = Number(row.indexProgress || 0);
+      group.stageKey =
+        row.indexStage === "多" || row.indexStage === "空"
+          ? row.indexStage
+          : `${row.indexStage}${rowProgress}`;
+    }
+    if (row.isBuy && Number(row.suggestedPositionPct || 0) > 0) {
+      group.candidates.set(row.code, row);
+    }
+  });
+
+  const body = document.getElementById("allocationTableBody");
+  body.innerHTML = [...groups.values()]
+    .sort((a, b) => {
+      const aBuy = [...a.candidates.values()].some(
+        (row) => !holdingCodes.has(row.code)
+      );
+      const bBuy = [...b.candidates.values()].some(
+        (row) => !holdingCodes.has(row.code)
+      );
+      if (aBuy !== bBuy) return aBuy ? -1 : 1;
+      if (a.currentWeight !== b.currentWeight) {
+        return b.currentWeight - a.currentWeight;
+      }
+      return a.name.localeCompare(b.name, "zh-CN");
+    })
+    .map((group) => {
+      const candidates = [...group.candidates.values()];
+      const pending = candidates.filter(
+        (row) => !holdingCodes.has(row.code)
+      );
+      const candidateText = candidates.length
+        ? candidates
+            .map((row) => {
+              const held = holdingCodes.has(row.code);
+              return `${row.name} ${formatNumber(row.suggestedPositionPct, 1)}%${
+                held ? "（已买）" : ""
+              }`;
+            })
+            .join(" · ")
+        : "—";
+      const currentText = group.currentNames.length
+        ? `${formatNumber(group.currentWeight, 1)}% · ${group.currentNames.length}只`
+        : "0%";
+      const status = pending.length
+        ? "待买入"
+        : candidates.length
+          ? "已计入持仓"
+          : group.currentWeight > 0
+            ? "继续持有"
+            : "观察";
+      const statusClass = status === "待买入" ? "skip" : "buy";
+      return `
+        <tr>
+          <td><strong>${escapeHtml(group.name)}</strong></td>
+          <td title="${escapeAttr(group.currentNames.join(" · "))}">${currentText}</td>
+          <td><span class="allocation-candidates">${escapeHtml(candidateText)}</span></td>
+          <td class="num">${formatNumber(
+            candidates.reduce(
+              (sum, row) => sum + Number(row.suggestedPositionPct || 0),
+              0
+            ),
+            1
+          )}%</td>
+          <td class="num">${formatNumber(group.fundCap, 0)}%</td>
+          <td class="num">${
+            group.available === null
+              ? "—"
+              : `${formatNumber(group.available, 1)}%`
+          }</td>
+          <td class="num">${formatInt(group.candidateCount)} / 2</td>
+          <td>${escapeHtml(group.stageKey || "—")}</td>
+          <td><span class="status-badge ${statusClass}">${status}</span></td>
+        </tr>`;
+    })
+    .join("");
 }
 
 function renderCandidateTable() {
