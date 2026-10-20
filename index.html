@@ -288,7 +288,7 @@
             <strong id="positionIndexState">—</strong>
           </div>
           <div>
-            <span>当前阶段目标</span>
+            <span>当前阶段AI硬件仓位目标</span>
             <strong id="positionStageTarget">—</strong>
           </div>
           <div>
@@ -308,9 +308,35 @@
             <strong id="positionHeadroom">—</strong>
           </div>
         </div>
-        <div class="allocation-note">
-          普通分组单组上限 20%；AI硬件资金池随上证指数阶段变化。已有持仓占用对应资金池额度，
-          同日同组按综合评分最多保留 2 只，所有分组与标的重叠后组合总仓位不超过 100%。
+        <div class="allocation-rule-grid">
+          <div class="allocation-rule">
+            <span>01</span>
+            <div>
+              <strong>先确定资金池</strong>
+              <p>上证指数阶段决定 AI 硬件可用资金，其余普通分组固定单组上限。</p>
+            </div>
+          </div>
+          <div class="allocation-rule">
+            <span>02</span>
+            <div>
+              <strong>持仓先占额度</strong>
+              <p id="allocationStageHint">当前持仓先消耗对应资金池，剩余空间才分给新候选。</p>
+            </div>
+          </div>
+          <div class="allocation-rule">
+            <span>03</span>
+            <div>
+              <strong>同组评分筛选</strong>
+              <p>普通分组上限 20%；同一判定分组按综合评分最多保留 2 只。</p>
+            </div>
+          </div>
+          <div class="allocation-rule">
+            <span>04</span>
+            <div>
+              <strong>组合总仓位封顶</strong>
+              <p>所有分组与标的重叠后，执行后计划仓位最高不超过 100%。</p>
+            </div>
+          </div>
         </div>
         <div class="table-scroll">
           <table class="data-table allocation-table">

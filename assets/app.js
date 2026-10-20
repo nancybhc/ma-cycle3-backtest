@@ -233,6 +233,15 @@ function populatePositionRules() {
     "positionStageTarget",
     stageTarget > 0 ? `${formatNumber(stageTarget, 0)}%` : "—"
   );
+  setText(
+    "allocationStageHint",
+    stageKey && stageTarget > 0
+      ? `当前${stageKey}，AI硬件资金池按 ${formatNumber(
+          stageTarget,
+          0
+        )}% 计；持仓先占，余额再分。`
+      : "当前持仓先消耗对应资金池，剩余空间才分给新候选。"
+  );
   setText("positionCurrentTotal", `${formatNumber(currentTotal, 1)}%`);
   setText("positionPendingTotal", `${formatNumber(pendingTotal, 1)}%`);
   setText("positionPlannedTotal", `${formatNumber(plannedTotal, 1)}%`);
