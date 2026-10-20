@@ -873,7 +873,7 @@ function renderGroupChart() {
 
 function renderScatterChart() {
   const chart = getChart("scatterChart");
-  const trades = state.data.trades;
+  const trades = state.data.performanceTrades || state.data.trades;
   chart.setOption({
     ...chartBase(),
     grid: { left: 52, right: 18, top: 20, bottom: 38 },
