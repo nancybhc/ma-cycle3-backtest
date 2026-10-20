@@ -44,7 +44,7 @@
       <div class="hero-copy">
         <div class="eyebrow"><span>QUANT RESEARCH</span><i></i><span>A股 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点，按信号日收盘买入。离场改为每日挂 MA5 回踩价条件单；上证指数双上 80%、双下 20%、混合 50% 总仓位，同组最多保留 2 只。</p>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点，按信号日收盘买入。离场改为运行价跌破 MA5 即卖出：14:40 用实时快照价，盘后用收盘价。上证指数双上 80%、双下 20%、混合 50% 总仓位，同组最多保留 2 只。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -532,8 +532,8 @@
           <div class="playbook-step">
             <span class="step-number">05</span>
             <div>
-              <h3>MA5 回踩价条件单离场</h3>
-              <p>每日收盘后按次日 MA5 回踩价挂条件卖单，盘中触及即成交；超出次日涨跌停价带时不挂单。MA10 拐头不再单独触发离场。</p>
+              <h3>运行价跌破 MA5 离场</h3>
+              <p>14:40 运行时用最新快照价、盘后运行时用当日收盘价；价格低于 MA5 即卖出。MA5 条件单和 MA10 拐头均不再使用。</p>
             </div>
           </div>
         </article>
