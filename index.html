@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=20261021-2130">
+  <link rel="stylesheet" href="assets/app.css?v=20261021-2200">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -21,13 +21,13 @@
     <a class="brand" href="#overview" aria-label="返回顶部">
       <span class="brand-mark">510</span>
       <span class="brand-copy">
-        <strong>5/10 QUANT LAB</strong>
+        <strong>5/10 量化实验室</strong>
         <small>5破10推演量化策略</small>
       </span>
     </a>
     <nav class="main-nav" aria-label="页面导航">
       <a href="#overview">总览</a>
-      <a href="#today">今日信号</a>
+      <a href="#today">今日操作</a>
       <a href="#rules">策略口径</a>
       <a href="#stages">多空进度</a>
       <a href="#analytics">统计分析</a>
@@ -42,7 +42,7 @@
   <main>
     <section class="hero section" id="overview">
       <div class="hero-copy">
-        <div class="eyebrow"><span>QUANT RESEARCH</span><i></i><span>A股 / 日线</span></div>
+        <div class="eyebrow"><span>量化研究</span><i></i><span>沪深股票 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
         <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5。</p>
         <div class="hero-meta">
@@ -67,7 +67,7 @@
             <strong id="accountDrawdown">—</strong>
           </div>
           <div>
-            <span>Sharpe</span>
+            <span>夏普比率</span>
             <strong id="accountSharpe">—</strong>
           </div>
         </div>
@@ -134,7 +134,7 @@
         <p>中位数 <span id="kpiMedian">—</span></p>
       </article>
       <article class="kpi-card" data-tone="amber">
-        <div class="kpi-head"><span>Profit Factor</span><i>04</i></div>
+        <div class="kpi-head"><span>盈亏比</span><i>04</i></div>
         <strong id="kpiPf">—</strong>
         <p>盈利总额 / 亏损总额</p>
       </article>
@@ -163,7 +163,7 @@
     <section class="section chart-section">
       <div class="section-head">
         <div>
-          <div class="eyebrow"><span>PERFORMANCE</span><i></i><span>资金曲线</span></div>
+          <div class="eyebrow"><span>资金曲线</span></div>
           <h2>组合净值与风险路径</h2>
         </div>
         <div class="section-note">按指数目标仓位与建议单票仓位计算 · 重叠持仓总仓位封顶 100%</div>
@@ -172,7 +172,6 @@
         <article class="panel chart-panel curve-panel">
           <div class="panel-head">
             <div>
-              <span class="panel-kicker">EQUITY CURVE</span>
               <h3>策略净值</h3>
             </div>
             <div class="legend-inline">
@@ -185,7 +184,6 @@
         <article class="panel risk-panel">
           <div class="panel-head">
             <div>
-              <span class="panel-kicker">RISK</span>
               <h3>回撤与样本切分</h3>
             </div>
           </div>
@@ -210,8 +208,7 @@
     <section class="section" id="today">
       <div class="section-head">
         <div>
-          <div class="eyebrow"><span>LIVE SIGNALS</span><i></i><span>今日信号</span></div>
-          <h2>持仓变动</h2>
+          <div class="eyebrow"><span>今日操作</span></div>
         </div>
         <div class="today-head-meta">
           <span class="date-chip" id="candidateDateChip">—</span>
@@ -222,7 +219,6 @@
       <article class="panel table-panel">
         <div class="table-toolbar">
           <div>
-            <span class="panel-kicker">TAIL PICK SUMMARY</span>
             <h3>今日持仓与全部信号</h3>
           </div>
           <div class="segmented" id="candidateScope">
@@ -259,7 +255,6 @@
       <article class="panel allocation-panel">
         <div class="panel-head">
           <div>
-            <span class="panel-kicker">POSITION SIZING</span>
             <h3>今日仓位管理明细</h3>
           </div>
         </div>
@@ -294,7 +289,7 @@
       <section class="today-subsection" id="rules">
         <div class="section-head">
           <div>
-            <div class="eyebrow"><span>PLAYBOOK</span><i></i><span>策略口径</span></div>
+            <div class="eyebrow"><span>策略口径</span></div>
             <h2>信号是怎么变成交易的</h2>
           </div>
           <div class="section-note">先看规则，再看收益；避免把研究回测当成实盘承诺</div>
@@ -302,7 +297,6 @@
         <article class="panel score-rules-panel">
           <div class="panel-head">
             <div>
-              <span class="panel-kicker">SIGNAL SCORE</span>
               <h3>信号综合评分规则</h3>
             </div>
             <span class="panel-tip">评分 0–1 · 用于组内排序</span>
@@ -353,21 +347,21 @@
             <div class="playbook-step">
               <span class="step-number">03</span>
               <div>
-                <h3>间距增幅 &gt; 1.5pp</h3>
+                <h3>间距增幅 &gt; 1.5 个百分点</h3>
                 <p>推演次日 5-10 间距% 减当日 5-10 间距%，保留正负号；增量必须大于 1.5 个百分点。</p>
               </div>
             </div>
             <div class="playbook-step">
               <span class="step-number">04</span>
               <div>
-                <h3>AI硬件资金池与分组上限</h3>
+                <h3>人工智能硬件资金池与分组上限</h3>
                 <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。</p>
               </div>
             </div>
             <div class="playbook-step">
               <span class="step-number">05</span>
               <div>
-                <h3>运行价跌破 MA5 离场</h3>
+                <h3>运行价跌破 5 日均线离场</h3>
                 <p>14:40 运行时用最新快照价、盘后运行时用当日收盘价；价格低于 MA5 即卖出。MA5 条件单和 MA10 拐头均不再使用。</p>
               </div>
             </div>
@@ -379,7 +373,7 @@
         <div class="stage-section">
           <div class="section-head">
             <div>
-              <div class="eyebrow"><span>MARKET STRUCTURE</span><i></i><span>MA5 / MA10</span></div>
+              <div class="eyebrow"><span>5 日均线与 10 日均线</span></div>
               <h2>多转空与空转多：各三步</h2>
             </div>
             <div class="section-note">用 MA5 是否拐头、MA5 与 MA10 的上下关系、MA10 是否同向确认，拆成可跟踪的进度</div>
@@ -413,8 +407,7 @@
             <article class="panel stage-panel to-short">
               <div class="stage-panel-head">
                 <div>
-                  <span class="panel-kicker">MULTI → SHORT</span>
-                  <h3>多转空 · MA5 先向下拐头</h3>
+                  <h3>多转空 · 5 日均线先向下拐头</h3>
                 </div>
                 <span class="stage-sort">排序：进度 1 → 3</span>
               </div>
@@ -445,8 +438,7 @@
             <article class="panel stage-panel to-long">
               <div class="stage-panel-head">
                 <div>
-                  <span class="panel-kicker">SHORT → MULTI</span>
-                  <h3>空转多 · MA5 先向上拐头</h3>
+                  <h3>空转多 · 5 日均线先向上拐头</h3>
                 </div>
                 <span class="stage-sort">排序：进度 3 → 1</span>
               </div>
@@ -489,7 +481,7 @@
     <section class="section" id="analytics">
       <div class="section-head">
         <div>
-          <div class="eyebrow"><span>ANALYTICS</span><i></i><span>收益结构</span></div>
+          <div class="eyebrow"><span>收益结构</span></div>
           <h2>这张策略画像说明了什么</h2>
         </div>
         <div class="section-note">单笔收益分布、月度贡献、板块表现与路径盈亏</div>
@@ -497,28 +489,28 @@
       <div class="analytics-grid">
         <article class="panel chart-panel">
           <div class="panel-head">
-            <div><span class="panel-kicker">MONTHLY</span><h3>月度收益</h3></div>
+            <div><h3>月度收益</h3></div>
             <span class="panel-tip">组合口径</span>
           </div>
           <div class="chart-lg" id="monthlyChart"></div>
         </article>
         <article class="panel chart-panel">
           <div class="panel-head">
-            <div><span class="panel-kicker">DISTRIBUTION</span><h3>单笔收益分布</h3></div>
+            <div><h3>单笔收益分布</h3></div>
             <span class="panel-tip" id="distributionSampleTip">—</span>
           </div>
           <div class="chart-lg" id="distributionChart"></div>
         </article>
         <article class="panel chart-panel">
           <div class="panel-head">
-            <div><span class="panel-kicker">SECTOR</span><h3>板块平均收益</h3></div>
+            <div><h3>板块平均收益</h3></div>
             <span class="panel-tip">样本数 ≥ 10</span>
           </div>
           <div class="chart-lg" id="groupChart"></div>
         </article>
         <article class="panel chart-panel">
           <div class="panel-head">
-            <div><span class="panel-kicker">PATH</span><h3>MFE / MAE 路径</h3></div>
+            <div><h3>最大浮盈与最大浮亏路径</h3></div>
             <span class="panel-tip">持有期内最高 / 最低</span>
           </div>
           <div class="chart-lg" id="scatterChart"></div>
@@ -526,7 +518,7 @@
       </div>
       <article class="panel holding-panel">
         <div class="panel-head">
-          <div><span class="panel-kicker">HOLDING PERIOD</span><h3>持有天数与胜率</h3></div>
+          <div><h3>持有天数与胜率</h3></div>
         </div>
         <div class="holding-bars" id="holdingBars"></div>
       </article>
@@ -535,12 +527,11 @@
     <section class="section" id="trades">
       <div class="section-head">
         <div>
-          <div class="eyebrow"><span>STRATEGY LEDGER</span><i></i><span>真实策略成交</span></div>
+          <div class="eyebrow"><span>真实策略成交</span></div>
           <h2>策略成交记录</h2>
         </div>
         <button class="ghost-button" id="exportTrades" type="button">
           <span>导出当前筛选</span>
-          <small>CSV</small>
         </button>
       </div>
       <article class="panel table-panel trade-panel">
@@ -594,7 +585,6 @@
 
     <section class="section usage-boundary-section" id="usage">
       <article class="panel caveat-panel">
-        <span class="panel-kicker">READ BEFORE USE</span>
         <h3>使用边界</h3>
         <div class="caveat-list">
           <div><i>01</i><p>未计手续费、印花税、滑点，也未处理停牌。</p></div>
@@ -626,14 +616,14 @@
   <aside class="drawer" id="drawer" aria-hidden="true">
     <button class="drawer-close" id="drawerClose" type="button" aria-label="关闭详情">×</button>
     <div class="drawer-head">
-      <span class="panel-kicker" id="drawerKicker">TRADE DETAIL</span>
+      <span class="panel-kicker" id="drawerKicker">逐笔复盘</span>
       <h2 id="drawerTitle">—</h2>
       <div class="drawer-tags" id="drawerTags"></div>
     </div>
     <div class="drawer-metrics" id="drawerMetrics"></div>
     <div class="drawer-chart-wrap">
       <div class="drawer-chart-head">
-        <span>K 线路径</span>
+          <span>价格走势</span>
         <div class="legend-inline compact">
           <span><i class="legend-line red"></i>MA5</span>
           <span><i class="legend-line amber"></i>MA10</span>
@@ -646,6 +636,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261021-2130"></script>
+  <script src="assets/app.js?v=20261021-2200"></script>
 </body>
 </html>

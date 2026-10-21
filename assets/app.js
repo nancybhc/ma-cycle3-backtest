@@ -1234,7 +1234,7 @@ function openTrade(id) {
   if (!trade) return;
   state.drawerType = "trade";
   state.drawerId = id;
-  setText("drawerKicker", "TRADE DETAIL / 逐笔复盘");
+  setText("drawerKicker", "逐笔复盘");
   setText("drawerTitle", `${trade.name} · ${trade.code}`);
   document.getElementById("drawerTags").innerHTML = `
     <span class="tag trend-badge">${escapeHtml(trade.group)}</span>
@@ -1273,12 +1273,12 @@ function openSignal(code, scope = "changes") {
   setText(
     "drawerKicker",
     signal.changeType === "sell"
-      ? "CHANGE DETAIL / 当天卖出"
+      ? "当天卖出"
       : signal.changeType === "buy"
-        ? "CHANGE DETAIL / 新买入"
+        ? "新买入"
         : signal.isHolding
-          ? "HOLDING DETAIL / 持仓未动"
-          : "SIGNAL DETAIL / 今日候选"
+          ? "持仓未动"
+          : "今日候选"
   );
   setText("drawerTitle", `${signal.name} · ${signal.code}`);
   document.getElementById("drawerTags").innerHTML = `
