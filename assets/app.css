@@ -845,6 +845,102 @@ main {
   color: rgba(232, 242, 247, 0.82);
 }
 
+.today-subsection {
+  padding-top: 48px;
+}
+
+.score-rules-panel {
+  position: relative;
+  margin-top: 16px;
+  padding: 18px 20px 20px;
+  background:
+    linear-gradient(135deg, rgba(111, 171, 255, 0.035), transparent 38%),
+    var(--panel);
+}
+
+.score-rules-panel .panel-head {
+  margin-bottom: 14px;
+}
+
+.score-rules-panel .panel-head h3 {
+  color: rgba(232, 242, 247, 0.82);
+}
+
+.score-formula {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  padding: 13px 15px;
+  border: 1px solid rgba(72, 225, 209, 0.18);
+  border-radius: 10px;
+  background: rgba(72, 225, 209, 0.035);
+}
+
+.score-formula span {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.score-formula strong {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.score-formula b {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.score-dimension-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.score-dimension {
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(4, 13, 22, 0.38);
+}
+
+.score-dimension > span {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 6px;
+  border: 1px solid rgba(72, 225, 209, 0.22);
+  border-radius: 5px;
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 8px;
+}
+
+.score-dimension strong {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.score-dimension p {
+  margin: 6px 0 0;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.score-rule-note {
+  display: block;
+  margin-top: 12px;
+  color: var(--text-dim);
+  font-size: 9px;
+  line-height: 1.7;
+}
+
 .allocation-facts {
   margin: 0 0 15px;
   border-top: 1px solid var(--line);
@@ -1397,6 +1493,16 @@ main {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(340px, 0.7fr);
   gap: 16px;
+}
+
+.rules-grid.rules-grid-stacked {
+  grid-template-columns: 1fr;
+}
+
+.rules-grid-stacked .caveat-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 28px;
 }
 
 .stage-base-grid {
@@ -2035,7 +2141,8 @@ main {
   }
 
   .analytics-grid,
-  .rules-grid {
+  .rules-grid,
+  .score-dimension-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2162,6 +2269,10 @@ main {
 
   .holding-bars {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .rules-grid-stacked .caveat-list {
+    grid-template-columns: 1fr;
   }
 
   .playbook-panel {

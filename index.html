@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=20261021-2110">
+  <link rel="stylesheet" href="assets/app.css?v=20261021-2120">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -290,6 +290,105 @@
           </table>
         </div>
       </article>
+
+      <article class="panel score-rules-panel">
+        <div class="panel-head">
+          <div>
+            <span class="panel-kicker">SIGNAL SCORE</span>
+            <h3>信号综合评分规则</h3>
+          </div>
+          <span class="panel-tip">评分 0–1 · 用于组内排序</span>
+        </div>
+        <div class="score-formula">
+          <span>综合评分 =</span>
+          <strong>40% 间距增幅分位</strong>
+          <b>+</b>
+          <strong>40% 分组多占比分位</strong>
+          <b>+</b>
+          <strong>20% 推演后 5–10 间距分位</strong>
+        </div>
+        <div class="score-dimension-grid">
+          <div class="score-dimension">
+            <span>40%</span>
+            <strong>间距增幅</strong>
+            <p>推演次日 5–10 间距% 减去当日 5–10 间距%，衡量均线分离是否在加速。</p>
+          </div>
+          <div class="score-dimension">
+            <span>40%</span>
+            <strong>分组多占比</strong>
+            <p>所属分组处于“多”阶段的股票数，除以当日有有效 MA5 / MA10 的股票数。</p>
+          </div>
+          <div class="score-dimension">
+            <span>20%</span>
+            <strong>推演后 5–10 间距</strong>
+            <p>假设次日收盘价不变，重新计算 MA5 / MA10 后的最终间距。</p>
+          </div>
+        </div>
+        <small class="score-rule-note">三个原始指标先转为分位排名，再按权重合成；评分只用于同一交易日、同一判定分组内排序，不替代买入硬条件和持仓上限。</small>
+      </article>
+
+      <section class="today-subsection" id="rules">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow"><span>PLAYBOOK</span><i></i><span>策略口径</span></div>
+            <h2>信号是怎么变成交易的</h2>
+          </div>
+          <div class="section-note">先看规则，再看收益；避免把研究回测当成实盘承诺</div>
+        </div>
+        <div class="rules-grid rules-grid-stacked">
+          <article class="panel playbook-panel">
+            <div class="playbook-step">
+              <span class="step-number">01</span>
+              <div>
+                <h3>空转多进度3首次出现</h3>
+                <p>MA5 已掉头向上、仍在 MA10 下方；信号日只入选，按当天收盘价作为买入价。</p>
+              </div>
+            </div>
+            <div class="playbook-step">
+              <span class="step-number">02</span>
+              <div>
+                <h3>推演次日 0% 完成 5破10</h3>
+                <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。</p>
+              </div>
+            </div>
+            <div class="playbook-step">
+              <span class="step-number">03</span>
+              <div>
+                <h3>间距增幅 &gt; 1.5pp</h3>
+                <p>推演次日 5-10 间距% 减当日 5-10 间距%，保留正负号；增量必须大于 1.5 个百分点。</p>
+              </div>
+            </div>
+            <div class="playbook-step">
+              <span class="step-number">04</span>
+              <div>
+                <h3>AI硬件资金池与分组上限</h3>
+                <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。</p>
+              </div>
+            </div>
+            <div class="playbook-step">
+              <span class="step-number">05</span>
+              <div>
+                <h3>运行价跌破 MA5 离场</h3>
+                <p>14:40 运行时用最新快照价、盘后运行时用当日收盘价；价格低于 MA5 即卖出。MA5 条件单和 MA10 拐头均不再使用。</p>
+              </div>
+            </div>
+          </article>
+          <article class="panel caveat-panel">
+            <span class="panel-kicker">READ BEFORE USE</span>
+            <h3>使用边界</h3>
+            <div class="caveat-list">
+              <div><i>01</i><p>未计手续费、印花税、滑点，也未处理停牌。</p></div>
+              <div><i>02</i><p>当前固定分组成员存在事后幸存者偏差。</p></div>
+              <div><i>03</i><p>组合净值按指数目标仓位和建议单票仓位计算，是研究示意，不是可成交账户。</p></div>
+              <div><i>04</i><p>今日候选只是收盘后选股结果，不代表保证成交或未来收益。</p></div>
+            </div>
+            <details class="raw-summary">
+              <summary>查看原始回测摘要</summary>
+              <pre id="rawSummary"></pre>
+            </details>
+          </article>
+        </div>
+      </section>
     </section>
 
     <section class="section" id="analytics">
@@ -508,68 +607,6 @@
       </div>
     </section>
 
-    <section class="section" id="rules">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow"><span>PLAYBOOK</span><i></i><span>策略口径</span></div>
-          <h2>信号是怎么变成交易的</h2>
-        </div>
-        <div class="section-note">先看规则，再看收益；避免把研究回测当成实盘承诺</div>
-      </div>
-      <div class="rules-grid">
-        <article class="panel playbook-panel">
-          <div class="playbook-step">
-            <span class="step-number">01</span>
-            <div>
-              <h3>空转多进度3首次出现</h3>
-              <p>MA5 已掉头向上、仍在 MA10 下方；信号日只入选，按当天收盘价作为买入价。</p>
-            </div>
-          </div>
-          <div class="playbook-step">
-            <span class="step-number">02</span>
-            <div>
-              <h3>推演次日 0% 完成 5破10</h3>
-              <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。</p>
-            </div>
-          </div>
-          <div class="playbook-step">
-            <span class="step-number">03</span>
-            <div>
-              <h3>间距增幅 &gt; 1.5pp</h3>
-              <p>推演次日 5-10 间距% 减当日 5-10 间距%，保留正负号；增量必须大于 1.5 个百分点。</p>
-            </div>
-          </div>
-          <div class="playbook-step">
-            <span class="step-number">04</span>
-            <div>
-              <h3>AI硬件资金池与分组上限</h3>
-              <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。</p>
-            </div>
-          </div>
-          <div class="playbook-step">
-            <span class="step-number">05</span>
-            <div>
-              <h3>运行价跌破 MA5 离场</h3>
-              <p>14:40 运行时用最新快照价、盘后运行时用当日收盘价；价格低于 MA5 即卖出。MA5 条件单和 MA10 拐头均不再使用。</p>
-            </div>
-          </div>
-        </article>
-        <article class="panel caveat-panel">
-          <span class="panel-kicker">READ BEFORE USE</span>
-          <h3>使用边界</h3>
-          <div class="caveat-list">
-            <div><i>01</i><p>未计手续费、印花税、滑点，也未处理停牌。</p></div>
-            <div><i>02</i><p>当前固定分组成员存在事后幸存者偏差。</p></div>
-            <div><i>03</i><p>组合净值按指数目标仓位和建议单票仓位计算，是研究示意，不是可成交账户。</p></div>
-            <div><i>04</i><p>今日候选只是收盘后选股结果，不代表保证成交或未来收益。</p></div>
-          </div>
-          <details class="raw-summary">
-            <summary>查看原始回测摘要</summary>
-            <pre id="rawSummary"></pre>
-          </details>
-        </article>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
@@ -607,6 +644,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261021-2110"></script>
+  <script src="assets/app.js?v=20261021-2120"></script>
 </body>
 </html>
