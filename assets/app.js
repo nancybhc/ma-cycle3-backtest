@@ -386,24 +386,32 @@ function holdingReturnHtml(row) {
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
-  if (Number(holdingWeightPct) > 0) {
+  const holdingWeight = Number(holdingWeightPct);
+  const hasScore = score !== null && score !== undefined;
+  if (!hasScore && holdingWeight > 0) {
     return `
       <span class="price-pair">
-        <strong>持有 ${formatNumber(holdingWeightPct, 1)}%</strong>
+        <strong>持有 ${formatNumber(holdingWeight, 1)}%</strong>
         <small>不新增</small>
       </span>`;
   }
-  if (score === null || score === undefined) {
+  if (!hasScore) {
     return `<span class="flat">—</span>`;
   }
   const pos =
     positionPct === null || positionPct === undefined
       ? "—"
       : `${formatNumber(positionPct, 1)}%`;
+  const detail =
+    holdingWeight > 0
+      ? `持有 ${formatNumber(holdingWeight, 1)}% · 不新增`
+      : Number(positionPct) > 0
+        ? `建议仓位 ${pos}`
+        : "未入仓";
   return `
     <span class="price-pair">
       <strong>${formatNumber(score, 3)}</strong>
-      <small>仓位 ${pos}</small>
+      <small>${detail}</small>
     </span>`;
 }
 
