@@ -28,13 +28,13 @@ const FONT_MONO = '"Cascadia Code","Consolas",monospace';
 const FONT_SANS = '"Microsoft YaHei UI","PingFang SC",sans-serif';
 const POSITION_STAGE_TARGETS = {
   "空": 20,
-  "空转多1": 40,
-  "空转多2": 60,
+  "空转多1": 30,
+  "空转多2": 50,
   "空转多3": 70,
   "多": 80,
-  "多转空1": 70,
-  "多转空2": 50,
-  "多转空3": 30,
+  "多转空1": 60,
+  "多转空2": 30,
+  "多转空3": 20,
 };
 const AI_HARDWARE_GROUPS = new Set([
   "PCB",
