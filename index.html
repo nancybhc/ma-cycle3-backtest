@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=20261021-2201">
+  <link rel="stylesheet" href="assets/app.css?v=20261021-2203">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -295,40 +295,6 @@
           </div>
           <div class="section-note">先看规则，再看收益；避免把研究回测当成实盘承诺</div>
         </div>
-        <article class="panel score-rules-panel">
-          <div class="panel-head">
-            <div>
-              <h3>信号综合评分规则</h3>
-            </div>
-            <span class="panel-tip">评分 0–1 · 用于组内排序</span>
-          </div>
-          <div class="score-formula">
-            <span>综合评分 =</span>
-            <strong>40% 间距增幅分位</strong>
-            <b>+</b>
-            <strong>40% 分组多占比分位</strong>
-            <b>+</b>
-            <strong>20% 推演后 5–10 间距分位</strong>
-          </div>
-          <div class="score-dimension-grid">
-            <div class="score-dimension">
-              <span>40%</span>
-              <strong>间距增幅</strong>
-              <p>推演次日 5–10 间距% 减去当日 5–10 间距%，衡量均线分离是否在加速。</p>
-            </div>
-            <div class="score-dimension">
-              <span>40%</span>
-              <strong>分组多占比</strong>
-              <p>所属分组处于“多”阶段的股票数，除以当日有有效 MA5 / MA10 的股票数。</p>
-            </div>
-            <div class="score-dimension">
-              <span>20%</span>
-              <strong>推演后 5–10 间距</strong>
-              <p>假设次日收盘价不变，重新计算 MA5 / MA10 后的最终间距。</p>
-            </div>
-          </div>
-          <small class="score-rule-note">三个原始指标先转为分位排名，再按权重合成；评分只用于同一交易日、同一判定分组内排序，不替代买入硬条件和持仓上限。</small>
-        </article>
         <div class="rules-grid rules-grid-stacked">
           <article class="panel playbook-panel">
             <div class="playbook-step">
@@ -355,7 +321,7 @@
             <div class="playbook-step">
               <span class="step-number">04</span>
               <div>
-                <h3>人工智能硬件资金池与分组上限</h3>
+                <h3>AI硬件资金池与分组上限</h3>
                 <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。</p>
               </div>
             </div>
@@ -368,6 +334,40 @@
             </div>
           </article>
         </div>
+        <article class="panel score-rules-panel">
+          <div class="panel-head">
+            <div>
+              <h3>信号综合评分规则</h3>
+            </div>
+            <span class="panel-tip">评分 0–1 · 用于组内排序</span>
+          </div>
+          <div class="score-formula">
+            <span>综合评分 =</span>
+            <strong>40% 间距增幅分位</strong>
+            <b>+</b>
+            <strong>40% 分组多占比分位</strong>
+            <b>+</b>
+            <strong>20% 推演后 5–10 间距分位</strong>
+          </div>
+          <div class="score-dimension-grid">
+            <div class="score-dimension">
+              <span>40%</span>
+              <strong>间距增幅</strong>
+              <p>推演次日 5–10 间距% 减去当日 5–10 间距%，也就是 MA5 相对 MA10 的间距变化；数值越大，说明均线分离越快。</p>
+            </div>
+            <div class="score-dimension">
+              <span>40%</span>
+              <strong>分组多占比</strong>
+              <p>统计所属分组内 MA5 向上、MA10 向上且 MA5 在 MA10 上方的“多”股票数，再除以该分组当日有有效 MA5 / MA10 的股票总数；占比越高，说明板块内部多头越一致。</p>
+            </div>
+            <div class="score-dimension">
+              <span>20%</span>
+              <strong>推演后 5–10 间距</strong>
+              <p>把信号日收盘价复制为推演次日价格，重算 MA5 / MA10；按（推演 MA5 ÷ 推演 MA10 − 1）× 100% 得到最终间距；数值越大，说明推演后的多头间隔越充分。</p>
+            </div>
+          </div>
+          <small class="score-rule-note">三个原始指标先转为分位排名，再按权重合成；评分只用于同一交易日、同一判定分组内排序，不替代买入硬条件和持仓上限。</small>
+        </article>
       </section>
 
       <section class="today-subsection" id="stages">

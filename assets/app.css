@@ -850,8 +850,8 @@ main {
 }
 
 .today-subsection .score-rules-panel {
-  margin-top: 0;
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 0;
 }
 
 .usage-boundary-section {
@@ -1789,7 +1789,7 @@ main {
   border-right: 0;
 }
 
-.playbook-step:nth-last-child(-n+2) {
+.playbook-step:last-child {
   border-bottom: 0;
 }
 
