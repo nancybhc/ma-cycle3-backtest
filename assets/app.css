@@ -849,6 +849,21 @@ main {
   padding-top: 48px;
 }
 
+.today-subsection .score-rules-panel {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.usage-boundary-section {
+  padding-top: 48px;
+}
+
+.usage-boundary-section .caveat-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 28px;
+}
+
 .score-rules-panel {
   position: relative;
   margin-top: 16px;
@@ -1497,12 +1512,6 @@ main {
 
 .rules-grid.rules-grid-stacked {
   grid-template-columns: 1fr;
-}
-
-.rules-grid-stacked .caveat-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 28px;
 }
 
 .stage-base-grid {
@@ -2271,7 +2280,7 @@ main {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .rules-grid-stacked .caveat-list {
+  .usage-boundary-section .caveat-list {
     grid-template-columns: 1fr;
   }
 
