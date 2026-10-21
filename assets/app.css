@@ -772,7 +772,7 @@ main {
 
 .today-split {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
   padding: 14px 4px;
 }
@@ -996,6 +996,11 @@ main {
   box-shadow: 12px 0 18px -18px rgba(0, 0, 0, 0.9);
 }
 
+.candidate-table.changes-view .projection-col,
+.candidate-table.changes-view .score-col {
+  display: none;
+}
+
 .candidate-table tbody tr:hover .sticky-col {
   background: #0c1c2b;
 }
@@ -1010,6 +1015,18 @@ main {
 
 .candidate-table tr.buy-row:hover .sticky-col {
   background: #142333;
+}
+
+.candidate-table tr.sell-row td {
+  background: rgba(32, 201, 140, 0.035);
+}
+
+.candidate-table tr.sell-row .sticky-col {
+  background: #0d1d27;
+}
+
+.candidate-table tr.hold-row td {
+  background: rgba(72, 225, 209, 0.018);
 }
 
 .code-cell {
@@ -1090,6 +1107,18 @@ main {
   border-color: rgba(255, 91, 110, 0.26);
   background: var(--red-soft);
   color: var(--red);
+}
+
+.status-badge.sell {
+  border-color: rgba(32, 201, 140, 0.28);
+  background: rgba(32, 201, 140, 0.12);
+  color: var(--green);
+}
+
+.status-badge.hold {
+  border-color: rgba(72, 225, 209, 0.24);
+  background: var(--cyan-soft);
+  color: var(--cyan);
 }
 
 .status-badge.skip {

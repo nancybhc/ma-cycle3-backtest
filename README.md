@@ -10,7 +10,7 @@ live snapshot price; the post-close run uses the daily close.
 
 Portfolio overlay: AI-hardware exposure follows the Shanghai Composite
 MA5/MA10 stage using a 20%-80% sleeve. Every non-AI group is capped at 20%.
-Existing holdings consume their sleeve first; at most two names are kept per group.
+Existing holdings and new buys share one two-name cap per group.
 
 The site is generated from local research output. It is a backtest visualization,
 not investment advice or a live trading system.

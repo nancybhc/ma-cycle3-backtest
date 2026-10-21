@@ -1,6 +1,6 @@
 const state = {
   data: null,
-  candidateScope: "buy",
+  candidateScope: "changes",
   trades: [],
   filteredTrades: [],
   page: 1,
@@ -26,6 +26,7 @@ const COLOR = {
 
 const FONT_MONO = '"Cascadia Code","Consolas",monospace';
 const FONT_SANS = '"Microsoft YaHei UI","PingFang SC",sans-serif';
+const MAX_POSITIONS_PER_GROUP = 2;
 const POSITION_STAGE_TARGETS = {
   "空": 20,
   "空转多1": 30,
@@ -156,12 +157,17 @@ function populateOverview() {
     (sum, row) => sum + Number(row.weightPct || 0),
     0
   );
+  const changeSummary = state.data.dailyChangeSummary || {};
+  const changeCount =
+    Number(changeSummary.buyCount || 0) +
+    Number(changeSummary.sellCount || 0) +
+    Number(changeSummary.holdCount || 0);
   setText(
     "currentHoldingsLine",
-    holdings.length
-      ? `当前持仓：${holdings
+    holdings.length || changeCount
+      ? `今日变动：新买入 ${formatInt(changeSummary.buyCount || 0)} · 当天卖出 ${formatInt(changeSummary.sellCount || 0)} · 持仓未动 ${formatInt(changeSummary.holdCount || 0)}；当前持仓：${holdings
           .map((row) => `${row.name} ${formatNumber(row.weightPct, 1)}%`)
-          .join(" · ")} · 合计 ${formatNumber(holdingTotal, 1)}%`
+          .join(" · ") || "无"} · 合计 ${formatNumber(holdingTotal, 1)}%`
       : "当前持仓：无"
   );
   setText(
@@ -173,8 +179,10 @@ function populateOverview() {
 function populateCandidates() {
   const signals = state.data.signals || [];
   const holdings = state.data.currentHoldings || [];
-  const holdingCodes = new Set(holdings.map((row) => row.code));
-  const buys = signals.filter((row) => row.isBuy && !holdingCodes.has(row.code));
+  const dailyChanges = state.data.dailyChanges || [];
+  const buys = dailyChanges.filter((row) => row.changeType === "buy");
+  const sells = dailyChanges.filter((row) => row.changeType === "sell");
+  const holds = dailyChanges.filter((row) => row.changeType === "hold");
   const limits = signals.filter((row) => row.limitUp);
   const failures = signals.filter(
     (row) => !row.isBuy && !row.limitUp && !row.projectedSuccess
@@ -187,13 +195,15 @@ function populateCandidates() {
       !(Number(row.gapDeltaPct) > 1.5)
   );
   setText("todayBuyCount", formatInt(buys.length));
-  setText("todayHoldCount", formatInt(holdings.length));
+  setText("todaySellCount", formatInt(sells.length));
+  setText("todayHoldCount", formatInt(holds.length));
+  setText("todayPositionCount", formatInt(holdings.length));
   setText("todaySignalCount", formatInt(signals.length));
   setText("todayLimitCount", formatInt(limits.length));
   setText("todayFailCount", formatInt(failures.length));
   setText("todayGapFailCount", formatInt(gapFailures.length));
-  setText("scopeBuyCount", formatInt(holdings.length + buys.length));
-  setText("scopeAllCount", formatInt(holdings.length + signals.length));
+  setText("scopeChangeCount", formatInt(dailyChanges.length));
+  setText("scopeAllCount", formatInt(signals.length));
   renderCandidateTable();
 }
 
@@ -319,7 +329,7 @@ function populatePositionRules() {
     })
     .map((group) => {
       const currentText = group.currentNames.length
-        ? `${formatNumber(group.currentWeight, 1)}% · ${group.currentNames.length}只`
+        ? `${formatNumber(group.currentWeight, 1)}% · 持仓 ${group.currentNames.length}/${MAX_POSITIONS_PER_GROUP}`
         : "0%";
       return `
         <tr>
@@ -335,25 +345,39 @@ function populatePositionRules() {
 function renderCandidateTable() {
   const allSignals = state.data.signals || [];
   const holdings = state.data.currentHoldings || [];
-  const holdingCodes = new Set(holdings.map((row) => row.code));
-  const buys = allSignals.filter(
-    (row) => row.isBuy && !holdingCodes.has(row.code)
-  );
-  const nonHoldingSignals = allSignals.filter(
-    (row) => !holdingCodes.has(row.code)
-  );
+  const dailyChanges = state.data.dailyChanges || holdings;
   const rows =
-    state.candidateScope === "buy"
-      ? [...holdings, ...buys]
-      : [...holdings, ...nonHoldingSignals];
+    state.candidateScope === "changes"
+      ? dailyChanges
+      : allSignals;
+  document
+    .getElementById("candidateTable")
+    .classList.toggle("changes-view", state.candidateScope === "changes");
   const body = document.getElementById("candidateTableBody");
   body.innerHTML = rows
     .map((row) => {
       const isHolding = Boolean(row.isHolding);
-      const statusClass = row.isBuy || isHolding ? "buy" : "skip";
-      const statusText = isHolding ? "持有中" : row.isBuy ? "买入候选" : row.reason;
+      const changeType = String(row.changeType || "");
+      const statusClass =
+        changeType === "sell"
+          ? "sell"
+          : changeType === "buy" || row.isBuy
+            ? "buy"
+            : changeType === "hold" || isHolding
+              ? "hold"
+              : "skip";
+      const statusText =
+        changeType === "sell"
+          ? "当天卖出"
+          : changeType === "buy"
+            ? "新买入"
+            : changeType === "hold"
+              ? "持仓未动"
+              : row.isBuy
+                ? "买入候选"
+                : row.reason;
       return `
-        <tr class="clickable ${row.isBuy || isHolding ? "buy-row" : ""}" data-code="${escapeAttr(row.code)}">
+        <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
           <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
           <td class="sticky-col col-name">
             <span class="name-cell">
@@ -370,8 +394,8 @@ function renderCandidateTable() {
           <td>${maDirectionHtml(row.ma5Dir, row.ma5Run)}</td>
           <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
           <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
-          <td>${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
-          <td>${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
+          <td class="projection-col">${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
+          <td class="score-col">${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
           <td>${positionContextHtml(row)}</td>
           <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
         </tr>`;
@@ -379,22 +403,27 @@ function renderCandidateTable() {
     .join("");
 
   body.querySelectorAll("tr").forEach((row) => {
-    row.addEventListener("click", () => openSignal(row.dataset.code));
+    row.addEventListener("click", () =>
+      openSignal(row.dataset.code, state.candidateScope)
+    );
   });
 }
 
 function holdingReturnHtml(row) {
-  if (!row.isHolding) return `<span class="flat">—</span>`;
+  if (!row.isHolding && row.changeType !== "sell") {
+    return `<span class="flat">—</span>`;
+  }
   const entry = Number(row.entryPrice);
   const current = Number(row.close);
   if (!(entry > 0) || !(current > 0)) {
     return `<span class="flat">—</span>`;
   }
   const returnPct = (current / entry - 1) * 100;
+  const label = row.changeType === "sell" ? "卖出" : "成本";
   return `
     <span class="price-pair holding-return">
       <strong class="${pctClass(returnPct)}">${formatPct(returnPct, true)}</strong>
-      <small>成本 ${formatPrice(entry)}</small>
+      <small>${label} ${formatPrice(current)} · 成本 ${formatPrice(entry)}</small>
     </span>`;
 }
 
@@ -1252,18 +1281,38 @@ function openTrade(id) {
   window.setTimeout(() => renderTradeChart(trade), 90);
 }
 
-function openSignal(code) {
+function openSignal(code, scope = "changes") {
   const signal =
-    (state.data.currentHoldings || []).find((row) => row.code === code) ||
-    state.data.signals.find((row) => row.code === code);
+    scope === "all"
+      ? state.data.signals.find((row) => row.code === code)
+      : (state.data.dailyChanges || []).find((row) => row.code === code) ||
+        (state.data.currentHoldings || []).find((row) => row.code === code) ||
+        state.data.signals.find((row) => row.code === code);
   if (!signal) return;
   state.drawerType = "signal";
   state.drawerId = code;
-  setText("drawerKicker", signal.isHolding ? "HOLDING DETAIL / 当前持仓" : "SIGNAL DETAIL / 今日候选");
+  setText(
+    "drawerKicker",
+    signal.changeType === "sell"
+      ? "CHANGE DETAIL / 当天卖出"
+      : signal.changeType === "buy"
+        ? "CHANGE DETAIL / 新买入"
+        : signal.isHolding
+          ? "HOLDING DETAIL / 持仓未动"
+          : "SIGNAL DETAIL / 今日候选"
+  );
   setText("drawerTitle", `${signal.name} · ${signal.code}`);
   document.getElementById("drawerTags").innerHTML = `
     <span class="tag trend-badge">${escapeHtml(signal.trend || "—")}</span>
-    <span class="tag ${signal.isBuy ? "status-badge buy" : "status-badge skip"}">${escapeHtml(signal.reason)}</span>
+    <span class="tag status-badge ${
+      signal.changeType === "sell"
+        ? "sell"
+        : signal.changeType === "buy" || signal.isBuy
+          ? "buy"
+          : signal.changeType === "hold"
+            ? "hold"
+            : "skip"
+    }">${escapeHtml(signal.reason)}</span>
     <span class="tag status-badge">${escapeHtml(signal.group)}</span>`;
   document.getElementById("drawerMetrics").innerHTML = [
     metricHtml("收盘价", formatPrice(signal.close)),
@@ -1272,7 +1321,18 @@ function openSignal(code) {
     metricHtml("MA5 连续", `${signal.ma5Dir} ${Math.abs(signal.ma5Run)}天`, signal.ma5Dir === "向上" ? 1 : -1),
   ].join("");
   document.getElementById("drawerDetails").innerHTML = detailTable([
-    ["信号日期", signal.date],
+    ["日期", signal.date],
+    ...(signal.changeType
+      ? [[
+          "当日变动",
+          signal.changeType === "buy"
+            ? "新买入"
+            : signal.changeType === "sell"
+              ? `当天卖出 ${formatPrice(signal.close)}`
+              : "持仓未动",
+        ]]
+      : []),
+    ["入场", signal.entryDate ? `${signal.entryDate} / ${formatPrice(signal.entryPrice)}` : "—"],
     ["5-10 间距", formatPct(signal.gapPct, true)],
     ["推演次日 5-10 间距", formatPct(signal.projectedGapPct, true)],
     ["间距增幅", formatPct(signal.gapDeltaPct, true)],

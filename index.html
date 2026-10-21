@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=20261020-2320">
+  <link rel="stylesheet" href="assets/app.css?v=20261021-1951">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -44,7 +44,7 @@
       <div class="hero-copy">
         <div class="eyebrow"><span>QUANT RESEARCH</span><i></i><span>A股 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点，按信号日收盘买入。离场改为运行价跌破 MA5 即卖出：14:40 用实时快照价，盘后用收盘价。AI硬件按上证指数阶段使用 20%～80% 资金池，普通分组每组最多 20%，已有持仓先占额度。</p>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -221,20 +221,22 @@
 
       <div class="today-summary">
         <div class="today-count">
-          <span>入选</span>
+          <span>今日买入</span>
           <strong id="todayBuyCount">—</strong>
-          <small>同组上限后候选</small>
+          <small>通过筛选且同组持仓名额可用</small>
         </div>
         <div class="today-split">
-          <div><span>当前持仓</span><strong id="todayHoldCount">—</strong></div>
+          <div><span>今日卖出</span><strong id="todaySellCount">—</strong></div>
+          <div><span>持仓未动</span><strong id="todayHoldCount">—</strong></div>
+          <div><span>当前持仓</span><strong id="todayPositionCount">—</strong></div>
           <div><span>今日进度3信号</span><strong id="todaySignalCount">—</strong></div>
           <div><span>尾盘涨停剔除</span><strong id="todayLimitCount">—</strong></div>
           <div><span>推演未过</span><strong id="todayFailCount">—</strong></div>
           <div><span>间距未过</span><strong id="todayGapFailCount">—</strong></div>
         </div>
         <div class="today-note">
-          <strong>与 Excel 汇总页同口径</strong>
-          <p>展示综合评分、组内排名、指数状态与建议单票仓位；价格、均线和推演列仍可逐项复核。点击任意标的查看 K 线与关键价位。</p>
+          <strong>持仓变动 = 持仓未动 + 新买入 + 当天卖出</strong>
+          <p>同一分组已有 2 只时不再买入新候选；“全部信号”只列当天信号，不再混入全部持仓。</p>
         </div>
       </div>
 
@@ -245,12 +247,12 @@
             <h3>5破10推演量化策略 · 今日持仓与候选</h3>
           </div>
           <div class="segmented" id="candidateScope">
-            <button class="active" data-scope="buy">持仓 + 候选 <b id="scopeBuyCount">—</b></button>
+            <button class="active" data-scope="changes">持仓变动 <b id="scopeChangeCount">—</b></button>
             <button data-scope="all">全部信号 <b id="scopeAllCount">—</b></button>
           </div>
         </div>
         <div class="table-scroll candidate-scroll">
-          <table class="data-table candidate-table">
+          <table class="data-table candidate-table changes-view" id="candidateTable">
             <thead>
               <tr>
                 <th class="sticky-col col-code">代码</th>
@@ -264,10 +266,10 @@
                 <th>MA5方向 / 连续</th>
                 <th>MA5拐头价</th>
                 <th>MA5回踩价</th>
-                <th>推演次日5-10 / 增量</th>
-                <th>评分 / 建议仓位</th>
+                <th class="projection-col">推演次日5-10 / 增量</th>
+                <th class="score-col">评分 / 建议仓位</th>
                 <th>持仓 / 可用</th>
-                <th>入选状态</th>
+                <th>当日变动</th>
               </tr>
             </thead>
             <tbody id="candidateTableBody"></tbody>
@@ -303,7 +305,7 @@
                 <th>分组</th>
                 <th>当前仓位</th>
                 <th>资金池上限</th>
-                <th>同组候选 / 保留上限</th>
+                <th>同组候选 / 持仓上限</th>
               </tr>
             </thead>
             <tbody id="allocationTableBody"></tbody>
@@ -570,7 +572,7 @@
             <span class="step-number">04</span>
             <div>
               <h3>AI硬件资金池与分组上限</h3>
-              <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20%；已有持仓先占额度，剩余额度再分配给当天新候选；同组最多保留 2 只，组合总仓位封顶 100%。</p>
+              <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。</p>
             </div>
           </div>
           <div class="playbook-step">
@@ -634,6 +636,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261020-2320"></script>
+  <script src="assets/app.js?v=20261021-1951"></script>
 </body>
 </html>
