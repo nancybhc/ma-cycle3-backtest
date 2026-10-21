@@ -1504,6 +1504,14 @@ main {
   gap: 16px;
 }
 
+.stage-grid .stage-panel.to-long {
+  order: 1;
+}
+
+.stage-grid .stage-panel.to-short {
+  order: 2;
+}
+
 .stage-panel {
   padding: 20px;
   border-top: 2px solid var(--line-strong);
