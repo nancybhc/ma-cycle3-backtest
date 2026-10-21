@@ -1254,6 +1254,14 @@ main {
   font-size: 8px;
 }
 
+.candidate-table .code-cell,
+.candidate-table .name-cell strong,
+.candidate-table .price-pair strong,
+.candidate-table .ma-level strong,
+.candidate-table .ma-cell strong {
+  color: var(--text-soft);
+}
+
 .analytics-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
