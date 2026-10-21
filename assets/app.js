@@ -58,8 +58,8 @@ async function init() {
     const response = await fetch("data/backtest.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`数据读取失败：HTTP ${response.status}`);
     state.data = await response.json();
-    state.trades = [...state.data.trades].sort((a, b) =>
-      b.entryDate.localeCompare(a.entryDate)
+    state.trades = [...(state.data.strategyTransactions || [])].sort((a, b) =>
+      b.date.localeCompare(a.date)
     );
     state.filteredTrades = [...state.trades];
     populateOverview();
@@ -152,24 +152,6 @@ function populateOverview() {
   setText("candidateDateChip", meta.candidateDate);
   setText("candidateRunTime", meta.candidateRunTime || `回测更新 ${meta.runTime}`);
   setText("rawSummary", meta.summaryText || "无原始摘要");
-  const holdings = state.data.currentHoldings || [];
-  const holdingTotal = holdings.reduce(
-    (sum, row) => sum + Number(row.weightPct || 0),
-    0
-  );
-  const changeSummary = state.data.dailyChangeSummary || {};
-  const changeCount =
-    Number(changeSummary.buyCount || 0) +
-    Number(changeSummary.sellCount || 0) +
-    Number(changeSummary.holdCount || 0);
-  setText(
-    "currentHoldingsLine",
-    holdings.length || changeCount
-      ? `今日变动：新买入 ${formatInt(changeSummary.buyCount || 0)} · 当天卖出 ${formatInt(changeSummary.sellCount || 0)} · 持仓未动 ${formatInt(changeSummary.holdCount || 0)}；当前持仓：${holdings
-          .map((row) => `${row.name} ${formatNumber(row.weightPct, 1)}%`)
-          .join(" · ") || "无"} · 合计 ${formatNumber(holdingTotal, 1)}%`
-      : "当前持仓：无"
-  );
   setText(
     "footerGenerated",
     `生成 ${meta.generatedAt} · 行情缓存 ${meta.barsUpdated || "—"}`
@@ -178,30 +160,7 @@ function populateOverview() {
 
 function populateCandidates() {
   const signals = state.data.signals || [];
-  const holdings = state.data.currentHoldings || [];
   const dailyChanges = state.data.dailyChanges || [];
-  const buys = dailyChanges.filter((row) => row.changeType === "buy");
-  const sells = dailyChanges.filter((row) => row.changeType === "sell");
-  const holds = dailyChanges.filter((row) => row.changeType === "hold");
-  const limits = signals.filter((row) => row.limitUp);
-  const failures = signals.filter(
-    (row) => !row.isBuy && !row.limitUp && !row.projectedSuccess
-  );
-  const gapFailures = signals.filter(
-    (row) =>
-      !row.isBuy &&
-      !row.limitUp &&
-      row.projectedSuccess &&
-      !(Number(row.gapDeltaPct) > 1.5)
-  );
-  setText("todayBuyCount", formatInt(buys.length));
-  setText("todaySellCount", formatInt(sells.length));
-  setText("todayHoldCount", formatInt(holds.length));
-  setText("todayPositionCount", formatInt(holdings.length));
-  setText("todaySignalCount", formatInt(signals.length));
-  setText("todayLimitCount", formatInt(limits.length));
-  setText("todayFailCount", formatInt(failures.length));
-  setText("todayGapFailCount", formatInt(gapFailures.length));
   setText("scopeChangeCount", formatInt(dailyChanges.length));
   setText("scopeAllCount", formatInt(signals.length));
   renderCandidateTable();
@@ -314,6 +273,7 @@ function populatePositionRules() {
 
   const body = document.getElementById("allocationTableBody");
   body.innerHTML = [...groups.values()]
+    .filter((group) => Number(group.currentWeight || 0) > 0.0001)
     .sort((a, b) => {
       const aBuy = [...a.candidates.values()].some(
         (row) => !holdingCodes.has(row.code)
@@ -329,14 +289,13 @@ function populatePositionRules() {
     })
     .map((group) => {
       const currentText = group.currentNames.length
-        ? `${formatNumber(group.currentWeight, 1)}% · 持仓 ${group.currentNames.length}/${MAX_POSITIONS_PER_GROUP}`
+        ? `${formatNumber(group.currentWeight, 1)}%`
         : "0%";
       return `
         <tr>
           <td><strong>${escapeHtml(group.name)}</strong></td>
           <td title="${escapeAttr(group.currentNames.join(" · "))}">${currentText}</td>
-          <td class="num">${formatNumber(group.fundCap, 0)}%</td>
-          <td class="num">${formatInt(group.candidateCount)} / 2</td>
+          <td class="num">${formatInt(group.currentNames.length)} / ${MAX_POSITIONS_PER_GROUP}</td>
         </tr>`;
     })
     .join("");
@@ -387,7 +346,7 @@ function renderCandidateTable() {
           </td>
           <td>${pricePairHtml(row.close, row.changePct)}</td>
           <td>${holdingReturnHtml(row)}</td>
-          <td><span class="trend-badge">${escapeHtml(row.trend || "—")}</span></td>
+          <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
           <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
           <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
           <td>${levelHtml(row.ma10Rebound, row.ma10ReboundPct)}</td>
@@ -419,11 +378,10 @@ function holdingReturnHtml(row) {
     return `<span class="flat">—</span>`;
   }
   const returnPct = (current / entry - 1) * 100;
-  const label = row.changeType === "sell" ? "卖出" : "成本";
   return `
     <span class="price-pair holding-return">
       <strong class="${pctClass(returnPct)}">${formatPct(returnPct, true)}</strong>
-      <small>${label} ${formatPrice(current)} · 成本 ${formatPrice(entry)}</small>
+      <small>成本 ${formatPrice(entry)}</small>
     </span>`;
 }
 
@@ -449,23 +407,52 @@ function scorePositionHtml(score, positionPct, holdingWeightPct) {
     </span>`;
 }
 
+function currentHoldingDays(row) {
+  if (!row.entryDate) return null;
+  const dates = state.data.chartBars?.[row.code]?.dates || [];
+  const endDate = state.data.meta?.candidateDate || "";
+  if (dates.length) {
+    const heldBars = dates.filter(
+      (date) => date >= row.entryDate && (!endDate || date <= endDate)
+    );
+    return Math.max(0, heldBars.length - 1);
+  }
+  const start = new Date(`${row.entryDate}T00:00:00`);
+  const end = new Date(`${endDate || row.date}T00:00:00`);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null;
+  }
+  return Math.max(0, Math.floor((end - start) / 86400000));
+}
+
 function positionContextHtml(row) {
-  if (row.isHolding) {
+  if (row.changeType === "sell") {
     return `
       <span class="price-pair">
-        <strong>持仓 ${formatNumber(row.holdingWeightPct, 1)}%</strong>
-        <small>当前持有</small>
+        <strong>0%</strong>
+        <small>当天已卖出</small>
       </span>`;
   }
-  const existing = Number(row.existingHoldingsPct || 0);
-  const available = Number(row.availablePositionPct || 0);
-  const stage = row.indexStage
-    ? `${row.indexStage}${row.indexProgress ? row.indexProgress : ""}`
-    : "—";
+  if (row.isHolding) {
+    const days = currentHoldingDays(row);
+    return `
+      <span class="price-pair">
+        <strong>${formatNumber(row.holdingWeightPct ?? row.weightPct, 1)}%</strong>
+        <small>${days === null ? "当前持有" : `当前持有 ${formatInt(days)} 天`}</small>
+      </span>`;
+  }
+  const suggested = Number(row.suggestedPositionPct || 0);
+  if (suggested > 0) {
+    return `
+      <span class="price-pair">
+        <strong>建议 ${formatNumber(suggested, 1)}%</strong>
+        <small>当前未持有</small>
+      </span>`;
+  }
   return `
     <span class="price-pair">
-      <strong>持仓 ${formatNumber(existing, 1)}%</strong>
-      <small>${escapeHtml(stage)} · 可用 ${formatNumber(available, 1)}%</small>
+      <strong>0%</strong>
+      <small>当前未持有</small>
     </span>`;
 }
 
@@ -522,7 +509,7 @@ function populateFilters() {
 
   const monthSelect = document.getElementById("monthFilter");
   const months = [
-    ...new Set(state.trades.map((row) => row.entryDate.slice(0, 7))),
+    ...new Set(state.trades.map((row) => row.date.slice(0, 7))),
   ].sort((a, b) => b.localeCompare(a));
   months.forEach((month) => {
     const option = document.createElement("option");
@@ -584,10 +571,8 @@ function applyTradeFilters() {
       if (!haystack.includes(query)) return false;
     }
     if (group && row.group !== group) return false;
-    if (month && !row.entryDate.startsWith(month)) return false;
-    if (result === "win" && row.returnPct <= 0) return false;
-    if (result === "loss" && row.returnPct >= 0) return false;
-    if (result === "open" && row.status !== "持有中") return false;
+    if (month && !row.date.startsWith(month)) return false;
+    if (result && row.action !== result) return false;
     return true;
   });
   populateTradeTable();
@@ -603,52 +588,38 @@ function populateTradeTable() {
 
   if (!rows.length) {
     body.innerHTML = `
-      <tr><td colspan="13" style="padding:42px;text-align:center;color:var(--text-dim)">
-        当前筛选条件下没有交易
+      <tr><td colspan="9" style="padding:42px;text-align:center;color:var(--text-dim)">
+        当前筛选条件下没有策略成交
       </td></tr>`;
   } else {
     body.innerHTML = rows
       .map((trade) => {
-        const statusClass =
-          trade.status === "持有中" ? "buy" : trade.returnPct >= 0 ? "buy" : "skip";
+        const isBuy = trade.action === "buy";
         return `
-          <tr class="clickable" data-id="${escapeAttr(trade.id)}">
-            <td>${escapeHtml(trade.entryDate)}</td>
+          <tr>
+            <td>${escapeHtml(trade.date)}</td>
+            <td><span class="status-badge ${isBuy ? "buy" : "sell"}">${escapeHtml(trade.actionLabel)}</span></td>
             <td class="code-cell">${escapeHtml(trade.code)}</td>
             <td><strong style="color:var(--text);font-weight:600">${escapeHtml(trade.name)}</strong></td>
             <td>${escapeHtml(trade.group)}</td>
-            <td class="num">${formatPrice(trade.entryPrice)}</td>
-            <td>${gapProjectionHtml(trade.projectedGapPct, trade.gapDeltaPct)}</td>
-            <td>${escapeHtml(trade.exitDate)}</td>
-            <td class="num">${formatPrice(trade.exitPrice)}</td>
-            <td class="num ${pctClass(trade.returnPct)}"><strong style="font-weight:600">${formatPct(trade.returnPct, true)}</strong></td>
-            <td class="num">${formatInt(trade.holdingDays)} 天</td>
-            <td class="num">
-              <span class="mfe-pair">
-                <span class="up">${formatPct(trade.mfePct, true, 1)}</span>
-                <span class="down">${formatPct(trade.maePct, true, 1)}</span>
-              </span>
-            </td>
-            <td>
-              <span class="status-badge ${statusClass}">${escapeHtml(trade.status)}</span>
+            <td class="num">${formatPrice(trade.price)}</td>
+            <td class="num">${formatNumber(trade.weightPct, 1)}%</td>
+            <td class="num ${trade.returnPct === null || trade.returnPct === undefined ? "" : pctClass(trade.returnPct)}">
               ${
-                trade.status === "持有中" && Number(trade.holdingWeightPct) > 0
-                  ? `<small style="display:block;margin-top:4px;color:var(--text-dim)">今日 ${formatPct(trade.todayReturnPct, true)} · 占总仓位 ${formatNumber(trade.holdingWeightPct, 1)}%</small>`
-                  : ""
+                trade.returnPct === null || trade.returnPct === undefined
+                  ? '<span class="flat">—</span>'
+                  : `<strong style="font-weight:600">${formatPct(trade.returnPct, true)}</strong>`
               }
             </td>
-            <td><button class="row-action" type="button" aria-label="查看详情">›</button></td>
+            <td>${escapeHtml(trade.reason || "—")}</td>
           </tr>`;
       })
       .join("");
   }
 
-  body.querySelectorAll("tr[data-id]").forEach((row) => {
-    row.addEventListener("click", () => openTrade(row.dataset.id));
-  });
   setText(
     "tradeCountLabel",
-    `当前 ${formatInt(total)} 笔 · 第 ${state.page} / ${pageCount} 页`
+    `当前 ${formatInt(total)} 条成交 · 第 ${state.page} / ${pageCount} 页`
   );
   renderPagination(pageCount);
 }
@@ -1303,7 +1274,7 @@ function openSignal(code, scope = "changes") {
   );
   setText("drawerTitle", `${signal.name} · ${signal.code}`);
   document.getElementById("drawerTags").innerHTML = `
-    <span class="tag trend-badge">${escapeHtml(signal.trend || "—")}</span>
+    <span class="tag trend-badge">${escapeHtml(signal.trendLabel || signal.trend || "—")}</span>
     <span class="tag status-badge ${
       signal.changeType === "sell"
         ? "sell"
@@ -1506,44 +1477,28 @@ function renderTradeChart(item) {
 
 function exportFilteredTrades() {
   const headers = [
+    "成交日期",
+    "操作",
     "代码",
     "名称",
     "分组",
-    "入场日期",
-    "入场价",
-    "当日5-10间距%",
-    "推演5破10日",
-    "推演次日5-10间距%",
-    "间距增幅pp",
-    "出场日期",
-    "出场价",
+    "成交价",
+    "仓位%",
     "收益%",
-    "持有交易日",
-    "出场原因",
-    "状态",
-    "MFE%",
-    "MAE%",
+    "备注",
   ];
   const lines = [headers.join(",")];
   state.filteredTrades.forEach((row) => {
     const values = [
+      row.date,
+      row.actionLabel,
       row.code,
       row.name,
       row.group,
-      row.entryDate,
-      row.entryPrice,
-      row.gapPct,
-      row.projectedDate,
-      row.projectedGapPct,
-      row.gapDeltaPct,
-      row.exitDate,
-      row.exitPrice,
+      row.price,
+      row.weightPct,
       row.returnPct,
-      row.holdingDays,
-      row.exitReason,
-      row.status,
-      row.mfePct,
-      row.maePct,
+      row.reason,
     ];
     lines.push(values.map(csvCell).join(","));
   });
@@ -1553,12 +1508,12 @@ function exportFilteredTrades() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `进度3_5破10_间距增幅_交易明细_${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = `策略成交记录_${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  showToast(`已导出 ${state.filteredTrades.length} 笔交易`);
+  showToast(`已导出 ${state.filteredTrades.length} 条策略成交`);
 }
 
 function csvCell(value) {
