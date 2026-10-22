@@ -44,7 +44,7 @@
       <div class="hero-copy">
         <div class="eyebrow"><span>量化研究</span><i></i><span>沪深股票 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5。</p>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5，或下一交易日起单股持仓触及 -8% 条件止损。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -328,8 +328,8 @@
             <div class="playbook-step">
               <span class="step-number">05</span>
               <div>
-                <h3>运行价跌破 5 日均线离场</h3>
-                <p>14:40 运行时用最新快照价、盘后运行时用当日收盘价；价格低于 MA5 即卖出。单股持仓收益从下一交易日起触及 -8% 也强制卖出，低开按开盘价成交。MA5 条件单和 MA10 拐头均不再使用。</p>
+                <h3>跌破 MA5 或持仓 -8% 条件止损</h3>
+                <p>14:40 运行时用最新快照价、盘后运行时用当日收盘价；价格低于 MA5 即卖出。单股持仓从下一交易日起，盘中最低价触及入场价的 92% 即按止损价卖出；跳空低开时按开盘价成交。MA5 条件单和 MA10 拐头均不再使用。</p>
               </div>
             </div>
           </article>
@@ -485,7 +485,7 @@
           <div class="eyebrow"><span>统计分析</span></div>
           <h2>这张策略画像说明了什么</h2>
         </div>
-        <div class="section-note">单笔收益分布、月度贡献、板块表现与路径盈亏</div>
+        <div class="section-note">单笔收益分布、月度贡献、板块表现、止损出场与路径盈亏</div>
       </div>
       <div class="analytics-grid">
         <article class="panel chart-panel">
