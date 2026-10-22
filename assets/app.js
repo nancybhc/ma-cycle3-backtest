@@ -385,7 +385,6 @@ function holdingReturnHtml(row) {
     return `
       <span class="price-pair holding-return">
         <strong class="${pctClass(realized)}">${formatPct(realized, true)}</strong>
-        <small>成本 ${formatPrice(entry)} · 已实现</small>
       </span>`;
   }
   const current = Number(row.close);
