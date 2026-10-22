@@ -1294,8 +1294,8 @@ function openSignal(code, scope = "changes") {
     }">${escapeHtml(signal.reason)}</span>
     <span class="tag status-badge">${escapeHtml(signal.group)}</span>`;
   document.getElementById("drawerMetrics").innerHTML = [
-    metricHtml("收盘价", formatPrice(signal.close)),
-    metricHtml("当日涨幅", formatPct(signal.changePct, true), signal.changePct),
+    metricHtml("现价", formatPrice(signal.close)),
+    metricHtml("涨幅", formatPct(signal.changePct, true), signal.changePct),
     metricHtml("MA10 连续", `${signal.ma10Dir} ${Math.abs(signal.ma10Run)}天`, signal.ma10Dir === "向上" ? 1 : -1),
     metricHtml("MA5 连续", `${signal.ma5Dir} ${Math.abs(signal.ma5Run)}天`, signal.ma5Dir === "向上" ? 1 : -1),
   ].join("");
