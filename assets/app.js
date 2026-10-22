@@ -93,7 +93,7 @@ function populateOverview() {
   const { meta, funnel, portfolio, stats } = state.data;
   setText("topDataDate", `${meta.dataEnd} · 收盘后更新`);
   setText("heroRange", `${meta.start} → ${meta.end}`);
-  setText("heroUpdated", meta.runTime);
+  setText("heroUpdated", meta.latestUpdateAt || meta.runTime);
   setText("heroSamples", `${formatInt(stats.all.count)} 笔`);
 
   const last = state.data.equity[state.data.equity.length - 1];
