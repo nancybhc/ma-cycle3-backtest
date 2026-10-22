@@ -600,7 +600,7 @@ function populateTradeTable() {
 
   if (!rows.length) {
     body.innerHTML = `
-      <tr><td colspan="10" style="padding:42px;text-align:center;color:var(--text-dim)">
+      <tr><td colspan="9" style="padding:42px;text-align:center;color:var(--text-dim)">
         当前筛选条件下没有策略成交
       </td></tr>`;
   } else {
@@ -609,8 +609,12 @@ function populateTradeTable() {
         const isBuy = trade.action === "buy";
         return `
           <tr>
-            <td>${escapeHtml(trade.entryDate || trade.date || "—")}</td>
-            <td>${escapeHtml(trade.date)}</td>
+            <td>
+              <div class="trade-date">
+                <span>${escapeHtml(trade.entryDate || trade.date || "—")}</span>
+                <small>${isBuy ? "尚未卖出" : `卖出 ${escapeHtml(trade.date || "—")}`}</small>
+              </div>
+            </td>
             <td><span class="status-badge ${isBuy ? "buy" : "sell"}">${escapeHtml(trade.actionLabel)}</span></td>
             <td class="code-cell">${escapeHtml(trade.code)}</td>
             <td><strong style="color:var(--text);font-weight:600">${escapeHtml(trade.name)}</strong></td>

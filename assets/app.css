@@ -1441,6 +1441,19 @@ main {
   font-size: 10px;
 }
 
+.trade-date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.trade-date small {
+  color: var(--text-dim);
+  font-size: 8px;
+  font-weight: 400;
+}
+
 .trade-table .num {
   text-align: right;
 }
