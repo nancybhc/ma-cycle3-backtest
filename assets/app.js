@@ -58,9 +58,13 @@ async function init() {
     const response = await fetch("data/backtest.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`数据读取失败：HTTP ${response.status}`);
     state.data = await response.json();
-    state.trades = [...(state.data.strategyTransactions || [])].sort((a, b) =>
-      b.date.localeCompare(a.date)
-    );
+    state.trades = [...(state.data.strategyTransactions || [])].sort((a, b) => {
+      const entryOrder = String(b.entryDate || b.date || "").localeCompare(
+        String(a.entryDate || a.date || "")
+      );
+      if (entryOrder !== 0) return entryOrder;
+      return String(b.date || "").localeCompare(String(a.date || ""));
+    });
     state.filteredTrades = [...state.trades];
     populateOverview();
     populateCandidates();
@@ -596,7 +600,7 @@ function populateTradeTable() {
 
   if (!rows.length) {
     body.innerHTML = `
-      <tr><td colspan="9" style="padding:42px;text-align:center;color:var(--text-dim)">
+      <tr><td colspan="10" style="padding:42px;text-align:center;color:var(--text-dim)">
         当前筛选条件下没有策略成交
       </td></tr>`;
   } else {
@@ -605,6 +609,7 @@ function populateTradeTable() {
         const isBuy = trade.action === "buy";
         return `
           <tr>
+            <td>${escapeHtml(trade.entryDate || trade.date || "—")}</td>
             <td>${escapeHtml(trade.date)}</td>
             <td><span class="status-badge ${isBuy ? "buy" : "sell"}">${escapeHtml(trade.actionLabel)}</span></td>
             <td class="code-cell">${escapeHtml(trade.code)}</td>
@@ -1485,6 +1490,7 @@ function renderTradeChart(item) {
 
 function exportFilteredTrades() {
   const headers = [
+    "买入日期",
     "成交日期",
     "操作",
     "代码",
@@ -1498,6 +1504,7 @@ function exportFilteredTrades() {
   const lines = [headers.join(",")];
   state.filteredTrades.forEach((row) => {
     const values = [
+      row.entryDate || row.date,
       row.date,
       row.actionLabel,
       row.code,
