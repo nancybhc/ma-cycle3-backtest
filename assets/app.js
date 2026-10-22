@@ -334,9 +334,9 @@ function renderCandidateTable() {
               : "skip";
       const statusText =
         changeType === "sell"
-          ? "当天卖出"
+          ? row.actionLabel || "当天卖出"
           : changeType === "buy"
-            ? "新买入"
+            ? row.actionLabel || "新买入"
             : changeType === "hold"
               ? "持仓未动"
               : row.isBuy
@@ -385,6 +385,7 @@ function holdingReturnHtml(row) {
     return `
       <span class="price-pair holding-return">
         <strong class="${pctClass(realized)}">${formatPct(realized, true)}</strong>
+        ${entry > 0 ? `<small>成本 ${formatPrice(entry)}</small>` : ""}
       </span>`;
   }
   const current = Number(row.close);
@@ -1293,12 +1294,13 @@ function openSignal(code, scope = "changes") {
   if (!signal) return;
   state.drawerType = "signal";
   state.drawerId = code;
+  const buyLabel = signal.actionLabel || "尾盘买入";
   setText(
     "drawerKicker",
     signal.changeType === "sell"
-      ? "当天卖出"
+      ? signal.actionLabel || "当天卖出"
       : signal.changeType === "buy"
-        ? "新买入"
+        ? buyLabel
         : signal.isHolding
           ? "持仓未动"
           : "今日候选"
@@ -1328,9 +1330,9 @@ function openSignal(code, scope = "changes") {
       ? [[
           "当日变动",
           signal.changeType === "buy"
-            ? "新买入"
+            ? buyLabel
             : signal.changeType === "sell"
-              ? `当天卖出 ${formatPrice(signal.close)}`
+              ? `${signal.actionLabel || "当天卖出"} ${formatPrice(signal.close)}`
               : "持仓未动",
         ]]
       : []),
