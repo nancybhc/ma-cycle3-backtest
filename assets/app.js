@@ -154,7 +154,10 @@ function populateOverview() {
   toneElement("testValue", stats.test.avgReturnPct);
 
   setText("candidateDateChip", meta.candidateDate);
-  setText("candidateRunTime", meta.candidateRunTime || `回测更新 ${meta.runTime}`);
+  setText(
+    "candidateRunTime",
+    meta.snapshotRunLabel || meta.candidateRunTime || `回测更新 ${meta.runTime}`
+  );
   setText("rawSummary", meta.summaryText || "无原始摘要");
   setText(
     "footerGenerated",
