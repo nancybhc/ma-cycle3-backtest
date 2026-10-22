@@ -713,6 +713,7 @@ function renderAllCharts() {
   renderDistributionChart();
   renderGroupChart();
   renderScatterChart();
+  renderExitReasonChart();
 }
 
 function chartBase() {
@@ -1161,21 +1162,24 @@ function renderScatterChart() {
 function renderExitReasonChart() {
   const chart = getChart("exitReasonChart");
   const rows = state.data.exitReasons || [];
-  const ma10Led = rows
-    .filter((row) => row.reason.includes("MA10"))
+  const stopped = rows
+    .filter((row) => row.reason.includes("强制卖出"))
+    .reduce((total, row) => total + row.count, 0);
+  const gapStops = rows
+    .filter((row) => row.reason.includes("强制卖出（低开）"))
     .reduce((total, row) => total + row.count, 0);
   const total = rows.reduce((sum, row) => sum + row.count, 0);
   setText(
     "exitMixTip",
-    `MA10 参与触发 ${formatInt(ma10Led)} 笔 · ${formatPct(
-      total ? ma10Led / total * 100 : 0,
+    `止损 ${formatInt(stopped)} 笔 · ${formatPct(
+      total ? stopped / total * 100 : 0,
       false
-    )}`
+    )} · 低开 ${formatInt(gapStops)} 笔`
   );
   const ordered = [...rows].reverse();
   const colorFor = (reason) => {
-    if (reason.includes("+MA10")) return COLOR.red;
-    if (reason === "MA10拐头") return COLOR.amber;
+    if (reason.includes("强制卖出（低开）")) return COLOR.amber;
+    if (reason.includes("强制卖出")) return COLOR.green;
     if (reason === "跌破MA5") return COLOR.cyan;
     return COLOR.dim;
   };
