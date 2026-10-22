@@ -380,6 +380,14 @@ function holdingReturnHtml(row) {
     return `<span class="flat">—</span>`;
   }
   const entry = Number(row.entryPrice);
+  const realized = Number(row.returnPct);
+  if (row.changeType === "sell" && Number.isFinite(realized)) {
+    return `
+      <span class="price-pair holding-return">
+        <strong class="${pctClass(realized)}">${formatPct(realized, true)}</strong>
+        <small>成本 ${formatPrice(entry)} · 已实现</small>
+      </span>`;
+  }
   const current = Number(row.close);
   if (!(entry > 0) || !(current > 0)) {
     return `<span class="flat">—</span>`;
