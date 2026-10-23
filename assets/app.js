@@ -352,6 +352,8 @@ function renderCandidateTable() {
             </span>
           </td>
           <td>${pricePairHtml(row.close, row.changePct)}</td>
+          <td class="num">${holdingCostHtml(row)}</td>
+          <td class="num">${holdingReturnHtml(row)}</td>
           <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
           <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
           <td>${projectedMa10DirectionHtml(row)}</td>
@@ -459,6 +461,46 @@ function pricePairHtml(price, changePct) {
     <span class="price-pair">
       <strong>${formatPrice(price)}</strong>
       <small class="${pctClass(changePct)}">${formatPct(changePct, true)}</small>
+    </span>`;
+}
+
+function holdingReturnPct(row) {
+  if (
+    row?.returnPct !== null &&
+    row?.returnPct !== undefined &&
+    Number.isFinite(Number(row.returnPct))
+  ) {
+    return Number(row.returnPct);
+  }
+  const entryPrice = Number(row?.entryPrice);
+  const currentPrice = Number(row?.currentPrice ?? row?.close);
+  if (entryPrice > 0 && currentPrice > 0) {
+    return (currentPrice / entryPrice - 1) * 100;
+  }
+  return null;
+}
+
+function holdingCostHtml(row) {
+  if (!row?.isHolding && row?.changeType !== "sell") {
+    return '<span class="flat">—</span>';
+  }
+  if (!(Number(row?.entryPrice) > 0)) {
+    return '<span class="flat">—</span>';
+  }
+  return `
+    <span class="price-pair">
+      <strong>${formatPrice(row.entryPrice)}</strong>
+      <small>${escapeHtml(row.entryDate || "建仓")}</small>
+    </span>`;
+}
+
+function holdingReturnHtml(row) {
+  const value = holdingReturnPct(row);
+  if (value === null) return '<span class="flat">—</span>';
+  return `
+    <span class="price-pair">
+      <strong class="${pctClass(value)}">${formatPct(value, true)}</strong>
+      <small>${row?.changeType === "sell" ? "已实现" : "较成本"}</small>
     </span>`;
 }
 
@@ -1309,11 +1351,24 @@ function openSignal(code, scope = "changes") {
             : "skip"
     }">${escapeHtml(signal.reason)}</span>
     <span class="tag status-badge">${escapeHtml(signal.group)}</span>`;
+  const positionReturn = holdingReturnPct(signal);
+  const positionMetrics =
+    signal.isHolding || signal.changeType === "sell"
+      ? [
+          metricHtml("持仓成本", formatPrice(signal.entryPrice)),
+          metricHtml(
+            signal.changeType === "sell" ? "已实现收益" : "持仓收益",
+            positionReturn === null ? "—" : formatPct(positionReturn, true),
+            positionReturn
+          ),
+        ]
+      : [];
   document.getElementById("drawerMetrics").innerHTML = [
     metricHtml("现价", formatPrice(signal.close)),
     metricHtml("涨幅", formatPct(signal.changePct, true), signal.changePct),
     metricHtml("MA10 连续", `${signal.ma10Dir} ${Math.abs(signal.ma10Run)}天`, signal.ma10Dir === "向上" ? 1 : -1),
     metricHtml("MA5 连续", `${signal.ma5Dir} ${Math.abs(signal.ma5Run)}天`, signal.ma5Dir === "向上" ? 1 : -1),
+    ...positionMetrics,
   ].join("");
   document.getElementById("drawerDetails").innerHTML = detailTable([
     ["日期", signal.date],
