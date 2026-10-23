@@ -1112,6 +1112,10 @@ main {
   display: none;
 }
 
+.candidate-table:not(.changes-view) .position-col {
+  display: none;
+}
+
 .candidate-table tbody tr:hover .sticky-col {
   background: #0c1c2b;
 }
