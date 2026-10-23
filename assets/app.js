@@ -352,8 +352,7 @@ function renderCandidateTable() {
             </span>
           </td>
           <td>${pricePairHtml(row.close, row.changePct)}</td>
-          <td class="num">${holdingCostHtml(row)}</td>
-          <td class="num">${holdingReturnHtml(row)}</td>
+          <td class="num">${holdingCostReturnHtml(row)}</td>
           <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
           <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
           <td>${projectedMa10DirectionHtml(row)}</td>
@@ -480,27 +479,19 @@ function holdingReturnPct(row) {
   return null;
 }
 
-function holdingCostHtml(row) {
+function holdingCostReturnHtml(row) {
   if (!row?.isHolding && row?.changeType !== "sell") {
     return '<span class="flat">—</span>';
   }
-  if (!(Number(row?.entryPrice) > 0)) {
-    return '<span class="flat">—</span>';
-  }
+  const returnValue = holdingReturnPct(row);
+  const cost =
+    Number(row?.entryPrice) > 0 ? formatPrice(row.entryPrice) : "—";
   return `
     <span class="price-pair">
-      <strong>${formatPrice(row.entryPrice)}</strong>
-      <small>${escapeHtml(row.entryDate || "建仓")}</small>
-    </span>`;
-}
-
-function holdingReturnHtml(row) {
-  const value = holdingReturnPct(row);
-  if (value === null) return '<span class="flat">—</span>';
-  return `
-    <span class="price-pair">
-      <strong class="${pctClass(value)}">${formatPct(value, true)}</strong>
-      <small>${row?.changeType === "sell" ? "已实现" : "较成本"}</small>
+      <strong>${cost}</strong>
+      <small class="${returnValue === null ? "flat" : pctClass(returnValue)}">
+        ${returnValue === null ? "—" : formatPct(returnValue, true)}
+      </small>
     </span>`;
 }
 
