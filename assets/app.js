@@ -363,7 +363,6 @@ function renderCandidateTable() {
           <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
           <td class="projection-col">${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
           <td class="score-col">${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
-          <td>${positionContextHtml(row)}</td>
           <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
         </tr>`;
     })
@@ -422,37 +421,6 @@ function currentHoldingDays(row) {
     return null;
   }
   return Math.max(0, Math.floor((end - start) / 86400000));
-}
-
-function positionContextHtml(row) {
-  if (row.changeType === "sell") {
-    return `
-      <span class="price-pair">
-        <strong>0%</strong>
-        <small>当天已卖出</small>
-      </span>`;
-  }
-  if (row.isHolding) {
-    const days = currentHoldingDays(row);
-    return `
-      <span class="price-pair">
-        <strong>${formatNumber(row.holdingWeightPct ?? row.weightPct, 1)}%</strong>
-        <small>${days === null ? "当前持有" : `当前持有 ${formatInt(days)} 天`}</small>
-      </span>`;
-  }
-  const suggested = Number(row.suggestedPositionPct || 0);
-  if (suggested > 0) {
-    return `
-      <span class="price-pair">
-        <strong>建议 ${formatNumber(suggested, 1)}%</strong>
-        <small>当前未持有</small>
-      </span>`;
-  }
-  return `
-    <span class="price-pair">
-      <strong>0%</strong>
-      <small>当前未持有</small>
-    </span>`;
 }
 
 function pricePairHtml(price, changePct) {
