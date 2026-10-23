@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=20261022-trade-date">
+<link rel="stylesheet" href="assets/app.css?v=20261023-four-metric-score">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -234,9 +234,9 @@
                 <th class="sticky-col col-code">代码</th>
                 <th class="sticky-col col-name">名称</th>
                 <th>现价 / 涨幅</th>
-                <th>持有收益</th>
                 <th>趋势</th>
                 <th>MA10方向 / 连续</th>
+                <th title="假设次日收盘价等于当日收盘价，比较重算后的 MA10 与今日 MA10；仅作参考，不进入评分。">推演次日MA10方向</th>
                 <th>MA10拐头价</th>
                 <th>MA10回踩价</th>
                 <th>MA5方向 / 连续</th>
@@ -308,7 +308,7 @@
               <span class="step-number">02</span>
               <div>
                 <h3>推演次日 0% 完成 5破10</h3>
-                <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。</p>
+                <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。同时展示推演次日 MA10 相对今日的方向，仅作参考，暂不进入评分。</p>
               </div>
             </div>
             <div class="playbook-step">
@@ -322,7 +322,7 @@
               <span class="step-number">04</span>
               <div>
                 <h3>AI硬件资金池与分组上限</h3>
-                <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。</p>
+                <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。多组同时有信号而总仓位不足时，按分组多占比从高到低分配，组内按综合评分从高到低选取。</p>
               </div>
             </div>
             <div class="playbook-step">
@@ -339,26 +339,33 @@
             <div>
               <h3>信号综合评分规则</h3>
             </div>
-            <span class="panel-tip">评分 0–1 · 用于组内排序</span>
+            <span class="panel-tip">评分 0–1 · 参考比较</span>
           </div>
           <div class="score-formula">
             <span>综合评分 =</span>
-            <strong>40% 间距增幅分位</strong>
+            <strong>30% MA10拐头价涨幅分位</strong>
             <b>+</b>
-            <strong>40% 分组多占比分位</strong>
+            <strong>30% 分组多占比分位</strong>
+            <b>+</b>
+            <strong>20% 间距增幅分位</strong>
             <b>+</b>
             <strong>20% 推演后 5–10 间距分位</strong>
           </div>
           <div class="score-dimension-grid">
             <div class="score-dimension">
-              <span>40%</span>
-              <strong>间距增幅</strong>
-              <p>推演次日 5–10 间距% 减去当日 5–10 间距%，也就是 MA5 相对 MA10 的间距变化；数值越大，说明均线分离越快。</p>
+              <span>30%</span>
+              <strong>MA10拐头价涨幅</strong>
+              <p>使用 MA10拐头价相对现价的涨幅，保留正负号并反向排名：负得越多，分数越高。负值说明次日平盘即可保持 MA10 向上，正值则说明平盘仍会转下，越接近转强越有利。</p>
             </div>
             <div class="score-dimension">
-              <span>40%</span>
+              <span>30%</span>
               <strong>分组多占比</strong>
               <p>统计所属分组内 MA5 向上、MA10 向上且 MA5 在 MA10 上方的“多”股票数，再除以该分组当日有有效 MA5 / MA10 的股票总数；占比越高，说明板块内部多头越一致。</p>
+            </div>
+            <div class="score-dimension">
+              <span>20%</span>
+              <strong>间距增幅</strong>
+              <p>推演次日 5–10 间距% 减去当日 5–10 间距%，也就是 MA5 相对 MA10 的间距变化；数值越大，说明均线分离越快。</p>
             </div>
             <div class="score-dimension">
               <span>20%</span>
@@ -366,7 +373,7 @@
               <p>把信号日收盘价复制为推演次日价格，重算 MA5 / MA10；按（推演 MA5 ÷ 推演 MA10 − 1）× 100% 得到最终间距；数值越大，说明推演后的多头间隔越充分。</p>
             </div>
           </div>
-          <small class="score-rule-note">三个原始指标先转为分位排名，再按权重合成；评分只用于同一交易日、同一判定分组内排序，不替代买入硬条件和持仓上限。</small>
+          <small class="score-rule-note">四个原始指标先转为分位排名，再按权重合成；MA10拐头价涨幅按数值越小分位越高，其余三项按数值越大分位越高。评分只用于横向参考，不替代买入硬条件和持仓上限。</small>
         </article>
       </section>
 
@@ -644,6 +651,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261022-no-realized-tail"></script>
+<script src="assets/app.js?v=20261023-projected-ma10-direction"></script>
 </body>
 </html>

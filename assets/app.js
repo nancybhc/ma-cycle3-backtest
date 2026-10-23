@@ -352,9 +352,9 @@ function renderCandidateTable() {
             </span>
           </td>
           <td>${pricePairHtml(row.close, row.changePct)}</td>
-          <td>${holdingReturnHtml(row)}</td>
           <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
           <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
+          <td>${projectedMa10DirectionHtml(row)}</td>
           <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
           <td>${levelHtml(row.ma10Rebound, row.ma10ReboundPct)}</td>
           <td>${maDirectionHtml(row.ma5Dir, row.ma5Run)}</td>
@@ -373,31 +373,6 @@ function renderCandidateTable() {
       openSignal(row.dataset.code, state.candidateScope)
     );
   });
-}
-
-function holdingReturnHtml(row) {
-  if (!row.isHolding && row.changeType !== "sell") {
-    return `<span class="flat">—</span>`;
-  }
-  const entry = Number(row.entryPrice);
-  const realized = Number(row.returnPct);
-  if (row.changeType === "sell" && Number.isFinite(realized)) {
-    return `
-      <span class="price-pair holding-return">
-        <strong class="${pctClass(realized)}">${formatPct(realized, true)}</strong>
-        ${entry > 0 ? `<small>成本 ${formatPrice(entry)}</small>` : ""}
-      </span>`;
-  }
-  const current = Number(row.close);
-  if (!(entry > 0) || !(current > 0)) {
-    return `<span class="flat">—</span>`;
-  }
-  const returnPct = (current / entry - 1) * 100;
-  return `
-    <span class="price-pair holding-return">
-      <strong class="${pctClass(returnPct)}">${formatPct(returnPct, true)}</strong>
-      <small>成本 ${formatPrice(entry)}</small>
-    </span>`;
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
@@ -506,6 +481,22 @@ function maDirectionHtml(direction, run) {
     <span class="ma-cell">
       <strong class="${cls}">${escapeHtml(direction || "—")}</strong>
       <span>${runText}</span>
+    </span>`;
+}
+
+function projectedMa10DirectionHtml(row) {
+  const current = Number(row.ma10);
+  const projected = Number(row.projectedMa10);
+  let direction = String(row.projectedMa10Dir || "");
+  if (!direction && Number.isFinite(current) && Number.isFinite(projected)) {
+    direction = projected > current ? "向上" : projected < current ? "向下" : "走平";
+  }
+  if (!direction) return `<span class="flat">—</span>`;
+  const cls =
+    direction === "向上" ? "up" : direction === "向下" ? "down" : "flat";
+  return `
+    <span class="ma-cell" title="仅作参考，不进入评分">
+      <strong class="${cls}">${escapeHtml(direction)}</strong>
     </span>`;
 }
 
@@ -1342,6 +1333,10 @@ function openSignal(code, scope = "changes") {
     ["间距增幅", formatPct(signal.gapDeltaPct, true)],
     ["推演次日 MA5", formatPrice(signal.projectedMa5)],
     ["推演次日 MA10", formatPrice(signal.projectedMa10)],
+    [
+      "推演次日 MA10 方向",
+      signal.projectedMa10Dir || "—",
+    ],
     ["MA10 拐头 / 回踩", `${formatPrice(signal.ma10Turn)} / ${formatPrice(signal.ma10Rebound)}`],
     ["MA5 拐头 / 回踩", `${formatPrice(signal.ma5Turn)} / ${formatPrice(signal.ma5Rebound)}`],
   ]);
