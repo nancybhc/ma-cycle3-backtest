@@ -44,7 +44,7 @@
       <div class="hero-copy">
         <div class="eyebrow"><span>量化研究</span><i></i><span>沪深股票 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5，或下一交易日起单股持仓触及 -8% 条件止损。</p>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5，或下一交易日起单股持仓触及 -8% 条件止损。上证指数进入多转空时，AI硬件目标仓位降为 0%，并在当日按收盘价强制清仓。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -323,7 +323,7 @@
               <span class="step-number">04</span>
               <div>
                 <h3>AI硬件资金池与分组上限</h3>
-                <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 60%/30%/20%。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。多组同时有信号而总仓位不足时，按分组多占比从高到低分配，组内按综合评分从高到低选取。</p>
+                <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 0%。进入多转空当日，已有 AI 硬件持仓按收盘价强制清仓。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。多组同时有信号而总仓位不足时，按分组多占比从高到低分配，组内按综合评分从高到低选取。</p>
               </div>
             </div>
             <div class="playbook-step">
@@ -407,9 +407,9 @@
             <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>50%</strong></div>
             <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
             <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
-            <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1</span><strong>60%</strong></div>
-            <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2</span><strong>30%</strong></div>
-            <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3</span><strong>20%</strong></div>
+            <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1 · 清仓</span><strong>0%</strong></div>
+            <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2 · 清仓</span><strong>0%</strong></div>
+            <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3 · 清仓</span><strong>0%</strong></div>
           </div>
 
           <div class="stage-grid">
