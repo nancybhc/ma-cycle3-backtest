@@ -1797,7 +1797,7 @@ main {
   grid-template-rows: auto auto minmax(0, 1fr);
   grid-template-areas:
     "step1 step4"
-    "step2 step5"
+    "step2 step4"
     "step3 step5";
   gap: 0;
   padding: 8px 22px;
