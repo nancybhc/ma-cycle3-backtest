@@ -309,36 +309,6 @@ main {
   line-height: 1.9;
 }
 
-.buy-gate {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: -10px 0 26px;
-  padding: 10px 14px;
-  border: 1px solid rgba(72, 225, 209, 0.35);
-  border-radius: 10px;
-  background: rgba(72, 225, 209, 0.08);
-}
-
-.buy-gate span {
-  color: var(--cyan);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.buy-gate strong {
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 13px;
-}
-
-.buy-gate i {
-  color: var(--text-dim);
-  font-style: normal;
-}
-
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
