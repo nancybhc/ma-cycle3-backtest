@@ -1794,6 +1794,11 @@ main {
 .playbook-panel {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-areas:
+    "step1 step4"
+    "step2 step5"
+    "step3 step5";
   gap: 0;
   padding: 8px 22px;
 }
@@ -1806,11 +1811,27 @@ main {
   border-bottom: 1px solid var(--line);
 }
 
-.playbook-step:nth-child(2n) {
+.playbook-step:nth-child(1) {
+  grid-area: step1;
+}
+
+.playbook-step:nth-child(2) {
+  grid-area: step2;
+}
+
+.playbook-step:nth-child(3) {
+  grid-area: step3;
+  border-bottom: 0;
+}
+
+.playbook-step:nth-child(4) {
+  grid-area: step4;
   border-right: 0;
 }
 
-.playbook-step:last-child {
+.playbook-step:nth-child(5) {
+  grid-area: step5;
+  border-right: 0;
   border-bottom: 0;
 }
 
@@ -2315,6 +2336,12 @@ main {
 
   .playbook-panel {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: none;
+  }
+
+  .playbook-step:nth-child(n) {
+    grid-area: auto;
   }
 
   .stage-base-grid {
