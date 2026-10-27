@@ -44,7 +44,13 @@
       <div class="hero-copy">
         <div class="eyebrow"><span>量化研究</span><i></i><span>沪深股票 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5，或下一交易日起单股持仓触及 -8% 条件止损。上证指数进入多转空时，AI硬件目标仓位降为 0%，并在当日按收盘价强制清仓。</p>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。买入前还必须满足判定分组多占比 ≥10%、综合评分 ≥0.25。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。离场为运行价跌破 MA5，或下一交易日起单股持仓触及 -8% 条件止损。上证指数进入多转空时，AI硬件目标仓位降为 0%，并在当日按收盘价强制清仓。</p>
+        <div class="buy-gate">
+          <span>买入硬门槛</span>
+          <strong>分组多占比 ≥10%</strong>
+          <i>+</i>
+          <strong>综合评分 ≥0.25</strong>
+        </div>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
