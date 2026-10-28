@@ -1108,8 +1108,16 @@ main {
 }
 
 .candidate-table.changes-view .projection-col,
-.candidate-table.changes-view .score-col {
+.candidate-table.changes-view .score-col,
+.candidate-table.changes-view .first-selected-col {
   display: none;
+}
+
+.candidate-table .first-selected-col {
+    min-width: 116px;
+    color: var(--text-soft);
+    font-family: var(--mono);
+    font-size: 9px;
 }
 
 .candidate-table:not(.changes-view) .position-col {

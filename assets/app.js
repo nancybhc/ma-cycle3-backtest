@@ -1,5 +1,8 @@
 const state = {
   data: null,
+  staticSignals: [],
+  liveData: null,
+  liveApplied: false,
   candidateScope: "changes",
   trades: [],
   filteredTrades: [],
@@ -58,6 +61,9 @@ async function init() {
     const response = await fetch("data/backtest.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`数据读取失败：HTTP ${response.status}`);
     state.data = await response.json();
+    state.staticSignals = [...(state.data.signals || [])];
+    state.liveData = await fetchLiveSignals();
+    applyLiveSignals(state.liveData);
     state.trades = [...(state.data.strategyTransactions || [])].sort((a, b) => {
       const entryOrder = String(b.entryDate || b.date || "").localeCompare(
         String(a.entryDate || a.date || "")
@@ -75,6 +81,8 @@ async function init() {
     bindInteractions();
     renderAllCharts();
     setupNavigation();
+    updateCandidateRunHeader();
+    window.setInterval(refreshLiveSignals, 60_000);
     window.addEventListener("resize", resizeCharts);
     document.getElementById("loadingScreen").classList.add("hidden");
   } catch (error) {
@@ -87,6 +95,105 @@ async function init() {
         <span>${escapeHtml(error.message || String(error))}</span>
       </div>`;
   }
+}
+
+async function fetchLiveSignals() {
+  try {
+    const response = await fetch(`data/live_signals.json?ts=${Date.now()}`, {
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function shanghaiClock() {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(new Date())
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    weekday: parts.weekday,
+    minuteOfDay: Number(parts.hour) * 60 + Number(parts.minute),
+  };
+}
+
+function shouldUseLiveSignals(live) {
+  if (
+    !live ||
+    !live.available ||
+    live.status !== "scanning" ||
+    !Array.isArray(live.signals) ||
+    !live.marketDate
+  ) {
+    return false;
+  }
+  const clock = shanghaiClock();
+  if (clock.date !== live.marketDate) return false;
+  if (["Sat", "Sun"].includes(clock.weekday)) return false;
+  if (clock.minuteOfDay < 9 * 60 + 15 || clock.minuteOfDay >= 15 * 60 + 5) {
+    return false;
+  }
+  const generatedAt = Date.parse(live.generatedAt || "");
+  if (!Number.isFinite(generatedAt)) return false;
+  return Date.now() - generatedAt <= 8 * 60 * 1000;
+}
+
+function applyLiveSignals(live) {
+  const useLive = shouldUseLiveSignals(live);
+  state.liveApplied = useLive;
+  state.liveData = live;
+  state.data.signals = useLive
+    ? [...live.signals]
+    : [...state.staticSignals];
+  return useLive;
+}
+
+async function refreshLiveSignals() {
+  const live = await fetchLiveSignals();
+  if (!live && !state.liveApplied) return;
+  const wasApplied = state.liveApplied;
+  applyLiveSignals(live);
+  updateCandidateRunHeader();
+  if (wasApplied || state.liveApplied) {
+    populateCandidates();
+    populatePositionRules();
+  }
+}
+
+function updateCandidateRunHeader() {
+  const live = state.liveData;
+  if (state.liveApplied && live) {
+    const quoteTime = live.marketTime || live.generatedAt || "";
+    const quoteClock =
+      String(quoteTime).match(/\b\d{2}:\d{2}:\d{2}\b/)?.[0] || "更新中";
+    setText("candidateDateChip", live.marketDate);
+    setText(
+      "candidateRunTime",
+      `盘中动态 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交`
+    );
+    return;
+  }
+  const { meta } = state.data;
+  setText("candidateDateChip", meta.candidateDate);
+  setText(
+    "candidateRunTime",
+    meta.snapshotRunLabel || meta.candidateRunTime || `回测更新 ${meta.runTime}`
+  );
 }
 
 function populateOverview() {
@@ -351,6 +458,7 @@ function renderCandidateTable() {
               <small>${escapeHtml(row.group || "未分组")}</small>
             </span>
           </td>
+          <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
           <td>${pricePairHtml(row.close, row.changePct)}</td>
           <td class="num position-col">${holdingCostReturnHtml(row)}</td>
           <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
@@ -374,6 +482,12 @@ function renderCandidateTable() {
       openSignal(row.dataset.code, state.candidateScope)
     );
   });
+}
+
+function firstSelectedTime(value) {
+  const text = String(value || "");
+  const match = text.match(/\b(\d{2}:\d{2}:\d{2})\b/);
+  return match ? match[1] : "—";
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
@@ -1356,6 +1470,7 @@ function openSignal(code, scope = "changes") {
   ].join("");
   document.getElementById("drawerDetails").innerHTML = detailTable([
     ["日期", signal.date],
+    ["首次入选时间", signal.firstSelectedAt || "—"],
     ...(signal.changeType
       ? [[
           "当日变动",
