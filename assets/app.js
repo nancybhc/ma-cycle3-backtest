@@ -84,7 +84,7 @@ async function init() {
     renderAllCharts();
     setupNavigation();
     updateCandidateRunHeader();
-    window.setInterval(refreshLiveSignals, 60_000);
+    window.setInterval(refreshLiveSignals, 10_000);
     window.setInterval(refreshMonitorStatus, 10_000);
     window.addEventListener("resize", resizeCharts);
     document.getElementById("loadingScreen").classList.add("hidden");
@@ -596,6 +596,7 @@ function renderCandidateTable() {
           <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
           <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
           <td class="projection-col">${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
+          <td class="num group-ratio-col">${groupRatioText(row.groupManyRatioPct)}</td>
           <td class="score-col">${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
           <td class="num position-context-col">${positionContextHtml(row)}</td>
           <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
@@ -614,6 +615,13 @@ function firstSelectedTime(value) {
   const text = String(value || "");
   const match = text.match(/\b(\d{2}:\d{2}:\d{2})\b/);
   return match ? match[1] : "—";
+}
+
+function groupRatioText(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return "—";
+  }
+  return `${Number(value).toFixed(2)}%`;
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
@@ -1611,6 +1619,7 @@ function openSignal(code, scope = "changes") {
     ["5-10 间距", formatPct(signal.gapPct, true)],
     ["推演次日 5-10 间距", formatPct(signal.projectedGapPct, true)],
     ["间距增幅", formatPct(signal.gapDeltaPct, true)],
+    ["分组多占比", signal.groupManyRatioPct === null || signal.groupManyRatioPct === undefined ? "—" : `${formatNumber(signal.groupManyRatioPct, 2)}%`],
     ["推演次日 MA5", formatPrice(signal.projectedMa5)],
     ["推演次日 MA10", formatPrice(signal.projectedMa10)],
     [

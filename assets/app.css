@@ -1194,8 +1194,15 @@ main {
 
 .candidate-table.changes-view .projection-col,
 .candidate-table.changes-view .score-col,
+.candidate-table.changes-view .group-ratio-col,
 .candidate-table.changes-view .first-selected-col {
   display: none;
+}
+
+.candidate-table .group-ratio-col {
+    min-width: 92px;
+    color: var(--text-soft);
+    font-family: var(--mono);
 }
 
 .candidate-table .first-selected-col {
