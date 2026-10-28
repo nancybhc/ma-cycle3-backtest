@@ -1227,6 +1227,9 @@ main {
 
 .candidate-table .group-ratio-col {
     min-width: 92px;
+}
+
+.candidate-table td.group-ratio-col {
     color: var(--text-soft);
     font-family: var(--mono);
     font-size: 10px;
