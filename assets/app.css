@@ -676,6 +676,25 @@ main {
   cursor: default;
 }
 
+.dynamic-signal-note {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: -2px 0 14px;
+  padding: 9px 13px;
+  border-left: 2px solid rgba(246, 185, 75, 0.65);
+  background: rgba(246, 185, 75, 0.045);
+  color: var(--text-dim);
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.dynamic-signal-note strong {
+  flex: 0 0 auto;
+  color: var(--amber);
+  font-weight: 600;
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1208,6 +1227,9 @@ main {
     min-width: 92px;
     color: var(--text-soft);
     font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
 }
 
 .candidate-table .first-selected-col {

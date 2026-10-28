@@ -223,13 +223,18 @@
           <div>
             <strong id="monitorStatusText">正在读取监控状态</strong>
             <small id="monitorStatusDetail">计划：交易日 09:15 自动启动，15:05 自动停止</small>
-            <small class="monitor-refresh-rule">刷新规则：本地网页每 10 秒刷新；GitHub 网页每分钟同步数据。</small>
+            <small class="monitor-refresh-rule">刷新规则：本地网页每 10 秒刷新；GitHub 网页每 60 秒同步数据。</small>
           </div>
         </div>
         <div class="monitor-actions">
           <button class="monitor-button start" id="monitorStartButton" type="button">启动监控</button>
           <button class="monitor-button stop" id="monitorStopButton" type="button">停止监控</button>
         </div>
+      </div>
+
+      <div class="dynamic-signal-note">
+        <strong>盘中为动态数据</strong>
+        <span>每次扫描都按最新行情重算；涨幅或条件不达标时，股票可能从名单移除。行情波动导致多次入选时，同一连续入选区间保留首次入选时间；跌出后再次入选则重新记录。</span>
       </div>
 
       <article class="panel table-panel">
