@@ -169,7 +169,17 @@ function applyLiveSignals(live) {
 
 async function refreshLiveSignals() {
   const live = await fetchLiveSignals();
-  if (!live && !state.liveApplied) return;
+  if (!live) return;
+  if (
+    state.liveApplied &&
+    live.marketDate === state.liveData?.marketDate &&
+    !shouldUseLiveSignals(live)
+  ) {
+    // 收盘后到下一交易日首次扫描前，持续保留同一交易日的最后一份信号。
+    state.liveData = live;
+    updateCandidateRunHeader();
+    return;
+  }
   const wasApplied = state.liveApplied;
   applyLiveSignals(live);
   updateCandidateRunHeader();
