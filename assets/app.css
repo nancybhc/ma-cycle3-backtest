@@ -621,6 +621,11 @@ main {
   font-size: 9px;
 }
 
+.monitor-refresh-rule {
+  color: var(--cyan) !important;
+  opacity: 0.82;
+}
+
 .monitor-dot {
   width: 9px;
   height: 9px;
