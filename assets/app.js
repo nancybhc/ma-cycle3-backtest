@@ -217,11 +217,22 @@ function updateCandidateRunHeader() {
     return;
   }
   const { meta } = state.data;
-  setText("topDataDate", `${meta.dataEnd} · 收盘后更新`);
+  const clock = shanghaiClock();
+  const phase =
+    !["Sat", "Sun"].includes(clock.weekday) &&
+    clock.minuteOfDay >= 9 * 60 + 15 &&
+    clock.minuteOfDay < 15 * 60 + 5
+      ? "盘中"
+      : "盘后";
+  setText("topDataDate", `${meta.dataEnd} · ${phase}`);
   setText("candidateDateChip", meta.candidateDate);
   setText(
     "candidateRunTime",
-    meta.snapshotRunLabel || meta.candidateRunTime || `回测更新 ${meta.runTime}`
+    `${phase} · ${
+      meta.snapshotRunLabel ||
+      meta.candidateRunTime ||
+      `回测更新 ${meta.runTime}`
+    }`
   );
 }
 
