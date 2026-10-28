@@ -155,11 +155,21 @@ function shouldUseLiveSignals(live) {
 
 function applyLiveSignals(live) {
   const useLive = shouldUseLiveSignals(live);
+  const sessionChanged = state.liveApplied !== useLive;
   state.liveApplied = useLive;
   state.liveData = live;
   state.data.signals = useLive
     ? [...live.signals]
     : [...state.staticSignals];
+  if (sessionChanged) {
+    state.candidateScope = useLive ? "all" : "changes";
+    document.querySelectorAll("#candidateScope button").forEach((button) => {
+      button.classList.toggle(
+        "active",
+        button.dataset.scope === state.candidateScope
+      );
+    });
+  }
   return useLive;
 }
 
@@ -181,6 +191,7 @@ function updateCandidateRunHeader() {
     const quoteTime = live.marketTime || live.generatedAt || "";
     const quoteClock =
       String(quoteTime).match(/\b\d{2}:\d{2}:\d{2}\b/)?.[0] || "更新中";
+    setText("topDataDate", `${live.marketDate} · 盘中动态`);
     setText("candidateDateChip", live.marketDate);
     setText(
       "candidateRunTime",
@@ -189,6 +200,7 @@ function updateCandidateRunHeader() {
     return;
   }
   const { meta } = state.data;
+  setText("topDataDate", `${meta.dataEnd} · 收盘后更新`);
   setText("candidateDateChip", meta.candidateDate);
   setText(
     "candidateRunTime",
