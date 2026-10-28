@@ -1207,12 +1207,14 @@ main {
 
 .candidate-table .col-code {
   left: 0;
-  min-width: 82px;
+  width: 72px;
+  min-width: 72px;
 }
 
 .candidate-table .col-name {
-  left: 82px;
-  min-width: 130px;
+  left: 72px;
+  width: 112px;
+  min-width: 112px;
   box-shadow: 12px 0 18px -18px rgba(0, 0, 0, 0.9);
 }
 
@@ -1233,10 +1235,19 @@ main {
 }
 
 .candidate-table .first-selected-col {
-    min-width: 116px;
+    width: 96px;
+    min-width: 96px;
     color: var(--text-soft);
     font-family: var(--mono);
     font-size: 9px;
+}
+
+.candidate-table th:last-child,
+.candidate-table td:last-child {
+    width: 220px;
+    min-width: 220px;
+    white-space: normal;
+    line-height: 1.55;
 }
 
 .candidate-table:not(.changes-view) .position-col {
