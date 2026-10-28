@@ -143,14 +143,8 @@ function shouldUseLiveSignals(live) {
     return false;
   }
   const clock = shanghaiClock();
-  if (clock.date !== live.marketDate) return false;
-  if (["Sat", "Sun"].includes(clock.weekday)) return false;
-  if (clock.minuteOfDay < 9 * 60 + 15 || clock.minuteOfDay >= 15 * 60 + 5) {
-    return false;
-  }
-  const generatedAt = Date.parse(live.generatedAt || "");
-  if (!Number.isFinite(generatedAt)) return false;
-  return Date.now() - generatedAt <= 8 * 60 * 1000;
+  // 同一交易日内保留最后一份盘中信号；15:05 后和收盘正式更新前都不清空。
+  return clock.date === live.marketDate;
 }
 
 function applyLiveSignals(live) {
@@ -188,14 +182,24 @@ async function refreshLiveSignals() {
 function updateCandidateRunHeader() {
   const live = state.liveData;
   if (state.liveApplied && live) {
+    const clock = shanghaiClock();
     const quoteTime = live.marketTime || live.generatedAt || "";
     const quoteClock =
       String(quoteTime).match(/\b\d{2}:\d{2}:\d{2}\b/)?.[0] || "更新中";
-    setText("topDataDate", `${live.marketDate} · 盘中动态`);
+    const inLiveWindow =
+      !["Sat", "Sun"].includes(clock.weekday) &&
+      clock.minuteOfDay >= 9 * 60 + 15 &&
+      clock.minuteOfDay < 15 * 60 + 5;
+    setText(
+      "topDataDate",
+      `${live.marketDate} · ${inLiveWindow ? "盘中动态" : "盘中信号冻结"}`
+    );
     setText("candidateDateChip", live.marketDate);
     setText(
       "candidateRunTime",
-      `盘中动态 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交`
+      inLiveWindow
+        ? `盘中动态 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交`
+        : `盘中信号已冻结 · 最后行情 ${quoteClock} · 收盘后统一更新持仓`
     );
     return;
   }
