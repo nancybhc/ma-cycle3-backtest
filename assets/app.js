@@ -79,10 +79,13 @@ async function init() {
     populateTradeTable();
     populateHoldingBars();
     bindInteractions();
+    bindMonitorControls();
+    await refreshMonitorStatus();
     renderAllCharts();
     setupNavigation();
     updateCandidateRunHeader();
     window.setInterval(refreshLiveSignals, 60_000);
+    window.setInterval(refreshMonitorStatus, 10_000);
     window.addEventListener("resize", resizeCharts);
     document.getElementById("loadingScreen").classList.add("hidden");
   } catch (error) {
@@ -202,14 +205,14 @@ function updateCandidateRunHeader() {
       clock.minuteOfDay < 15 * 60 + 5;
     setText(
       "topDataDate",
-      `${live.marketDate} · ${inLiveWindow ? "盘中动态" : "盘中信号冻结"}`
+      `${live.marketDate} · ${inLiveWindow ? "盘中" : "盘后"}`
     );
     setText("candidateDateChip", live.marketDate);
     setText(
       "candidateRunTime",
       inLiveWindow
-        ? `盘中动态 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交`
-        : `盘中信号已冻结 · 最后行情 ${quoteClock} · 收盘后统一更新持仓`
+        ? `盘中 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交`
+        : `盘后 · 最后行情 ${quoteClock} · 收盘后统一更新持仓`
     );
     return;
   }
@@ -220,6 +223,92 @@ function updateCandidateRunHeader() {
     "candidateRunTime",
     meta.snapshotRunLabel || meta.candidateRunTime || `回测更新 ${meta.runTime}`
   );
+}
+
+function bindMonitorControls() {
+  document
+    .getElementById("monitorStartButton")
+    .addEventListener("click", () => controlMonitor("start"));
+  document
+    .getElementById("monitorStopButton")
+    .addEventListener("click", () => controlMonitor("stop"));
+}
+
+async function refreshMonitorStatus() {
+  try {
+    const response = await fetch(`api/monitor/status?ts=${Date.now()}`, {
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    renderMonitorStatus(await response.json());
+  } catch {
+    renderMonitorStatus({
+      control_available: false,
+      running: false,
+      state_label: "本地控制不可用",
+      detail: "公网页面只读；请通过本机 127.0.0.1:8765 打开后控制监控。",
+    });
+  }
+}
+
+function renderMonitorStatus(status) {
+  const available = Boolean(status.control_available);
+  const running = Boolean(status.running);
+  const dot = document.getElementById("monitorStatusDot");
+  dot.classList.toggle("running", available && running);
+  dot.classList.toggle("stopped", available && !running);
+
+  const heartbeat = status.last_heartbeat_at
+    ? String(status.last_heartbeat_at).replace("T", " ").slice(0, 19)
+    : "—";
+  const started = status.started_at
+    ? String(status.started_at).replace("T", " ").slice(0, 19)
+    : "";
+  const schedule = status.schedule || {};
+  setText(
+    "monitorStatusText",
+    available
+      ? `监控${status.state_label || (running ? "运行中" : "已停止")}`
+      : status.state_label || "本地控制不可用"
+  );
+  setText(
+    "monitorStatusDetail",
+    available
+      ? [
+          running ? `实际运行${started ? ` · 启动于 ${started}` : ""}` : "实际已停止",
+          `最后心跳 ${heartbeat}`,
+          `${status.session_phase || "—"} · 计划 ${schedule.start || "09:15"} 启动 / ${schedule.stop || "15:05"} 停止`,
+        ].join(" · ")
+      : status.detail
+  );
+  document.getElementById("monitorStartButton").disabled =
+    !available || running;
+  document.getElementById("monitorStopButton").disabled =
+    !available || !running;
+}
+
+async function controlMonitor(action) {
+  const startButton = document.getElementById("monitorStartButton");
+  const stopButton = document.getElementById("monitorStopButton");
+  startButton.disabled = true;
+  stopButton.disabled = true;
+  setText(
+    "monitorStatusText",
+    action === "start" ? "正在启动监控…" : "正在停止监控…"
+  );
+  try {
+    const response = await fetch(`api/monitor/${action}`, {
+      method: "POST",
+      cache: "no-store",
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+    renderMonitorStatus(payload);
+    showToast(action === "start" ? "监控已启动" : "监控已停止");
+  } catch (error) {
+    showToast(`操作失败：${error.message || String(error)}`);
+    await refreshMonitorStatus();
+  }
 }
 
 function populateOverview() {
