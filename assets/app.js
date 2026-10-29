@@ -147,7 +147,7 @@ function shouldUseLiveSignals(live) {
     return false;
   }
   const clock = shanghaiClock();
-  // 同一交易日内保留最后一份盘中信号；15:05 后和收盘正式更新前都不清空。
+  // 同一交易日内保留最后一份盘中信号；15:00 后和收盘正式更新前都不清空。
   return clock.date === live.marketDate;
 }
 
@@ -297,7 +297,7 @@ function renderMonitorStatus(status) {
       ? [
           running ? `实际运行${started ? ` · 启动于 ${started}` : ""}` : "实际已停止",
           `最后心跳 ${heartbeat}`,
-          `${status.session_phase || "—"} · 计划 ${schedule.start || "09:15"} 启动 / ${schedule.stop || "15:05"} 停止`,
+          `${status.session_phase || "—"} · 计划 ${schedule.start || "09:15"} 启动 / ${schedule.stop || "15:00"} 停止`,
         ].join(" · ")
       : status.detail
   );
