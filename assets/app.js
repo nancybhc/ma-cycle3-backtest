@@ -3,6 +3,7 @@ const state = {
   staticSignals: [],
   liveData: null,
   liveApplied: false,
+  monitorStatus: null,
   candidateScope: "changes",
   trades: [],
   filteredTrades: [],
@@ -194,6 +195,9 @@ async function refreshLiveSignals() {
 
 function updateCandidateRunHeader() {
   const live = state.liveData;
+  const monitor = state.monitorStatus || {};
+  const waitingForQuote =
+    Boolean(monitor.running) && monitor.monitor_status === "error";
   if (state.liveApplied && live) {
     const clock = shanghaiClock();
     const quoteTime = live.marketTime || live.generatedAt || "";
@@ -211,7 +215,9 @@ function updateCandidateRunHeader() {
     setText(
       "candidateRunTime",
       inLiveWindow
-        ? `盘中 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交`
+        ? `盘中 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交${
+            waitingForQuote ? " · 行情重试中" : ""
+          }`
         : `盘后 · 最后行情 ${quoteClock} · 收盘后统一更新持仓`
     );
     return;
@@ -228,11 +234,13 @@ function updateCandidateRunHeader() {
   setText("candidateDateChip", meta.candidateDate);
   setText(
     "candidateRunTime",
-    `${phase} · ${
-      meta.snapshotRunLabel ||
-      meta.candidateRunTime ||
-      `回测更新 ${meta.runTime}`
-    }`
+    waitingForQuote && meta.candidateDate !== clock.date
+      ? `${phase} · 等待今日有效行情 · 当前保留 ${meta.candidateDate} 最后信号`
+      : `${phase} · ${
+          meta.snapshotRunLabel ||
+          meta.candidateRunTime ||
+          `回测更新 ${meta.runTime}`
+        }`
   );
 }
 
@@ -263,6 +271,7 @@ async function refreshMonitorStatus() {
 }
 
 function renderMonitorStatus(status) {
+  state.monitorStatus = status;
   const available = Boolean(status.control_available);
   const running = Boolean(status.running);
   const dot = document.getElementById("monitorStatusDot");
@@ -296,6 +305,7 @@ function renderMonitorStatus(status) {
     !available || running;
   document.getElementById("monitorStopButton").disabled =
     !available || !running;
+  updateCandidateRunHeader();
 }
 
 async function controlMonitor(action) {
