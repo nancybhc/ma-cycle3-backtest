@@ -567,7 +567,8 @@ function renderCandidateTable() {
     .map((row) => {
       const isHolding = Boolean(row.isHolding);
       const changeType = String(row.changeType || "");
-      const limitUpBlocked = Boolean(row.limitUp);
+      const limitUpBlocked =
+        Boolean(row.limitUp) && isOnlyLimitUpReason(row.reason);
       const statusClass =
         limitUpBlocked
           ? "limit-up"
@@ -637,6 +638,11 @@ function groupRatioText(value) {
     return "—";
   }
   return `${Number(value).toFixed(2)}%`;
+}
+
+function isOnlyLimitUpReason(value) {
+  const text = String(value || "").trim();
+  return text.includes("尾盘涨停") && !/[；;]/.test(text);
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
@@ -1577,7 +1583,7 @@ function openSignal(code, scope = "changes") {
   const buyLabel = signal.actionLabel || "尾盘买入";
   setText(
     "drawerKicker",
-    signal.limitUp
+    Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
       ? "尾盘涨停 · 买不进"
       : signal.changeType === "sell"
       ? signal.actionLabel || "当天卖出"
@@ -1591,7 +1597,7 @@ function openSignal(code, scope = "changes") {
   document.getElementById("drawerTags").innerHTML = `
     <span class="tag trend-badge">${escapeHtml(signal.trendLabel || signal.trend || "—")}</span>
     <span class="tag status-badge ${
-      signal.limitUp
+      Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
         ? "limit-up"
         : signal.changeType === "sell"
         ? "sell"
