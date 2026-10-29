@@ -1277,6 +1277,18 @@ main {
   background: #142333;
 }
 
+.candidate-table tr.limit-up-row td {
+  background: rgba(246, 185, 75, 0.045);
+}
+
+.candidate-table tr.limit-up-row .sticky-col {
+  background: #171c20;
+}
+
+.candidate-table tr.limit-up-row:hover .sticky-col {
+  background: #20231f;
+}
+
 .candidate-table tr.sell-row td {
   background: rgba(32, 201, 140, 0.035);
 }
@@ -1369,6 +1381,12 @@ main {
   color: var(--red);
 }
 
+.status-badge.limit-up {
+  border-color: rgba(246, 185, 75, 0.32);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
 .status-badge.sell {
   border-color: rgba(32, 201, 140, 0.28);
   background: rgba(32, 201, 140, 0.12);
@@ -1414,6 +1432,11 @@ main {
 .candidate-table tr.buy-row .code-cell,
 .candidate-table tr.buy-row .name-cell strong {
     color: var(--red) !important;
+}
+
+.candidate-table tr.limit-up-row .code-cell,
+.candidate-table tr.limit-up-row .name-cell strong {
+    color: var(--amber) !important;
 }
 
 .analytics-grid {

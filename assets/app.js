@@ -567,8 +567,11 @@ function renderCandidateTable() {
     .map((row) => {
       const isHolding = Boolean(row.isHolding);
       const changeType = String(row.changeType || "");
+      const limitUpBlocked = Boolean(row.limitUp);
       const statusClass =
-        changeType === "sell"
+        limitUpBlocked
+          ? "limit-up"
+          : changeType === "sell"
           ? "sell"
           : changeType === "buy" || row.isBuy
             ? "buy"
@@ -576,7 +579,9 @@ function renderCandidateTable() {
               ? "hold"
               : "skip";
       const statusText =
-        changeType === "sell"
+        limitUpBlocked
+          ? row.reason || "尾盘涨停 · 买不进"
+          : changeType === "sell"
           ? row.actionLabel || "当天卖出"
           : changeType === "buy"
             ? row.actionLabel || "新买入"
@@ -1572,7 +1577,9 @@ function openSignal(code, scope = "changes") {
   const buyLabel = signal.actionLabel || "尾盘买入";
   setText(
     "drawerKicker",
-    signal.changeType === "sell"
+    signal.limitUp
+      ? "尾盘涨停 · 买不进"
+      : signal.changeType === "sell"
       ? signal.actionLabel || "当天卖出"
       : signal.changeType === "buy"
         ? buyLabel
@@ -1584,7 +1591,9 @@ function openSignal(code, scope = "changes") {
   document.getElementById("drawerTags").innerHTML = `
     <span class="tag trend-badge">${escapeHtml(signal.trendLabel || signal.trend || "—")}</span>
     <span class="tag status-badge ${
-      signal.changeType === "sell"
+      signal.limitUp
+        ? "limit-up"
+        : signal.changeType === "sell"
         ? "sell"
         : signal.changeType === "buy" || signal.isBuy
           ? "buy"
