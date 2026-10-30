@@ -590,7 +590,7 @@ function candidateRowHtml(row) {
     Boolean(row.limitUp) && isOnlyLimitUpReason(row.reason);
   const statusClass =
     row.intradayJumpToMany
-      ? "buy"
+      ? "jump"
       : limitUpBlocked
       ? "limit-up"
       : changeType === "sell"
@@ -1619,7 +1619,9 @@ function openSignal(code, scope = "changes") {
   const buyLabel = signal.actionLabel || "尾盘买入";
   setText(
     "drawerKicker",
-    Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
+    signal.intradayJumpToMany
+      ? "盘中跳级转多 · 非买入"
+      : Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
       ? "尾盘涨停 · 买不进"
       : signal.changeType === "sell"
       ? signal.actionLabel || "当天卖出"
@@ -1633,7 +1635,9 @@ function openSignal(code, scope = "changes") {
   document.getElementById("drawerTags").innerHTML = `
     <span class="tag trend-badge">${escapeHtml(signal.trendLabel || signal.trend || "—")}</span>
     <span class="tag status-badge ${
-      Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
+      signal.intradayJumpToMany
+        ? "jump"
+        : Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
         ? "limit-up"
         : signal.changeType === "sell"
         ? "sell"

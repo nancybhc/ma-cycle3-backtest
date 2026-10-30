@@ -1306,6 +1306,18 @@ main {
   background: #142333;
 }
 
+.candidate-table tr.jump-row td {
+  background: rgba(246, 185, 75, 0.035);
+}
+
+.candidate-table tr.jump-row .sticky-col {
+  background: #151b27;
+}
+
+.candidate-table tr.jump-row:hover .sticky-col {
+  background: #1a2230;
+}
+
 .candidate-table tr.limit-up-row td {
   background: rgba(246, 185, 75, 0.045);
 }
@@ -1408,6 +1420,12 @@ main {
   border-color: rgba(255, 91, 110, 0.26);
   background: var(--red-soft);
   color: var(--red);
+}
+
+.status-badge.jump {
+  color: var(--amber);
+  border-color: rgba(246, 185, 75, 0.34);
+  background: rgba(246, 185, 75, 0.10);
 }
 
 .status-badge.limit-up {
