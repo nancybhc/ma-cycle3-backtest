@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261030-intraday-jump-title-gray">
+<link rel="stylesheet" href="assets/app.css?v=20261030-intraday-jump-backtest">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -308,6 +308,45 @@
               </tr>
             </thead>
             <tbody id="intradayJumpTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel table-panel intraday-backtest-panel" id="intraday-jump-backtest">
+        <div class="table-toolbar">
+          <div>
+            <h3>盘中跳多独立回测</h3>
+            <p class="intraday-jump-note">分组多占比 ≥10%；信号当日尾盘集合竞价按收盘价买入。离场与现策略一致：收盘跌破 MA5，或次交易日起触及 -8% 止损。</p>
+          </div>
+          <span class="jump-backtest-start" id="jumpBacktestStart">起始日 —</span>
+        </div>
+        <div class="jump-backtest-facts">
+          <div><span>信号</span><strong id="jumpBacktestSignals">—</strong></div>
+          <div><span>待尾盘买入</span><strong id="jumpBacktestPending">—</strong></div>
+          <div><span>持有中</span><strong id="jumpBacktestOpen">—</strong></div>
+          <div><span>已平仓</span><strong id="jumpBacktestClosed">—</strong></div>
+          <div><span>胜率</span><strong id="jumpBacktestWinRate">—</strong></div>
+          <div><span>平均收益</span><strong id="jumpBacktestAvgReturn">—</strong></div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table jump-backtest-table">
+            <thead>
+              <tr>
+                <th>信号日期</th>
+                <th>代码</th>
+                <th>名称</th>
+                <th>分组</th>
+                <th>分组多占比</th>
+                <th>首次入选时间</th>
+                <th>跳多时间</th>
+                <th>尾盘买入价</th>
+                <th>最新价</th>
+                <th>收益</th>
+                <th>状态</th>
+                <th>离场日期 / 原因</th>
+              </tr>
+            </thead>
+            <tbody id="jumpBacktestTableBody"></tbody>
           </table>
         </div>
       </article>
@@ -712,6 +751,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261030-intraday-jump-title-gray"></script>
+  <script src="assets/app.js?v=20261030-intraday-jump-backtest"></script>
 </body>
 </html>
