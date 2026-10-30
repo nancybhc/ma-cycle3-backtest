@@ -276,6 +276,42 @@
         </div>
       </article>
 
+      <article class="panel table-panel intraday-jump-panel">
+        <div class="table-toolbar">
+          <div>
+            <h3>盘中直接跳多信号 <b id="intradayJumpCount">—</b></h3>
+            <p class="intraday-jump-note">盘中曾进入“全部信号”，随后因涨幅推升直接越过空转多3转为多；保留最后一份盘中信号记录。</p>
+          </div>
+        </div>
+        <div class="table-scroll candidate-scroll">
+          <table class="data-table candidate-table jump-signal-table" id="intradayJumpTable">
+            <thead>
+              <tr>
+                <th class="sticky-col col-code">代码</th>
+                <th class="sticky-col col-name">名称</th>
+                <th class="first-selected-col">首次入选时间</th>
+                <th>现价 / 涨幅</th>
+                <th class="num position-col">成本 / 持仓收益</th>
+                <th>趋势</th>
+                <th>MA10方向 / 连续</th>
+                <th title="假设次日收盘价等于当日收盘价，比较重算后的 MA10 与今日 MA10；仅作参考，不进入评分。">推演次日MA10方向</th>
+                <th>MA10拐头价</th>
+                <th>MA10回踩价</th>
+                <th>MA5方向 / 连续</th>
+                <th>MA5拐头价</th>
+                <th>MA5回踩价</th>
+                <th class="projection-col">推演次日5-10 / 增量</th>
+                <th class="group-ratio-col">分组多占比</th>
+                <th class="score-col">评分 / 建议仓位</th>
+                <th class="num position-context-col">仓位</th>
+                <th>当日变动</th>
+              </tr>
+            </thead>
+            <tbody id="intradayJumpTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+
       <article class="panel allocation-panel">
         <div class="panel-head">
           <div>
