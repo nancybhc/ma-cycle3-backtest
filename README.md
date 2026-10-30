@@ -6,10 +6,10 @@ Signal: cycle-3 first appearance, projected next-day 5/10 cross, and projected
 5/10 gap expansion greater than 1.5 percentage points.
 
 Exit: AI hardware is cleared at the close when the Shanghai Composite enters
-MA5-to-MA10 bearish transition. A stock with positive holding return is also
-cleared at the close after three consecutive lower highs, even when price is
-still above MA5. A break below MA5 exits the remaining position, and a -8%
-stop is enforced intraday from the next trading day.
+MA5-to-MA10 bearish transition. A stock with positive holding return sells
+half on the first lower high and clears the remainder after any later pair
+of consecutive lower highs. A break below MA5 exits the remaining position,
+and a -8% stop is enforced intraday from the next trading day.
 
 Portfolio overlay: AI-hardware exposure follows the Shanghai Composite
 MA5/MA10 stage using a 20%-80% sleeve. Every non-AI group is capped at 20%.
