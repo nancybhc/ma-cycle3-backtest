@@ -156,6 +156,9 @@ function applyLiveSignals(live) {
   const sessionChanged = state.liveApplied !== useLive;
   state.liveApplied = useLive;
   state.liveData = live;
+  state.data.intradayJumps = Array.isArray(live?.intradayJumps)
+    ? [...live.intradayJumps]
+    : [];
   state.data.signals = useLive
     ? [...live.signals]
     : [...state.staticSignals];
@@ -181,6 +184,11 @@ async function refreshLiveSignals() {
   ) {
     // 收盘后到下一交易日首次扫描前，持续保留同一交易日的最后一份信号。
     state.liveData = live;
+    state.data.intradayJumps = Array.isArray(live.intradayJumps)
+      ? [...live.intradayJumps]
+      : [];
+    setText("intradayJumpCount", formatInt(state.data.intradayJumps.length));
+    renderIntradayJumpTable();
     updateCandidateRunHeader();
     return;
   }
@@ -411,9 +419,12 @@ function populateOverview() {
 function populateCandidates() {
   const signals = state.data.signals || [];
   const dailyChanges = state.data.dailyChanges || [];
+  const intradayJumps = state.data.intradayJumps || [];
   setText("scopeChangeCount", formatInt(dailyChanges.length));
   setText("scopeAllCount", formatInt(signals.length));
+  setText("intradayJumpCount", formatInt(intradayJumps.length));
   renderCandidateTable();
+  renderIntradayJumpTable();
 }
 
 function populatePositionRules() {
@@ -563,66 +574,88 @@ function renderCandidateTable() {
     .getElementById("candidateTable")
     .classList.toggle("changes-view", state.candidateScope === "changes");
   const body = document.getElementById("candidateTableBody");
-  body.innerHTML = rows
-    .map((row) => {
-      const isHolding = Boolean(row.isHolding);
-      const changeType = String(row.changeType || "");
-      const limitUpBlocked =
-        Boolean(row.limitUp) && isOnlyLimitUpReason(row.reason);
-      const statusClass =
-        limitUpBlocked
-          ? "limit-up"
-          : changeType === "sell"
-          ? "sell"
-          : changeType === "buy" || row.isBuy
-            ? "buy"
-            : changeType === "hold" || isHolding
-              ? "hold"
-              : "skip";
-      const statusText =
-        limitUpBlocked
-          ? row.reason || "尾盘涨停 · 买不进"
-          : changeType === "sell"
-          ? row.actionLabel || "当天卖出"
-          : changeType === "buy"
-            ? row.actionLabel || "新买入"
-            : changeType === "hold"
-              ? "持仓未动"
-              : row.isBuy
-                ? "买入候选"
-                : row.reason;
-      return `
-        <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
-          <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
-          <td class="sticky-col col-name">
-            <span class="name-cell">
-              <strong>${escapeHtml(row.name)}</strong>
-              <small>${escapeHtml(row.group || "未分组")}</small>
-            </span>
-          </td>
-          <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
-          <td>${pricePairHtml(row.close, row.changePct)}</td>
-          <td class="num position-col">${holdingCostReturnHtml(row)}</td>
-          <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
-          <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
-          <td>${projectedMa10DirectionHtml(row)}</td>
-          <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
-          <td>${levelHtml(row.ma10Rebound, row.ma10ReboundPct)}</td>
-          <td>${maDirectionHtml(row.ma5Dir, row.ma5Run)}</td>
-          <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
-          <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
-          <td class="projection-col">${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
-          <td class="num group-ratio-col">${groupRatioText(row.groupManyRatioPct)}</td>
-          <td class="score-col">${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
-          <td class="num position-context-col">${positionContextHtml(row)}</td>
-          <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
-        </tr>`;
-    })
-    .join("");
+  body.innerHTML = rows.map(candidateRowHtml).join("");
 
-  body.querySelectorAll("tr").forEach((row) => {
+  body.querySelectorAll("tr[data-code]").forEach((row) => {
     row.addEventListener("click", () =>
       openSignal(row.dataset.code, state.candidateScope)
+    );
+  });
+}
+
+function candidateRowHtml(row) {
+  const isHolding = Boolean(row.isHolding);
+  const changeType = String(row.changeType || "");
+  const limitUpBlocked =
+    Boolean(row.limitUp) && isOnlyLimitUpReason(row.reason);
+  const statusClass =
+    row.intradayJumpToMany
+      ? "buy"
+      : limitUpBlocked
+      ? "limit-up"
+      : changeType === "sell"
+      ? "sell"
+      : changeType === "buy" || row.isBuy
+        ? "buy"
+        : changeType === "hold" || isHolding
+          ? "hold"
+          : "skip";
+  const statusText =
+    row.intradayJumpToMany
+      ? row.reason || "盘中直接跳级转多"
+      : limitUpBlocked
+      ? row.reason || "尾盘涨停 · 买不进"
+      : changeType === "sell"
+      ? row.actionLabel || "当天卖出"
+      : changeType === "buy"
+        ? row.actionLabel || "新买入"
+        : changeType === "hold"
+          ? "持仓未动"
+          : row.isBuy
+            ? "买入候选"
+            : row.reason;
+  return `
+    <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
+      <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
+      <td class="sticky-col col-name">
+        <span class="name-cell">
+          <strong>${escapeHtml(row.name)}</strong>
+          <small>${escapeHtml(row.group || "未分组")}</small>
+        </span>
+      </td>
+      <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
+      <td>${pricePairHtml(row.close, row.changePct)}</td>
+      <td class="num position-col">${holdingCostReturnHtml(row)}</td>
+      <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
+      <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
+      <td>${projectedMa10DirectionHtml(row)}</td>
+      <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
+      <td>${levelHtml(row.ma10Rebound, row.ma10ReboundPct)}</td>
+      <td>${maDirectionHtml(row.ma5Dir, row.ma5Run)}</td>
+      <td>${levelHtml(row.ma5Turn, row.ma5TurnPct)}</td>
+      <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
+      <td class="projection-col">${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
+      <td class="num group-ratio-col">${groupRatioText(row.groupManyRatioPct)}</td>
+      <td class="score-col">${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
+      <td class="num position-context-col">${positionContextHtml(row)}</td>
+      <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
+    </tr>`;
+}
+
+function renderIntradayJumpTable() {
+  const rows = state.data.intradayJumps || [];
+  const body = document.getElementById("intradayJumpTableBody");
+  if (!rows.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="18" class="empty-cell">暂无盘中直接跳级转多信号</td>
+      </tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(candidateRowHtml).join("");
+  body.querySelectorAll("tr[data-code]").forEach((row) => {
+    row.addEventListener("click", () =>
+      openSignal(row.dataset.code, "intradayJumps")
     );
   });
 }
@@ -1572,7 +1605,10 @@ function openTrade(id) {
 
 function openSignal(code, scope = "changes") {
   const signal =
-    scope === "all"
+    scope === "intradayJumps"
+      ? (state.data.intradayJumps || []).find((row) => row.code === code) ||
+        state.data.signals.find((row) => row.code === code)
+      : scope === "all"
       ? state.data.signals.find((row) => row.code === code)
       : (state.data.dailyChanges || []).find((row) => row.code === code) ||
         (state.data.currentHoldings || []).find((row) => row.code === code) ||

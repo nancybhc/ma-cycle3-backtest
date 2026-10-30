@@ -1217,6 +1217,12 @@ main {
   line-height: 1.6;
 }
 
+.empty-cell {
+  padding: 28px 16px !important;
+  text-align: center;
+  color: var(--text-soft);
+}
+
 .candidate-table .sticky-col {
   position: sticky;
   z-index: 4;
