@@ -1205,52 +1205,6 @@ main {
   line-height: 1.6;
 }
 
-.intraday-backtest-panel {
-  margin-top: 16px;
-}
-
-.intraday-backtest-panel .table-toolbar h3 {
-  color: rgba(232, 242, 247, 0.82);
-}
-
-.jump-backtest-start {
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 9px;
-}
-
-.jump-backtest-facts {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-  margin: 4px 0 12px;
-}
-
-.jump-backtest-facts > div {
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.018);
-}
-
-.jump-backtest-facts span {
-  display: block;
-  color: var(--text-dim);
-  font-size: 9px;
-}
-
-.jump-backtest-facts strong {
-  display: block;
-  margin-top: 4px;
-  color: var(--text);
-  font-size: 16px;
-  font-variant-numeric: tabular-nums;
-}
-
-.jump-backtest-table {
-  min-width: 1280px;
-}
-
 .empty-cell {
   padding: 28px 16px !important;
   text-align: center;

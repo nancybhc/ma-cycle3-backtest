@@ -7,7 +7,6 @@ const state = {
   candidateScope: "changes",
   trades: [],
   filteredTrades: [],
-  jumpBacktest: null,
   page: 1,
   pageSize: 40,
   drawerType: "",
@@ -66,7 +65,6 @@ async function init() {
     state.staticSignals = [...(state.data.signals || [])];
     state.liveData = await fetchLiveSignals();
     applyLiveSignals(state.liveData);
-    state.jumpBacktest = await fetchJumpBacktest();
     state.trades = [...(state.data.strategyTransactions || [])].sort((a, b) => {
       const entryOrder = String(b.entryDate || b.date || "").localeCompare(
         String(a.entryDate || a.date || "")
@@ -77,7 +75,6 @@ async function init() {
     state.filteredTrades = [...state.trades];
     populateOverview();
     populateCandidates();
-    populateJumpBacktest();
     populatePositionRules();
     populateFilters();
     populateTradeTable();
@@ -89,7 +86,6 @@ async function init() {
     setupNavigation();
     updateCandidateRunHeader();
     window.setInterval(refreshLiveSignals, 10_000);
-    window.setInterval(refreshJumpBacktest, 60_000);
     window.setInterval(refreshMonitorStatus, 10_000);
     window.addEventListener("resize", resizeCharts);
     document.getElementById("loadingScreen").classList.add("hidden");
@@ -115,26 +111,6 @@ async function fetchLiveSignals() {
   } catch {
     return null;
   }
-}
-
-async function fetchJumpBacktest() {
-  try {
-    const response = await fetch(
-      `data/intraday_jump_backtest.json?ts=${Date.now()}`,
-      { cache: "no-store" },
-    );
-    if (!response.ok) return null;
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
-async function refreshJumpBacktest() {
-  const data = await fetchJumpBacktest();
-  if (!data) return;
-  state.jumpBacktest = data;
-  populateJumpBacktest();
 }
 
 function shanghaiClock() {
@@ -680,60 +656,6 @@ function renderIntradayJumpTable() {
       openSignal(row.dataset.code, "intradayJumps")
     );
   });
-}
-
-function populateJumpBacktest() {
-  const data = state.jumpBacktest;
-  const trades = data?.trades || [];
-  const stats = data?.stats || {};
-  setText("jumpBacktestStart", `起始日 ${data?.startDate || "—"}`);
-  setText("jumpBacktestSignals", formatInt(stats["信号数"] || 0));
-  setText("jumpBacktestPending", formatInt(stats["待尾盘买入"] || 0));
-  setText("jumpBacktestOpen", formatInt(stats["持有中"] || 0));
-  setText("jumpBacktestClosed", formatInt(stats["已平仓"] || 0));
-  setText(
-    "jumpBacktestWinRate",
-    stats["胜率%"] === null || stats["胜率%"] === undefined
-      ? "—"
-      : `${formatNumber(stats["胜率%"], 1)}%`,
-  );
-  setText(
-    "jumpBacktestAvgReturn",
-    stats["平均收益%"] === null || stats["平均收益%"] === undefined
-      ? "—"
-      : formatPct(stats["平均收益%"], true),
-  );
-  const body = document.getElementById("jumpBacktestTableBody");
-  if (!trades.length) {
-    body.innerHTML = `
-      <tr><td colspan="12" class="empty-cell">暂无符合分组多占比≥10%的跳多回测信号</td></tr>`;
-    return;
-  }
-  body.innerHTML = trades
-    .map((row) => {
-      const status = String(row["状态"] || "");
-      const cls =
-        status === "已平仓" ? "hold" : status === "持有中" ? "buy" : "skip";
-      const exitText = row["离场日期"]
-        ? `${row["离场日期"]} / ${row["离场原因"] || "离场"}`
-        : "—";
-      return `
-        <tr>
-          <td>${escapeHtml(row["信号日期"] || "—")}</td>
-          <td>${escapeHtml(row["代码"] || "—")}</td>
-          <td><strong>${escapeHtml(row["名称"] || "—")}</strong></td>
-          <td>${escapeHtml(row["分组"] || "—")}</td>
-          <td class="num">${formatNumber(row["分组多占比%"], 2)}%</td>
-          <td>${escapeHtml(firstSelectedTime(row["首次入选时间"]))}</td>
-          <td>${escapeHtml(firstSelectedTime(row["跳多时间"]))}</td>
-          <td>${formatPrice(row["尾盘买入价"])}</td>
-          <td>${formatPrice(row["最新价"])}</td>
-          <td class="${Number(row["收益%"]) >= 0 ? "up" : "down"}">${row["收益%"] === null || row["收益%"] === undefined ? "—" : formatPct(row["收益%"], true)}</td>
-          <td><span class="status-badge ${cls}">${escapeHtml(status || "—")}</span></td>
-          <td>${escapeHtml(exitText)}</td>
-        </tr>`;
-    })
-    .join("");
 }
 
 function firstSelectedTime(value) {
