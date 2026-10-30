@@ -5,8 +5,11 @@ Static research dashboard for the A-share 5/10 projection quant strategy.
 Signal: cycle-3 first appearance, projected next-day 5/10 cross, and projected
 5/10 gap expansion greater than 1.5 percentage points.
 
-Exit: sell when the latest price closes below MA5. The formal 15:05 close run
-uses the daily close snapshot once per trading day.
+Exit: AI hardware is cleared at the close when the Shanghai Composite enters
+MA5-to-MA10 bearish transition. A stock with positive holding return is also
+cleared at the close after three consecutive lower highs, even when price is
+still above MA5. A break below MA5 exits the remaining position, and a -8%
+stop is enforced intraday from the next trading day.
 
 Portfolio overlay: AI-hardware exposure follows the Shanghai Composite
 MA5/MA10 stage using a 20%-80% sleeve. Every non-AI group is capped at 20%.
