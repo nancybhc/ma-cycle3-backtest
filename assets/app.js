@@ -187,7 +187,6 @@ async function refreshLiveSignals() {
     state.data.intradayJumps = Array.isArray(live.intradayJumps)
       ? [...live.intradayJumps]
       : [];
-    setText("intradayJumpCount", formatInt(state.data.intradayJumps.length));
     renderIntradayJumpTable();
     updateCandidateRunHeader();
     return;
@@ -422,7 +421,6 @@ function populateCandidates() {
   const intradayJumps = state.data.intradayJumps || [];
   setText("scopeChangeCount", formatInt(dailyChanges.length));
   setText("scopeAllCount", formatInt(signals.length));
-  setText("intradayJumpCount", formatInt(intradayJumps.length));
   renderCandidateTable();
   renderIntradayJumpTable();
 }

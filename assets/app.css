@@ -1194,20 +1194,8 @@ main {
   background: rgba(72, 225, 209, 0.045);
 }
 
-.intraday-jump-panel {
-  border-color: rgba(246, 185, 75, 0.28);
-}
-
-.intraday-jump-panel h3 b {
-  display: inline-flex;
-  min-width: 28px;
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  color: var(--amber);
-  background: rgba(246, 185, 75, 0.12);
-  font-size: 12px;
-  justify-content: center;
+.intraday-jump-panel .table-toolbar h3 {
+  color: rgba(232, 242, 247, 0.82);
 }
 
 .intraday-jump-note {
