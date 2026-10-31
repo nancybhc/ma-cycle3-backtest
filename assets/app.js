@@ -5,6 +5,7 @@ const state = {
   liveApplied: false,
   monitorStatus: null,
   candidateScope: "changes",
+  candidatePhase: "",
   trades: [],
   filteredTrades: [],
   page: 1,
@@ -151,9 +152,30 @@ function shouldUseLiveSignals(live) {
   return clock.date === live.marketDate;
 }
 
+function isIntradayFocusWindow(clock = shanghaiClock()) {
+  return (
+    !["Sat", "Sun"].includes(clock.weekday) &&
+    clock.minuteOfDay >= 9 * 60 + 15 &&
+    clock.minuteOfDay < 15 * 60
+  );
+}
+
+function syncCandidateFocusPhase() {
+  const phase = isIntradayFocusWindow() ? "intraday" : "closed";
+  if (state.candidatePhase === phase) return false;
+  state.candidatePhase = phase;
+  state.candidateScope = phase === "intraday" ? "all" : "changes";
+  document.querySelectorAll("#candidateScope button").forEach((button) => {
+    button.classList.toggle(
+      "active",
+      button.dataset.scope === state.candidateScope
+    );
+  });
+  return true;
+}
+
 function applyLiveSignals(live) {
   const useLive = shouldUseLiveSignals(live);
-  const sessionChanged = state.liveApplied !== useLive;
   state.liveApplied = useLive;
   state.liveData = live;
   state.data.intradayJumps = Array.isArray(live?.intradayJumps)
@@ -162,15 +184,7 @@ function applyLiveSignals(live) {
   state.data.signals = useLive
     ? [...live.signals]
     : [...state.staticSignals];
-  if (sessionChanged) {
-    state.candidateScope = useLive ? "all" : "changes";
-    document.querySelectorAll("#candidateScope button").forEach((button) => {
-      button.classList.toggle(
-        "active",
-        button.dataset.scope === state.candidateScope
-      );
-    });
-  }
+  syncCandidateFocusPhase();
   return useLive;
 }
 
@@ -187,14 +201,18 @@ async function refreshLiveSignals() {
     state.data.intradayJumps = Array.isArray(live.intradayJumps)
       ? [...live.intradayJumps]
       : [];
+    const focusChanged = syncCandidateFocusPhase();
     renderIntradayJumpTable();
     updateCandidateRunHeader();
+    if (focusChanged) populateCandidates();
     return;
   }
   const wasApplied = state.liveApplied;
+  const previousScope = state.candidateScope;
   applyLiveSignals(live);
+  const focusChanged = state.candidateScope !== previousScope;
   updateCandidateRunHeader();
-  if (wasApplied || state.liveApplied) {
+  if (wasApplied || state.liveApplied || focusChanged) {
     populateCandidates();
     populatePositionRules();
   }
@@ -214,6 +232,12 @@ function updateCandidateRunHeader() {
       !["Sat", "Sun"].includes(clock.weekday) &&
       clock.minuteOfDay >= 9 * 60 + 15 &&
       clock.minuteOfDay < 15 * 60 + 5;
+    const isLocalPage = ["127.0.0.1", "localhost", "::1"].includes(
+      location.hostname
+    );
+    const refreshLabel = isLocalPage
+      ? "本地10秒刷新"
+      : "GitHub每60秒同步";
     setText(
       "topDataDate",
       `${live.marketDate} · ${inLiveWindow ? "盘中" : "盘后"}`
@@ -222,7 +246,7 @@ function updateCandidateRunHeader() {
     setText(
       "candidateRunTime",
       inLiveWindow
-        ? `盘中 · 行情 ${quoteClock} · 60秒刷新 · 仅出信号，尾盘竞价成交${
+        ? `盘中 · 行情 ${quoteClock} · ${refreshLabel} · 仅出信号，尾盘竞价成交${
             waitingForQuote ? " · 行情重试中" : ""
           }`
         : `盘后 · 最后行情 ${quoteClock} · 收盘后统一更新持仓`
@@ -304,6 +328,7 @@ function renderMonitorStatus(status) {
       ? [
           running ? `实际运行${started ? ` · 启动于 ${started}` : ""}` : "实际已停止",
           `最后心跳 ${heartbeat}`,
+          `${status.interval_seconds || 10}秒轮询`,
           `${status.session_phase || "—"} · 计划 ${schedule.start || "09:15"} 启动 / ${schedule.stop || "15:00"} 停止`,
         ].join(" · ")
       : status.detail

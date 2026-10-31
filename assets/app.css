@@ -695,6 +695,26 @@ main {
   font-weight: 600;
 }
 
+.signal-color-legend {
+  margin: -6px 0 14px;
+  padding: 0 13px 0 15px;
+  color: var(--text-dim);
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.signal-color-legend b {
+  font-weight: 600;
+}
+
+.legend-red {
+  color: var(--red);
+}
+
+.legend-amber {
+  color: var(--amber);
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1192,10 +1212,6 @@ main {
 
 .data-table tbody tr:hover {
   background: rgba(72, 225, 209, 0.045);
-}
-
-.intraday-jump-panel .table-toolbar h3 {
-  color: rgba(232, 242, 247, 0.82);
 }
 
 .intraday-jump-note {
