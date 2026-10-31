@@ -1126,6 +1126,10 @@ main {
   overflow: hidden;
 }
 
+.intraday-jump-panel {
+  margin-top: 16px;
+}
+
 .table-toolbar {
   display: flex;
   align-items: center;
