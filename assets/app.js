@@ -687,10 +687,23 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
-      <td class="num mfe-col">${
+      <td class="num mfe-col ${
+        row.mfePct === null || row.mfePct === undefined
+          ? ""
+          : pctClass(row.mfePct)
+      }">${
         row.mfePct === null || row.mfePct === undefined
           ? '<span class="flat">—</span>'
           : formatPct(row.mfePct, true)
+      }</td>
+      <td class="num mae-col ${
+        row.maePct === null || row.maePct === undefined
+          ? ""
+          : pctClass(row.maePct)
+      }">${
+        row.maePct === null || row.maePct === undefined
+          ? '<span class="flat">—</span>'
+          : formatPct(row.maePct, true)
       }</td>
       ${showDailyChange ? `<td class="hold-days-col">${holdingDaysHtml(row)}</td>` : ""}
       <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>

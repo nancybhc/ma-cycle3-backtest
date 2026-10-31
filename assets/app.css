@@ -1064,8 +1064,17 @@ main {
   gap: 10px;
 }
 
-.candidate-table:not(.changes-view) .mfe-col {
+.candidate-table:not(.changes-view) .mfe-col,
+.candidate-table:not(.changes-view) .mae-col {
   display: none;
+}
+
+.candidate-table td.mfe-col,
+.candidate-table td.mae-col {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .score-dimension {
