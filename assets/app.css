@@ -244,6 +244,11 @@ a {
   width: 7px;
   height: 7px;
   border-radius: 50%;
+  background: var(--text-dim);
+  box-shadow: 0 0 10px rgba(98, 123, 142, 0.35);
+}
+
+.status-dot.intraday {
   background: var(--green);
   box-shadow: 0 0 12px rgba(32, 201, 140, 0.75);
 }

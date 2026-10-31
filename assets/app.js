@@ -137,6 +137,65 @@ function shanghaiClock() {
   };
 }
 
+function shiftShanghaiDate(date, days) {
+  const shifted = new Date(`${date}T12:00:00+08:00`);
+  shifted.setUTCDate(shifted.getUTCDate() + days);
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      weekday: "short",
+    })
+      .formatToParts(shifted)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    weekday: parts.weekday,
+  };
+}
+
+function previousWeekday(date) {
+  let previous = shiftShanghaiDate(date, -1);
+  while (["Sat", "Sun"].includes(previous.weekday)) {
+    previous = shiftShanghaiDate(previous.date, -1);
+  }
+  return previous.date;
+}
+
+function marketDisplayState(clock = shanghaiClock()) {
+  const weekend = ["Sat", "Sun"].includes(clock.weekday);
+  if (weekend) {
+    return {
+      date: previousWeekday(clock.date),
+      label: "收盘行情",
+      intraday: false,
+    };
+  }
+  if (clock.minuteOfDay < 9 * 60 + 30) {
+    return {
+      date: previousWeekday(clock.date),
+      label: "收盘行情",
+      intraday: false,
+    };
+  }
+  if (clock.minuteOfDay < 15 * 60) {
+    return {
+      date: clock.date,
+      label: "盘中行情",
+      intraday: true,
+    };
+  }
+  return {
+    date: clock.date,
+    label: "收盘行情",
+    intraday: false,
+  };
+}
+
 function shouldUseLiveSignals(live) {
   if (
     !live ||
@@ -219,51 +278,11 @@ async function refreshLiveSignals() {
 }
 
 function updateCandidateRunHeader() {
-  const live = state.liveData;
-  const monitor = state.monitorStatus || {};
-  const clock = shanghaiClock();
-  const inLiveWindow =
-    !["Sat", "Sun"].includes(clock.weekday) &&
-    clock.minuteOfDay >= 9 * 60 + 15 &&
-    clock.minuteOfDay < 15 * 60 + 5;
-  const monitorKnown = monitor.control_available === true;
-  const intraday = monitorKnown
-    ? Boolean(monitor.running)
-    : Boolean(live?.status === "scanning" && inLiveWindow);
-  const phaseLabel = intraday ? "盘中行情" : "收盘行情";
-  const waitingForQuote =
-    Boolean(monitor.running) && monitor.monitor_status === "error";
-  if (state.liveApplied && live) {
-    const quoteTime = live.marketTime || live.generatedAt || "";
-    const quoteClock =
-      String(quoteTime).match(/\b\d{2}:\d{2}:\d{2}\b/)?.[0] || "更新中";
-    const isLocalPage = ["127.0.0.1", "localhost", "::1"].includes(
-      location.hostname
-    );
-    const refreshLabel = isLocalPage
-      ? "本地10秒刷新"
-      : "GitHub每60秒同步";
-    setText("topDataDate", `${live.marketDate} ${phaseLabel}`);
-    setText("candidateDateChip", live.marketDate);
-    setText(
-      "candidateRunTime",
-      intraday
-        ? `盘中行情 · 行情 ${quoteClock} · ${refreshLabel} · 仅出信号，尾盘竞价成交${
-            waitingForQuote ? " · 行情重试中" : ""
-          }`
-        : "收盘行情"
-    );
-    return;
-  }
-  const { meta } = state.data;
-  setText("topDataDate", `${meta.dataEnd} ${phaseLabel}`);
-  setText("candidateDateChip", meta.candidateDate);
-  setText(
-    "candidateRunTime",
-    waitingForQuote && meta.candidateDate !== clock.date
-      ? `盘中行情 · 等待今日有效行情 · 当前保留 ${meta.candidateDate} 最后信号`
-      : phaseLabel
-  );
+  const display = marketDisplayState(shanghaiClock());
+  setText("topDataDate", `${display.date} ${display.label}`);
+  document
+    .querySelector(".top-status .status-dot")
+    ?.classList.toggle("intraday", display.intraday);
 }
 
 function bindMonitorControls() {
