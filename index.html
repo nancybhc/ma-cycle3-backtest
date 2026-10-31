@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261031-exit-reason-clean">
+<link rel="stylesheet" href="assets/app.css?v=20261031-table-font">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -259,6 +259,7 @@
                 <th class="first-selected-col">首次入选时间</th>
                 <th>现价 / 涨幅</th>
                 <th class="num position-col">成本 / 持仓收益</th>
+                <th class="num hold-days-col">持有天数</th>
                 <th>趋势</th>
                 <th>MA10方向 / 连续</th>
                 <th title="假设次日收盘价等于当日收盘价，比较重算后的 MA10 与今日 MA10；仅作参考，不进入评分。">推演次日MA10方向</th>
@@ -737,12 +738,14 @@
             <thead>
               <tr>
                 <th>买入日期</th>
+                <th class="num">持有天数</th>
                 <th>操作</th>
                 <th>代码</th>
                 <th>名称</th>
                 <th>分组</th>
-                <th class="num">成本 / 成交价</th>
-                <th class="num">仓位</th>
+                <th class="num">成本价</th>
+                <th class="num">成交价</th>
+                <th class="num">买入时仓位</th>
                 <th class="num">收益</th>
                 <th>备注</th>
               </tr>
@@ -810,6 +813,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261031-scatter-scale"></script>
+  <script src="assets/app.js?v=20261031-trade-hold-days"></script>
 </body>
 </html>

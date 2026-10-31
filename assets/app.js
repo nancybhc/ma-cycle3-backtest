@@ -649,6 +649,7 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
+      <td class="num hold-days-col">${holdingDaysHtml(row)}</td>
       <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
       <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
       <td>${projectedMa10DirectionHtml(row)}</td>
@@ -837,6 +838,20 @@ function holdingCostReturnHtml(row) {
     </span>`;
 }
 
+function holdingDaysHtml(row) {
+  if (!row?.isHolding && row?.changeType !== "sell") {
+    return '<span class="flat">—</span>';
+  }
+  const days =
+    row.changeType === "sell"
+      ? Number(row.holdingDays)
+      : currentHoldingDays(row);
+  if (!Number.isFinite(days)) {
+    return '<span class="flat">—</span>';
+  }
+  return `${formatInt(Math.max(0, days))} 天`;
+}
+
 function levelHtml(price, pct) {
   if (price === null || price === undefined) return `<span class="flat">—</span>`;
   return `
@@ -977,7 +992,7 @@ function populateTradeTable() {
 
   if (!rows.length) {
     body.innerHTML = `
-      <tr><td colspan="9" style="padding:42px;text-align:center;color:var(--text-dim)">
+      <tr><td colspan="11" style="padding:42px;text-align:center;color:var(--text-dim)">
         当前筛选条件下没有策略成交
       </td></tr>`;
   } else {
@@ -992,10 +1007,16 @@ function populateTradeTable() {
                 <small>${isBuy ? "尚未卖出" : `卖出 ${escapeHtml(trade.date || "—")}`}</small>
               </div>
             </td>
+            <td class="num">${
+              trade.holdingDays === null || trade.holdingDays === undefined
+                ? "—"
+                : `${formatInt(trade.holdingDays)} 天`
+            }</td>
             <td><span class="status-badge ${isBuy ? "buy" : "sell"}">${escapeHtml(trade.actionLabel)}</span></td>
             <td class="code-cell">${escapeHtml(trade.code)}</td>
             <td><strong style="color:var(--text);font-weight:600">${escapeHtml(trade.name)}</strong></td>
             <td>${escapeHtml(trade.group)}</td>
+            <td class="num">${formatPrice(trade.entryPrice ?? trade.price)}</td>
             <td class="num">${formatPrice(trade.price)}</td>
             <td class="num">${formatNumber(trade.weightPct, 1)}%</td>
             <td class="num ${trade.returnPct === null || trade.returnPct === undefined ? "" : pctClass(trade.returnPct)}">
@@ -1961,13 +1982,15 @@ function renderTradeChart(item) {
 function exportFilteredTrades() {
   const headers = [
     "买入日期",
+    "持有天数",
     "成交日期",
     "操作",
     "代码",
     "名称",
     "分组",
+    "成本价",
     "成交价",
-    "仓位%",
+    "买入时仓位%",
     "收益%",
     "备注",
   ];
@@ -1975,11 +1998,13 @@ function exportFilteredTrades() {
   state.filteredTrades.forEach((row) => {
     const values = [
       row.entryDate || row.date,
+      row.holdingDays ?? "",
       row.date,
       row.actionLabel,
       row.code,
       row.name,
       row.group,
+      row.entryPrice ?? row.price,
       row.price,
       row.weightPct,
       row.returnPct,
