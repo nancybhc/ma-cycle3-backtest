@@ -1745,7 +1745,7 @@ function openTrade(id) {
   document.getElementById("drawerDetails").innerHTML = detailTable([
     ["入场", `${trade.entryDate} / ${formatPrice(trade.entryPrice)}`],
     ["当日 5-10 间距", formatPct(trade.gapPct, true)],
-    ["推演次日 5-10 / 增量", `${formatPct(trade.projectedGapPct, true)} / ${formatPct(trade.gapDeltaPct, true)}`],
+    ["推演次日 5-10 / 增幅", `${formatPct(trade.projectedGapPct, true)} / ${formatPct(trade.gapDeltaPct, true)}`],
     ["出场", `${trade.exitDate} / ${formatPrice(trade.exitPrice)}`],
     ["推演 5破10 日", trade.projectedDate],
     ["实际次日 5破10", trade.actualSuccess ? "成功" : "未成功"],
