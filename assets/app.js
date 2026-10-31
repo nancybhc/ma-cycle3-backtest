@@ -1549,9 +1549,41 @@ function renderExitReasonChart() {
     if (reason === "跌破MA5") return COLOR.cyan;
     return COLOR.dim;
   };
+  const compactLabel = (reason) => {
+    if (reason.includes("低开")) return "−8% 强制止损（低开）";
+    if (reason.includes("AI硬件") && reason.includes("指数多转空")) {
+      return reason.includes("最高价首次下移")
+        ? "高回落 · AI 硬件强平"
+        : "指数多转空 · AI 硬件强平";
+    }
+    if (reason.includes("最高价首次下移")) {
+      if (reason.includes("持仓收益≤-8%")) {
+        return "高回落 · 剩余半仓 −8% 止损";
+      }
+      if (reason.includes("同日原卖出规则")) {
+        return "高回落 · 同日跌破 MA5 清仓";
+      }
+      if (reason.includes("次日继续下移")) {
+        return "高回落 · 次日下移清仓";
+      }
+      if (reason.includes("后续最高价连续两天下移")) {
+        return "高回落 · 后续下移清仓";
+      }
+      return "高回落 · 剩余半仓跌破 MA5";
+    }
+    if (reason.includes("持仓收益≤-8%")) return "−8% 强制止损";
+    if (reason === "跌破MA5") return "跌破 MA5";
+    return reason;
+  };
+  const compact = chart.getWidth() < 720;
   chart.setOption({
     ...chartBase(),
-    grid: { left: 155, right: 130, top: 20, bottom: 28 },
+    grid: {
+      left: compact ? 190 : 245,
+      right: compact ? 105 : 140,
+      top: 18,
+      bottom: 24,
+    },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
@@ -1576,12 +1608,20 @@ function renderExitReasonChart() {
       data: ordered.map((row) => row.reason),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: COLOR.soft, fontSize: 9 },
+      axisLabel: {
+        color: COLOR.soft,
+        fontSize: 9,
+        width: compact ? 165 : 220,
+        overflow: "break",
+        lineHeight: 12,
+        formatter: compactLabel,
+      },
     },
     series: [
       {
         type: "bar",
         barWidth: "52%",
+        barMaxWidth: 20,
         data: ordered.map((row) => ({
           value: row.count,
           itemStyle: {

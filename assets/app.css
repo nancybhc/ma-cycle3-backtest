@@ -1500,6 +1500,14 @@ main {
   gap: 16px;
 }
 
+.exit-reason-panel {
+  grid-column: 1 / -1;
+}
+
+.exit-reason-panel .chart-lg {
+  height: 340px;
+}
+
 .holding-panel {
   margin-top: 16px;
   padding: 18px 20px 20px;
