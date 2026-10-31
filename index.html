@@ -430,9 +430,6 @@
                 </div>
               </details>
             </div>
-            <div class="rule-footnote">
-              09:15 启动盘中监控，每 60 秒重算并记录首次入选时间；盘中入选不等于成交，实际买入统一在尾盘集合竞价，15:05 按收盘快照确认。
-            </div>
           </article>
 
           <article class="panel trade-rule-panel sell-rule-panel">
@@ -478,7 +475,7 @@
                   </span>
                 </summary>
                 <div class="rule-copy trade-rule-detail">
-                  <p>从买入后的下一交易日起，盘中最低价触及 -8% 即卖出；若跳空低开并直接低于止损价，按开盘价成交。</p>
+                  <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即挂条件单卖出；若跳空低开并直接低于止损价，按开盘价成交。</p>
                 </div>
               </details>
             </div>
@@ -509,10 +506,8 @@
                 <div>
                   <h3>AI 硬件资金池特殊规则</h3>
                   <p>资金池按上证指数阶段变化：空 20%；空转多 1/2/3 为 30%/50%/70%；多 80%；多转空 1/2/3 全部 0%。</p>
-                  <div class="ai-rule-explanation">
-                    <strong>为什么指数多转空先清仓 AI 硬件？</strong>
-                    <p>多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤；等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
-                  </div>
+                  <p><b>为什么指数多转空先清仓 AI 硬件？</b></p>
+                  <p>多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤；等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
                 </div>
               </div>
             </div>
@@ -540,7 +535,7 @@
             <div class="priority-arrow arrow-2">↓</div>
             <div class="priority-item priority-3">
               <span>03</span>
-              <div><strong>高回落分批止盈</strong><p>收益 &gt;0% 后首次下移卖半仓，后续连续两日下移清剩余半仓。</p></div>
+              <div><strong>最高点下移分批止盈</strong><p>收益 &gt;0% 后首次下移卖半仓，后续连续两日下移清剩余半仓。</p></div>
             </div>
             <div class="priority-arrow arrow-3">←</div>
             <div class="priority-item priority-4">
@@ -548,7 +543,6 @@
               <div><strong>跌破 MA5</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
             </div>
             <div class="priority-arrow arrow-4">↑</div>
-            <div class="priority-center"><span>执行顺序</span><strong>01 → 02 → 03 → 04</strong></div>
           </div>
           <p class="priority-note">若同日首次高回落减半与跌破 MA5 重叠，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
         </article>

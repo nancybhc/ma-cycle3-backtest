@@ -2025,7 +2025,7 @@ main {
 
 .trade-rule-panel-head h3 {
   margin: 4px 0 0;
-  color: var(--text);
+  color: var(--text-soft);
   font-size: 15px;
   font-weight: 600;
 }
@@ -2116,7 +2116,7 @@ main {
 .rule-title .rule-heading,
 .allocation-rule-card h3 {
   margin: 0;
-  color: rgba(238, 247, 252, 0.92);
+  color: var(--text-soft);
   font-size: 12px;
   font-weight: 600;
 }
@@ -2143,36 +2143,12 @@ main {
   margin: 4px 0 0;
   color: var(--text-dim);
   font-size: 10px;
-  line-height: 1.72;
+  line-height: 1.75;
 }
 
 .rule-copy p b {
   color: rgba(220, 233, 242, 0.82);
   font-weight: 600;
-}
-
-.rule-formula {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 9px;
-  padding: 8px 10px;
-  border: 1px solid rgba(72, 225, 209, 0.14);
-  border-radius: 8px;
-  background: rgba(72, 225, 209, 0.025);
-}
-
-.rule-formula span {
-  color: rgba(202, 221, 231, 0.72);
-  font-family: var(--mono);
-  font-size: 8px;
-}
-
-.rule-formula b {
-  color: rgba(72, 225, 209, 0.46);
-  font-size: 9px;
-  font-weight: 400;
 }
 
 .rule-footnote {
@@ -2210,52 +2186,6 @@ main {
   background:
     linear-gradient(135deg, rgba(111, 171, 255, 0.035), transparent 52%),
     rgba(4, 13, 22, 0.30);
-}
-
-.stage-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 9px;
-}
-
-.stage-chip-row span {
-  padding: 3px 6px;
-  border: 1px solid rgba(111, 171, 255, 0.16);
-  border-radius: 5px;
-  background: rgba(111, 171, 255, 0.035);
-  color: rgba(168, 196, 220, 0.76);
-  font-family: var(--mono);
-  font-size: 8px;
-}
-
-.stage-chip-row .danger {
-  border-color: rgba(255, 91, 110, 0.22);
-  background: rgba(255, 91, 110, 0.05);
-  color: rgba(255, 132, 149, 0.88);
-}
-
-.ai-rule-explanation {
-  margin-top: 11px;
-  padding: 12px 13px;
-  border-left: 2px solid rgba(111, 171, 255, 0.48);
-  border-radius: 0 8px 8px 0;
-  background: rgba(111, 171, 255, 0.035);
-}
-
-.ai-rule-explanation strong {
-  display: block;
-  margin-bottom: 6px;
-  color: rgba(179, 208, 235, 0.92);
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.ai-rule-explanation p {
-  margin: 0;
-  color: rgba(156, 177, 193, 0.78);
-  font-size: 9px;
-  line-height: 1.78;
 }
 
 .execution-priority-panel {
@@ -2310,16 +2240,16 @@ main {
 
 .priority-item strong {
   display: block;
-  color: rgba(238, 247, 252, 0.92);
-  font-size: 11px;
+  color: var(--text-soft);
+  font-size: 12px;
   font-weight: 600;
 }
 
 .priority-item p {
   margin: 6px 0 0;
   color: var(--text-dim);
-  font-size: 9px;
-  line-height: 1.65;
+  font-size: 10px;
+  line-height: 1.75;
 }
 
 .priority-arrow {
@@ -2344,36 +2274,6 @@ main {
 
 .arrow-4 {
   grid-area: a4;
-}
-
-.priority-center {
-  display: flex;
-  grid-area: center;
-  align-self: center;
-  justify-self: center;
-  min-width: 102px;
-  min-height: 44px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 9px;
-  border: 1px dashed rgba(72, 225, 209, 0.20);
-  border-radius: 999px;
-  background: rgba(72, 225, 209, 0.025);
-  text-align: center;
-}
-
-.priority-center span {
-  color: var(--text-dim);
-  font-size: 8px;
-}
-
-.priority-center strong {
-  margin-top: 2px;
-  color: rgba(72, 225, 209, 0.72);
-  font-family: var(--mono);
-  font-size: 8px;
-  font-weight: 500;
 }
 
 .priority-note {
@@ -2831,8 +2731,7 @@ main {
   }
 
   .priority-item,
-  .priority-arrow,
-  .priority-center {
+  .priority-arrow {
     grid-area: auto;
   }
 
