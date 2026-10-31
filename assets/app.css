@@ -2285,6 +2285,13 @@ main {
   line-height: 1;
 }
 
+@media (min-width: 901px) {
+  .priority-arrow.arrow-1,
+  .priority-arrow.arrow-3 {
+    transform: scaleX(1.35);
+  }
+}
+
 .arrow-1 {
   grid-area: a1;
 }
