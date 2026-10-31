@@ -606,6 +606,10 @@ function renderCandidateTable() {
   document
     .getElementById("candidateTable")
     .classList.toggle("changes-view", state.candidateScope === "changes");
+  setText(
+    "candidateChangeHeader",
+    state.candidateScope === "changes" ? "当日变动" : "信号判定"
+  );
   const body = document.getElementById("candidateTableBody");
   body.innerHTML = rows.map((row) => candidateRowHtml(row)).join("");
 

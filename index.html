@@ -43,7 +43,7 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成 5 破 10 的强度来定义尾盘买入策略，并严格遵照跌破 MA5、持仓收益 ≤-8% 强制止损、最高点下移分批止盈以及 AI 硬件特殊规则等卖出策略。</p>
+        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成 5 破 10 的强度来定义尾盘买入策略，并严格执行跌破 MA5、持仓收益 ≤-8%、最高点下移等卖出策略。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -266,7 +266,7 @@
                 <th class="group-ratio-col">分组多占比</th>
                 <th class="score-col">评分 / 建议仓位</th>
                 <th class="num position-context-col">仓位</th>
-                <th>当日变动</th>
+                <th id="candidateChangeHeader">当日变动</th>
               </tr>
             </thead>
             <tbody id="candidateTableBody"></tbody>
@@ -807,6 +807,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261031-market-clock"></script>
+  <script src="assets/app.js?v=20261031-signal-judgement"></script>
 </body>
 </html>
