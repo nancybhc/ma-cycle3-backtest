@@ -443,16 +443,17 @@
               <div class="priority-flow">
                 <div class="priority-item priority-1">
                   <span>01</span>
-                  <div><strong>-8% 条件止损</strong><p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即挂条件单卖出；若跳空低开并直接低于止损价，按开盘价成交。</p></div>
+                  <div>
+                    <strong>持仓收益 -8% 强平</strong>
+                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即卖出。若跳空低开至止损价下方，按开盘价卖出。实盘注意了解条件单设置规则以及学会竞价挂跌停价保证止损成功。</p>
+                  </div>
                 </div>
                 <div class="priority-arrow arrow-1">→</div>
                 <div class="priority-item priority-2">
                   <span>02</span>
                   <div>
                     <strong>AI 硬件多转空强平</strong>
-                    <p>上证指数进入多转空，AI 硬件剩余仓位当日按收盘价强制清仓。</p>
-                    <p><b>为什么指数多转空先清仓 AI 硬件？</b></p>
-                    <p>多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤；等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
+                    <p>上证指数进入多转空，AI 硬件剩余仓位当日按收盘价强制清仓。多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤。等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-2">↓</div>
@@ -463,7 +464,7 @@
                 <div class="priority-arrow arrow-3">←</div>
                 <div class="priority-item priority-4">
                   <span>04</span>
-                  <div><strong>跌破 MA5</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p></div>
+                  <div><strong>跌破 MA5 清仓</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p></div>
                 </div>
                 <div class="priority-arrow arrow-4">↑</div>
               </div>
