@@ -221,57 +221,48 @@ async function refreshLiveSignals() {
 function updateCandidateRunHeader() {
   const live = state.liveData;
   const monitor = state.monitorStatus || {};
+  const clock = shanghaiClock();
+  const inLiveWindow =
+    !["Sat", "Sun"].includes(clock.weekday) &&
+    clock.minuteOfDay >= 9 * 60 + 15 &&
+    clock.minuteOfDay < 15 * 60 + 5;
+  const monitorKnown = monitor.control_available === true;
+  const intraday = monitorKnown
+    ? Boolean(monitor.running)
+    : Boolean(live?.status === "scanning" && inLiveWindow);
+  const phaseLabel = intraday ? "盘中行情" : "收盘行情";
   const waitingForQuote =
     Boolean(monitor.running) && monitor.monitor_status === "error";
   if (state.liveApplied && live) {
-    const clock = shanghaiClock();
     const quoteTime = live.marketTime || live.generatedAt || "";
     const quoteClock =
       String(quoteTime).match(/\b\d{2}:\d{2}:\d{2}\b/)?.[0] || "更新中";
-    const inLiveWindow =
-      !["Sat", "Sun"].includes(clock.weekday) &&
-      clock.minuteOfDay >= 9 * 60 + 15 &&
-      clock.minuteOfDay < 15 * 60 + 5;
     const isLocalPage = ["127.0.0.1", "localhost", "::1"].includes(
       location.hostname
     );
     const refreshLabel = isLocalPage
       ? "本地10秒刷新"
       : "GitHub每60秒同步";
-    setText(
-      "topDataDate",
-      `${live.marketDate} · ${inLiveWindow ? "盘中" : "盘后"}`
-    );
+    setText("topDataDate", `${live.marketDate} ${phaseLabel}`);
     setText("candidateDateChip", live.marketDate);
     setText(
       "candidateRunTime",
-      inLiveWindow
-        ? `盘中 · 行情 ${quoteClock} · ${refreshLabel} · 仅出信号，尾盘竞价成交${
+      intraday
+        ? `盘中行情 · 行情 ${quoteClock} · ${refreshLabel} · 仅出信号，尾盘竞价成交${
             waitingForQuote ? " · 行情重试中" : ""
           }`
-        : `盘后 · 最后行情 ${quoteClock} · 收盘后统一更新持仓`
+        : "收盘行情"
     );
     return;
   }
   const { meta } = state.data;
-  const clock = shanghaiClock();
-  const phase =
-    !["Sat", "Sun"].includes(clock.weekday) &&
-    clock.minuteOfDay >= 9 * 60 + 15 &&
-    clock.minuteOfDay < 15 * 60 + 5
-      ? "盘中"
-      : "盘后";
-  setText("topDataDate", `${meta.dataEnd} · ${phase}`);
+  setText("topDataDate", `${meta.dataEnd} ${phaseLabel}`);
   setText("candidateDateChip", meta.candidateDate);
   setText(
     "candidateRunTime",
     waitingForQuote && meta.candidateDate !== clock.date
-      ? `${phase} · 等待今日有效行情 · 当前保留 ${meta.candidateDate} 最后信号`
-      : `${phase} · ${
-          meta.snapshotRunLabel ||
-          meta.candidateRunTime ||
-          `回测更新 ${meta.runTime}`
-        }`
+      ? `盘中行情 · 等待今日有效行情 · 当前保留 ${meta.candidateDate} 最后信号`
+      : phaseLabel
   );
 }
 
@@ -366,7 +357,7 @@ async function controlMonitor(action) {
 
 function populateOverview() {
   const { meta, funnel, portfolio, stats } = state.data;
-  setText("topDataDate", `${meta.dataEnd} · 收盘后更新`);
+  setText("topDataDate", `${meta.dataEnd} 收盘行情`);
   setText("heroRange", `${meta.start} → ${meta.end}`);
   setText("heroUpdated", meta.latestUpdateAt || meta.runTime);
   setText("heroSamples", `${formatInt(stats.all.count)} 笔`);
