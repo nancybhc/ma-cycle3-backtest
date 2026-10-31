@@ -435,81 +435,33 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">卖出</span>
-                <h3>四类离场规则，按优先级触发</h3>
+                <h3>四类离场规则，按闭环顺序触发</h3>
               </div>
-            </div>
-            <div class="trade-rule-list">
-              <details class="trade-rule-item">
-                <summary>
-                  <span class="rule-index">01</span>
-                  <span class="rule-title">
-                    <strong class="rule-heading">最高点下移分批止盈</strong>
-                    <span class="rule-tag">收益 &gt; 0%</span>
-                  </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
-                  <p>持仓收益为正时。最高价首次低于前一日，按当日收盘价先卖半仓；此后任一时点再次形成连续两天下移，就清掉剩余半仓。</p>
-                  <p>没有再次连续下移时，剩余半仓继续持有。首次减半后，资金池只按剩余半仓占用，但该股票仍占一个分组名额。</p>
-                </div>
-              </details>
-              <details class="trade-rule-item">
-                <summary>
-                  <span class="rule-index">02</span>
-                  <span class="rule-title">
-                    <strong class="rule-heading">跌破 MA5</strong>
-                    <span class="rule-tag">趋势破坏</span>
-                  </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
-                  <p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p>
-                </div>
-              </details>
-              <details class="trade-rule-item">
-                <summary>
-                  <span class="rule-index">03</span>
-                  <span class="rule-title">
-                    <strong class="rule-heading">持仓收益 ≤ -8%</strong>
-                    <span class="rule-tag">强制止损</span>
-                  </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
-                  <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即挂条件单卖出；若跳空低开并直接低于止损价，按开盘价成交。</p>
-                </div>
-              </details>
             </div>
             <div class="sell-priority-section">
-              <div class="trade-rule-panel-head">
-                <div>
-                  <span class="rule-kicker">执行优先级</span>
-                  <h3>同一天发生多条信号时的执行顺序</h3>
-                </div>
-              </div>
               <div class="priority-flow">
                 <div class="priority-item priority-1">
                   <span>01</span>
-                  <div><strong>-8% 条件止损</strong><p>下一交易日起，盘中收益触及 -8% 最先成交；低开按开盘价。</p></div>
+                  <div><strong>-8% 条件止损</strong><p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即挂条件单卖出；若跳空低开并直接低于止损价，按开盘价成交。</p></div>
                 </div>
                 <div class="priority-arrow arrow-1">→</div>
                 <div class="priority-item priority-2">
                   <span>02</span>
-                  <div><strong>AI 硬件多转空强平</strong><p>上证指数进入多转空，AI 硬件剩余仓位当日收盘强制清仓。</p></div>
+                  <div><strong>AI 硬件多转空强平</strong><p>上证指数进入多转空，AI 硬件剩余仓位当日按收盘价强制清仓。</p></div>
                 </div>
                 <div class="priority-arrow arrow-2">↓</div>
                 <div class="priority-item priority-3">
                   <span>03</span>
-                  <div><strong>最高点下移分批止盈</strong><p>收益 &gt;0% 后首次下移卖半仓，后续连续两日下移清剩余半仓。</p></div>
+                  <div><strong>最高点下移分批止盈</strong><p>持仓收益为正时，最高价首次低于前一日先卖半仓；此后任一时点再次连续两天下移，清掉剩余半仓。减半后资金池只按剩余半仓占用，仍占一个分组名额。</p></div>
                 </div>
                 <div class="priority-arrow arrow-3">←</div>
                 <div class="priority-item priority-4">
                   <span>04</span>
-                  <div><strong>跌破 MA5</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
+                  <div><strong>跌破 MA5</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p></div>
                 </div>
                 <div class="priority-arrow arrow-4">↑</div>
               </div>
               <p class="priority-note">若同日首次高回落减半与跌破 MA5 重叠，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
-            </div>
-            <div class="rule-footnote">
-              指数多转空时，AI 硬件还会触发独立的仓位强平规则；该规则属于仓位管理，并列入执行优先级第 2 条。
             </div>
           </article>
 
