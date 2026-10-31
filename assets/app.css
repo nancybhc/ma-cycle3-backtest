@@ -1376,7 +1376,6 @@ main {
 }
 
 .price-pair strong,
-.score-only,
 .ma-level strong {
   color: var(--text);
   font-family: var(--mono);
@@ -2018,8 +2017,7 @@ main {
   gap: 16px;
 }
 
-.trade-rule-panel,
-.execution-priority-panel {
+.trade-rule-panel {
   overflow: hidden;
   padding: 0;
   background:
@@ -2193,8 +2191,14 @@ main {
     rgba(4, 13, 22, 0.30);
 }
 
-.execution-priority-panel {
-  margin-top: 16px;
+.sell-priority-section {
+  border-top: 1px solid var(--line);
+  background: rgba(4, 13, 22, 0.18);
+}
+
+.sell-priority-section .trade-rule-panel-head {
+  padding: 16px 22px 12px;
+  border-bottom: 0;
 }
 
 .priority-flow {

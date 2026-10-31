@@ -597,7 +597,7 @@ function renderCandidateTable() {
     .getElementById("candidateTable")
     .classList.toggle("changes-view", state.candidateScope === "changes");
   const body = document.getElementById("candidateTableBody");
-  body.innerHTML = rows.map(candidateRowHtml).join("");
+  body.innerHTML = rows.map((row) => candidateRowHtml(row)).join("");
 
   body.querySelectorAll("tr[data-code]").forEach((row) => {
     row.addEventListener("click", () =>
@@ -606,7 +606,7 @@ function renderCandidateTable() {
   });
 }
 
-function candidateRowHtml(row) {
+function candidateRowHtml(row, showDailyChange = true) {
   const isHolding = Boolean(row.isHolding);
   const changeType = String(row.changeType || "");
   const limitUpBlocked =
@@ -669,7 +669,11 @@ function candidateRowHtml(row) {
             )
       }</td>
       <td class="num position-context-col">${positionContextHtml(row)}</td>
-      <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
+      ${
+        showDailyChange
+          ? `<td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>`
+          : ""
+      }
     </tr>`;
 }
 
@@ -679,11 +683,13 @@ function renderIntradayJumpTable() {
   if (!rows.length) {
     body.innerHTML = `
       <tr>
-        <td colspan="18" class="empty-cell">暂无盘中直接跳级转多信号</td>
+        <td colspan="17" class="empty-cell">暂无盘中直接跳级转多信号</td>
       </tr>`;
     return;
   }
-  body.innerHTML = rows.map(candidateRowHtml).join("");
+  body.innerHTML = rows
+    .map((row) => candidateRowHtml(row, false))
+    .join("");
   body.querySelectorAll("tr[data-code]").forEach((row) => {
     row.addEventListener("click", () =>
       openSignal(row.dataset.code, "intradayJumps")
@@ -739,7 +745,10 @@ function scoreOnlyHtml(score) {
   if (score === null || score === undefined || Number.isNaN(Number(score))) {
     return `<span class="flat">—</span>`;
   }
-  return `<span class="score-only">${formatNumber(score, 3)}</span>`;
+  return `
+    <span class="price-pair">
+      <strong>${formatNumber(score, 3)}</strong>
+    </span>`;
 }
 
 function positionContextHtml(row) {
