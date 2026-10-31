@@ -378,7 +378,7 @@ function populateOverview() {
   setText("kpiMfe", formatPct(stats.all.avgMfePct, true));
   setText("kpiMae", formatPct(stats.all.avgMaePct, true));
   setText("kpiActive", `${formatNumber(portfolio.avgActive, 1)} 笔`);
-  setText("kpiMaxActive", `${formatInt(portfolio.maxActive)} 笔`);
+  setText("kpiMaxActive", formatInt(portfolio.maxActive));
   setText("kpiDayWin", formatPct(portfolio.positiveDaysPct, false));
   setText("kpiDays", formatInt(portfolio.tradingDays));
   setText("distributionSampleTip", `${formatInt(stats.all.count)} 笔`);
