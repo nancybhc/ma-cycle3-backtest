@@ -1064,6 +1064,10 @@ main {
   gap: 10px;
 }
 
+.candidate-table:not(.changes-view) .mfe-col {
+  display: none;
+}
+
 .score-dimension {
   display: flex;
   flex-direction: column;
