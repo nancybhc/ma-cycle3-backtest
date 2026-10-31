@@ -1996,10 +1996,9 @@ main {
 }
 
 .trade-rule-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-items: start;
 }
 
 .trade-rule-panel,
@@ -2012,7 +2011,7 @@ main {
 }
 
 .buy-rule-panel {
-  grid-row: span 2;
+  width: 100%;
 }
 
 .trade-rule-panel-head {
@@ -2226,8 +2225,8 @@ main {
 
 .priority-flow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 8px;
   align-items: stretch;
   padding: 18px 20px 12px;
 }
@@ -2236,7 +2235,7 @@ main {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
   gap: 9px;
-  min-height: 104px;
+  min-height: auto;
   padding: 14px 13px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -2265,9 +2264,11 @@ main {
 
 .priority-arrow {
   align-self: center;
+  justify-self: center;
   color: rgba(72, 225, 209, 0.34);
   font-family: var(--mono);
   font-size: 12px;
+  transform: rotate(90deg);
 }
 
 .priority-note {
@@ -2662,20 +2663,12 @@ main {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .trade-rule-grid {
+  .priority-flow {
     grid-template-columns: 1fr;
   }
 
-  .buy-rule-panel {
-    grid-row: auto;
-  }
-
-  .priority-flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .priority-arrow {
-    display: none;
+    transform: rotate(90deg);
   }
 }
 
