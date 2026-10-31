@@ -1277,9 +1277,6 @@ main {
 .candidate-table .first-selected-col {
     width: 96px;
     min-width: 96px;
-    color: var(--text-soft);
-    font-family: var(--mono);
-    font-size: 9px;
 }
 
 .candidate-table th:last-child,
@@ -1713,10 +1710,8 @@ main {
   text-align: left;
 }
 
-.candidate-table .first-selected-col {
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.4;
+.candidate-table:not(.changes-view) .hold-days-col {
+  display: none;
 }
 
 .mfe-pair {
