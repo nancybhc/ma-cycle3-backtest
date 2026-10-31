@@ -685,8 +685,8 @@ main {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin: -2px 0 14px;
-  padding: 9px 13px;
+  margin: 0;
+  padding: 7px 13px 0;
   border-left: 0;
   background: transparent;
   color: var(--text-dim);
@@ -703,11 +703,22 @@ main {
 }
 
 .signal-color-legend {
-  margin: -6px 0 14px;
-  padding: 0 13px 0 15px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 5px 13px 0;
   color: var(--text-dim);
   font-size: 9px;
   line-height: 1.65;
+}
+
+.signal-color-legend strong {
+  flex: 0 0 auto;
+  color: var(--cyan);
+  font-size: 9px;
+  font-weight: 600;
+  opacity: 0.82;
 }
 
 .signal-color-legend b {
