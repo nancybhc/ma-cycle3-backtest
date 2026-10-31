@@ -1454,6 +1454,12 @@ function renderGroupChart() {
 function renderScatterChart() {
   const chart = getChart("scatterChart");
   const trades = state.data.performanceTrades || state.data.trades;
+  const maeValues = trades.map((trade) => Number(trade.maePct) || 0);
+  const mfeValues = trades.map((trade) => Number(trade.mfePct) || 0);
+  const xMin = Math.min(-10, Math.floor(Math.min(...maeValues) / 5) * 5);
+  const xMax = Math.max(5, Math.ceil(Math.max(...maeValues) / 5) * 5);
+  const yMax = Math.max(60, Math.ceil(Math.max(...mfeValues) / 20) * 20);
+  const diagonalLimit = Math.min(Math.abs(xMin), yMax);
   chart.setOption({
     ...chartBase(),
     grid: { left: 52, right: 18, top: 20, bottom: 38 },
@@ -1476,8 +1482,8 @@ function renderScatterChart() {
       axisLabel: { color: COLOR.dim, fontSize: 8 },
       splitLine: { lineStyle: { color: COLOR.grid } },
       axisLine: { lineStyle: { color: COLOR.axis } },
-      min: -30,
-      max: 2,
+      min: xMin,
+      max: xMax,
     },
     yAxis: {
       type: "value",
@@ -1487,14 +1493,14 @@ function renderScatterChart() {
       splitLine: { lineStyle: { color: COLOR.grid } },
       axisLine: { show: false },
       min: 0,
-      max: 70,
+      max: yMax,
     },
     series: [
       {
         type: "scatter",
         data: trades.map((trade) => [
-          Math.max(-30, trade.maePct),
-          Math.min(70, trade.mfePct),
+          trade.maePct,
+          trade.mfePct,
           trade.returnPct,
           trade.code,
           trade.name,
@@ -1518,9 +1524,9 @@ function renderScatterChart() {
       {
         type: "line",
         data: [
-          [-30, 30],
-          [-20, 20],
-          [-10, 10],
+          [-diagonalLimit, diagonalLimit],
+          [(-diagonalLimit * 2) / 3, (diagonalLimit * 2) / 3],
+          [-diagonalLimit / 3, diagonalLimit / 3],
           [0, 0],
         ],
         symbol: "none",
