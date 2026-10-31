@@ -758,15 +758,12 @@ function positionContextHtml(row) {
     return `
       <span class="price-pair">
         <strong>0%</strong>
-        <small>--</small>
       </span>`;
   }
   if (row.isHolding) {
-    const days = currentHoldingDays(row);
     return `
       <span class="price-pair">
         <strong>${Number.isFinite(weight) ? `${formatNumber(weight, 1)}%` : "—"}</strong>
-        <small>${days === null ? "当前持仓" : `已持有 ${formatInt(days)} 天`}</small>
       </span>`;
   }
   const suggested = Number(row.suggestedPositionPct);
@@ -774,7 +771,6 @@ function positionContextHtml(row) {
     return `
       <span class="price-pair">
         <strong>${formatNumber(suggested, 1)}%</strong>
-        <small>${row.changeType === "buy" ? "新买入" : "建议仓位"}</small>
       </span>`;
   }
   return `<span class="flat">—</span>`;
