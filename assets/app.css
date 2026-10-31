@@ -2054,15 +2054,44 @@ main {
 }
 
 .trade-rule-item {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 13px;
-  padding: 18px 22px;
+  display: block;
+  padding: 0;
   border-bottom: 1px solid rgba(131, 173, 207, 0.10);
 }
 
 .trade-rule-item:last-child {
   border-bottom: 0;
+}
+
+.trade-rule-item > summary {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 18px;
+  gap: 13px;
+  align-items: center;
+  padding: 13px 22px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 0.18s ease;
+}
+
+.trade-rule-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+.trade-rule-item > summary:hover {
+  background: rgba(72, 225, 209, 0.025);
+}
+
+.trade-rule-item > summary::after {
+  color: rgba(72, 225, 209, 0.58);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: center;
+  content: "+";
+}
+
+.trade-rule-item[open] > summary::after {
+  content: "−";
 }
 
 .rule-index {
@@ -2081,15 +2110,24 @@ main {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 7px;
+  margin: 0;
 }
 
-.rule-title h3,
+.rule-title .rule-heading,
 .allocation-rule-card h3 {
   margin: 0;
   color: rgba(238, 247, 252, 0.92);
   font-size: 12px;
   font-weight: 600;
+}
+
+.trade-rule-detail {
+  margin-left: 47px;
+  padding: 0 40px 15px 0;
+}
+
+.trade-rule-detail p:first-child {
+  margin-top: 2px;
 }
 
 .rule-tag {
@@ -2775,13 +2813,21 @@ main {
   }
 
   .trade-rule-panel-head,
-  .trade-rule-item,
   .rule-footnote {
     padding-right: 16px;
     padding-left: 16px;
   }
 
-  .trade-rule-item,
+  .trade-rule-item > summary {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .trade-rule-detail {
+    margin-left: 36px;
+    padding-right: 16px;
+  }
+
   .allocation-rule-card {
     grid-template-columns: 27px minmax(0, 1fr);
     gap: 9px;
