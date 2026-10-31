@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261031-market-clock">
+<link rel="stylesheet" href="assets/app.css?v=20261031-score-40-40-20">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -504,27 +504,20 @@
           </div>
           <div class="score-formula">
             <span>综合评分 =</span>
-            <strong>30% MA10拐头价涨幅分位</strong>
+            <strong>40% 分组多占比分位</strong>
             <b>+</b>
-            <strong>30% 分组多占比分位</strong>
-            <b>+</b>
-            <strong>20% 间距增幅分位</strong>
+            <strong>40% 间距增幅分位</strong>
             <b>+</b>
             <strong>20% 推演后 5–10 间距分位</strong>
           </div>
           <div class="score-dimension-grid">
             <div class="score-dimension">
-              <span>30%</span>
-              <strong>MA10拐头价涨幅</strong>
-              <p>使用 MA10拐头价相对现价的涨幅，保留正负号并反向排名：负得越多，分数越高。负值说明次日平盘即可保持 MA10 向上，正值则说明平盘仍会转下，越接近转强越有利。</p>
-            </div>
-            <div class="score-dimension">
-              <span>30%</span>
+              <span>40%</span>
               <strong>分组多占比</strong>
               <p>统计所属分组内 MA5 向上、MA10 向上且 MA5 在 MA10 上方的“多”股票数，再除以该分组当日有有效 MA5 / MA10 的股票总数；占比越高，说明板块内部多头越一致。</p>
             </div>
             <div class="score-dimension">
-              <span>20%</span>
+              <span>40%</span>
               <strong>间距增幅</strong>
               <p>推演次日 5–10 间距% 减去当日 5–10 间距%，也就是 MA5 相对 MA10 的间距变化；数值越大，说明均线分离越快。</p>
             </div>
@@ -534,7 +527,7 @@
               <p>把信号日收盘价复制为推演次日价格，重算 MA5 / MA10；按（推演 MA5 ÷ 推演 MA10 − 1）× 100% 得到最终间距；数值越大，说明推演后的多头间隔越充分。</p>
             </div>
           </div>
-          <small class="score-rule-note">四个原始指标先转为分位排名，再按权重合成；MA10拐头价涨幅按数值越小分位越高，其余三项按数值越大分位越高。评分只用于横向参考，不替代买入硬条件和持仓上限。</small>
+          <small class="score-rule-note">三个原始指标先转为分位排名，再按权重合成；三项均按数值越大分位越高。评分只用于横向参考，不替代买入硬条件和持仓上限。</small>
         </article>
       </section>
 
