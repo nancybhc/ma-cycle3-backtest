@@ -1425,7 +1425,7 @@ function renderDistributionChart() {
 function renderGroupChart() {
   const chart = getChart("groupChart");
   const rows = state.data.groups
-    .filter((row) => row.count >= 10)
+    .filter((row) => row.count > 8)
     .sort((a, b) => b.avgReturnPct - a.avgReturnPct)
     .slice(0, 12)
     .reverse();
@@ -1495,7 +1495,7 @@ function renderScatterChart() {
   const diagonalLimit = Math.min(Math.abs(xMin), yMax);
   chart.setOption({
     ...chartBase(),
-    grid: { left: 52, right: 18, top: 20, bottom: 38 },
+    grid: { left: 64, right: 30, top: 24, bottom: 48 },
     tooltip: {
       ...chartBase().tooltip,
       formatter(params) {
@@ -1511,7 +1511,13 @@ function renderScatterChart() {
     xAxis: {
       type: "value",
       name: "MAE %",
-      nameTextStyle: { color: COLOR.dim, fontSize: 8 },
+      nameLocation: "middle",
+      nameGap: 24,
+      nameTextStyle: {
+        color: COLOR.dim,
+        fontSize: 8,
+        fontWeight: 500,
+      },
       axisLabel: { color: COLOR.dim, fontSize: 8 },
       splitLine: { lineStyle: { color: COLOR.grid } },
       axisLine: { lineStyle: { color: COLOR.axis } },
@@ -1521,7 +1527,14 @@ function renderScatterChart() {
     yAxis: {
       type: "value",
       name: "MFE %",
-      nameTextStyle: { color: COLOR.dim, fontSize: 8 },
+      nameLocation: "middle",
+      nameRotate: 90,
+      nameGap: 42,
+      nameTextStyle: {
+        color: COLOR.dim,
+        fontSize: 8,
+        fontWeight: 500,
+      },
       axisLabel: { color: COLOR.dim, fontSize: 8 },
       splitLine: { lineStyle: { color: COLOR.grid } },
       axisLine: { show: false },
