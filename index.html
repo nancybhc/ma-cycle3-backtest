@@ -436,7 +436,7 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">卖出</span>
-                <h3>四类离场规则，按闭环顺序触发</h3>
+                <h3>四类离场规则，按顺序触发</h3>
               </div>
             </div>
             <div class="sell-priority-section">
@@ -445,7 +445,8 @@
                   <span>01</span>
                   <div>
                     <strong>持仓收益 -8% 强平</strong>
-                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即卖出。若跳空低开至止损价下方，按开盘价卖出。实盘注意了解条件单设置规则以及学会竞价挂跌停价保证止损成功。</p>
+                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即卖出。若跳空低开至止损价下方，按开盘价卖出。</p>
+                    <p>实盘注意了解条件单设置规则以及学会竞价挂跌停价保证止损成功。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-1">→</div>
@@ -466,7 +467,6 @@
                   <span>04</span>
                   <div><strong>跌破 MA5 清仓</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p></div>
                 </div>
-                <div class="priority-arrow arrow-4">↑</div>
               </div>
               <p class="priority-note">若同日首次高回落减半与跌破 MA5 重叠，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
             </div>
@@ -645,7 +645,6 @@
             <div class="stage-reading-icon">3</div>
             <div>
               <strong>本策略的信号起点是空转多进度 3</strong>
-              <p>信号日先取空转多进度 3 的首次出现；随后假设次日收盘价持平，重算 MA5 / MA10。只有推演结果变为 MA5 &gt; MA10（5破10）且间距增幅达标才进入候选。候选再经过指数仓位和同组综合评分上限。</p>
             </div>
           </div>
         </div>

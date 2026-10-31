@@ -2241,7 +2241,7 @@ main {
   grid-template-rows: auto 52px auto;
   grid-template-areas:
     "p1 a1 p2"
-    "a4 center a2"
+    ". . a2"
     "p4 a3 p3";
   gap: 10px 12px;
   align-items: stretch;
@@ -2313,10 +2313,6 @@ main {
 
 .arrow-3 {
   grid-area: a3;
-}
-
-.arrow-4 {
-  grid-area: a4;
 }
 
 .priority-note {
