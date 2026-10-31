@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261031-score-cards-two-lines">
+<link rel="stylesheet" href="assets/app.css?v=20261031-ai-pool-guide">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -554,17 +554,6 @@
             </div>
           </div>
 
-          <div class="position-stage-ladder" id="positionStageLadder">
-            <div class="position-stage" data-stage-key="空"><span>空</span><strong>20%</strong></div>
-            <div class="position-stage" data-stage-key="空转多1"><span>空转多 · 进度1</span><strong>30%</strong></div>
-            <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>50%</strong></div>
-            <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
-            <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
-            <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1 · 清仓</span><strong>0%</strong></div>
-            <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2 · 清仓</span><strong>0%</strong></div>
-            <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3 · 清仓</span><strong>0%</strong></div>
-          </div>
-
           <div class="stage-grid">
             <article class="panel stage-panel to-short">
               <div class="stage-panel-head">
@@ -627,6 +616,25 @@
                 </div>
               </div>
             </article>
+          </div>
+
+          <div class="position-pool-guide">
+            <div>
+              <span>AI 硬件资金池</span>
+              <strong>仓位按上证指数阶段分配，对应下方胶囊</strong>
+              <p>空 20%；空转多进度 1/2/3 为 30%/50%/70%；多为 80%；多转空进度 1/2/3 全部为 0%，并在进入多转空当日清仓。</p>
+            </div>
+            <i>↓</i>
+          </div>
+          <div class="position-stage-ladder" id="positionStageLadder">
+            <div class="position-stage" data-stage-key="空"><span>空</span><strong>20%</strong></div>
+            <div class="position-stage" data-stage-key="空转多1"><span>空转多 · 进度1</span><strong>30%</strong></div>
+            <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>50%</strong></div>
+            <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
+            <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
+            <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1 · 清仓</span><strong>0%</strong></div>
+            <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2 · 清仓</span><strong>0%</strong></div>
+            <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3 · 清仓</span><strong>0%</strong></div>
           </div>
 
         </div>
