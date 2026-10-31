@@ -1333,7 +1333,13 @@ function renderMonthlyChart() {
 
 function renderDistributionChart() {
   const chart = getChart("distributionChart");
-  const rows = state.data.distribution;
+  const allRows = state.data.distribution;
+  const firstActive = allRows.findIndex((row) => row.count > 0);
+  const lastActive = allRows.findLastIndex((row) => row.count > 0);
+  const rows =
+    firstActive === -1
+      ? allRows
+      : allRows.slice(firstActive, lastActive + 1);
   chart.setOption({
     ...chartBase(),
     grid: { left: 45, right: 20, top: 28, bottom: 54 },
@@ -1553,23 +1559,23 @@ function renderExitReasonChart() {
     if (reason.includes("低开")) return "−8% 强制止损（低开）";
     if (reason.includes("AI硬件") && reason.includes("指数多转空")) {
       return reason.includes("最高价首次下移")
-        ? "高回落 · AI 硬件强平"
+        ? "最高点下移 · AI 硬件强平"
         : "指数多转空 · AI 硬件强平";
     }
     if (reason.includes("最高价首次下移")) {
       if (reason.includes("持仓收益≤-8%")) {
-        return "高回落 · 剩余半仓 −8% 止损";
+        return "最高点下移 · 剩余半仓 −8% 止损";
       }
       if (reason.includes("同日原卖出规则")) {
-        return "高回落 · 同日跌破 MA5 清仓";
+        return "最高点下移 · 同日跌破 MA5 清仓";
       }
       if (reason.includes("次日继续下移")) {
-        return "高回落 · 次日下移清仓";
+        return "最高点下移 · 次日下移清仓";
       }
       if (reason.includes("后续最高价连续两天下移")) {
-        return "高回落 · 后续下移清仓";
+        return "最高点下移 · 后续下移清仓";
       }
-      return "高回落 · 剩余半仓跌破 MA5";
+      return "最高点下移 · 剩余半仓跌破 MA5";
     }
     if (reason.includes("持仓收益≤-8%")) return "−8% 强制止损";
     if (reason === "跌破MA5") return "跌破 MA5";
@@ -1614,6 +1620,8 @@ function renderExitReasonChart() {
         width: compact ? 165 : 220,
         overflow: "break",
         lineHeight: 12,
+        align: "left",
+        margin: compact ? 175 : 225,
         formatter: compactLabel,
       },
     },
