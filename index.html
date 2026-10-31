@@ -44,7 +44,7 @@
       <div class="hero-copy">
         <div class="eyebrow"><span>量化研究</span><i></i><span>沪深股票 / 日线</span></div>
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅超过 1.5 个百分点。买入前还必须满足判定分组多占比 ≥10%、综合评分 ≥0.25。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。持仓收益超过 0% 后，最高价首次下移先卖半仓；此后任一时点再次形成连续两天最高价下移，就清仓剩余半仓。运行价跌破 MA5 或持仓触及 -8% 仍会离场。上证指数进入多转空时，AI硬件目标仓位降为 0%，并在当日按收盘价强制清仓。</p>
+        <p class="hero-desc">空转多进度3首次出现后，推演次日平盘完成 5 破 10，且间距增幅 ≥ 1.5%。买入前还必须满足判定分组多占比 ≥10%、综合评分 ≥0.25。已有持仓和新买入合并计算，每组最多两只；同组已有两只时不再买入。持仓收益超过 0% 后，最高价首次下移先卖半仓；此后任一时点再次形成连续两天最高价下移，就清仓剩余半仓。运行价跌破 MA5 或持仓触及 -8% 仍会离场。上证指数进入多转空时，AI硬件目标仓位降为 0%，并在当日按收盘价强制清仓。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -105,7 +105,7 @@
       </div>
       <div class="funnel-arrow">→</div>
       <div class="funnel-step accent">
-        <span>间距增幅 &gt; 1.5pp</span>
+        <span>间距增幅 ≥ 1.5%</span>
         <strong id="funnelGap">—</strong>
         <small id="funnelGapRate">—</small>
       </div>
@@ -360,7 +360,7 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">买入</span>
-                <h3>5 项条件全部满足，才进入尾盘买入候选</h3>
+                <h3>五项条件全部满足，才进入尾盘买入候选</h3>
               </div>
             </div>
             <div class="trade-rule-list buy-rule-list">
@@ -394,12 +394,12 @@
                 <div class="buy-rule-card-head">
                   <span class="rule-index">03</span>
                   <span class="rule-title">
-                    <strong class="rule-heading">间距增幅 &gt; 1.5 个百分点</strong>
+                    <strong class="rule-heading">间距增幅 ≥ 1.5%</strong>
                     <span class="rule-tag">突破强度</span>
                   </span>
                 </div>
                 <div class="rule-copy buy-rule-detail">
-                  <p><b>定义：</b>推演次日 5–10 间距% 减去当日 5–10 间距%，保留正负号，结果必须大于 1.5pp。</p>
+                  <p><b>定义：</b>推演次日 5–10 间距% 减去当日 5–10 间距%，保留正负号，结果必须 ≥ 1.5%。</p>
                   <p><b>说明：</b>避免 MA5 与 MA10 只是勉强粘合后交叉。间距扩张越快，说明短线均线相对中期均线正在加速转强。</p>
                 </div>
               </article>
@@ -413,7 +413,7 @@
                 </div>
                 <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>判定分组内，同时满足 MA5 向上、MA10 向上、MA5 在 MA10 上方的股票数，除以该组有效股票总数。</p>
-                  <p><b>说明：</b>多占比低于 10% 时不买，避免个股形态孤立转强、但所属板块整体仍弱。多分组股票取多占比最高的分组作为判定分组。</p>
+                  <p><b>说明：</b>多占比低于 10% 时不买，避免个股形态孤立转强但所属板块整体仍弱。</p>
                 </div>
               </article>
               <article class="buy-rule-card">
@@ -448,7 +448,12 @@
                 <div class="priority-arrow arrow-1">→</div>
                 <div class="priority-item priority-2">
                   <span>02</span>
-                  <div><strong>AI 硬件多转空强平</strong><p>上证指数进入多转空，AI 硬件剩余仓位当日按收盘价强制清仓。</p></div>
+                  <div>
+                    <strong>AI 硬件多转空强平</strong>
+                    <p>上证指数进入多转空，AI 硬件剩余仓位当日按收盘价强制清仓。</p>
+                    <p><b>为什么指数多转空先清仓 AI 硬件？</b></p>
+                    <p>多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤；等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
+                  </div>
                 </div>
                 <div class="priority-arrow arrow-2">↓</div>
                 <div class="priority-item priority-3">
@@ -487,8 +492,6 @@
                 <div>
                   <h3>AI 硬件资金池特殊规则</h3>
                   <p>资金池按上证指数阶段变化：空 20%；空转多 1/2/3 为 30%/50%/70%；多 80%；多转空 1/2/3 全部 0%。</p>
-                  <p><b>为什么指数多转空先清仓 AI 硬件？</b></p>
-                  <p>多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤；等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
                 </div>
               </div>
             </div>
