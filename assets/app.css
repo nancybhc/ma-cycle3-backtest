@@ -2033,6 +2033,42 @@ main {
   width: 100%;
 }
 
+.buy-rule-panel .buy-rule-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.buy-rule-card {
+  min-width: 0;
+  padding: 16px 18px 18px;
+  border-bottom: 1px solid rgba(131, 173, 207, 0.10);
+}
+
+.buy-rule-card:nth-child(odd):not(:last-child) {
+  border-right: 1px solid rgba(131, 173, 207, 0.10);
+}
+
+.buy-rule-card:last-child {
+  grid-column: 1 / -1;
+  border-bottom: 0;
+}
+
+.buy-rule-card-head {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 13px;
+  align-items: center;
+}
+
+.buy-rule-card .rule-title::after {
+  content: none;
+}
+
+.buy-rule-detail {
+  margin: 9px 0 0 47px;
+  padding-right: 8px;
+}
+
 .trade-rule-panel-head {
   display: flex;
   align-items: flex-start;
@@ -2814,6 +2850,23 @@ main {
   .trade-rule-detail {
     margin-left: 36px;
     padding-right: 16px;
+  }
+
+  .buy-rule-panel .buy-rule-list {
+    grid-template-columns: 1fr;
+  }
+
+  .buy-rule-card,
+  .buy-rule-card:nth-child(odd):not(:last-child) {
+    grid-column: auto;
+    padding-right: 16px;
+    padding-left: 16px;
+    border-right: 0;
+  }
+
+  .buy-rule-detail {
+    margin-left: 36px;
+    padding-right: 0;
   }
 
   .allocation-rule-card {

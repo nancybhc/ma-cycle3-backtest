@@ -360,74 +360,75 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">买入</span>
+                <h3>5 项条件全部满足，才进入尾盘买入候选</h3>
               </div>
             </div>
-            <div class="trade-rule-list">
-              <details class="trade-rule-item">
-                <summary>
+            <div class="trade-rule-list buy-rule-list">
+              <article class="buy-rule-card">
+                <div class="buy-rule-card-head">
                   <span class="rule-index">01</span>
                   <span class="rule-title">
                     <strong class="rule-heading">空转多进度3首次出现</strong>
                     <span class="rule-tag">趋势前提</span>
                   </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
+                </div>
+                <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>个股首次进入“空转多进度3”，即 MA5 向上、MA10 向上，且 MA5 仍不高于 MA10。</p>
                   <p><b>说明：</b>它表示下跌或调整结构已经修复，但 5 日线尚未正式站到 10 日线上方，属于趋势转强前最接近确认的位置。</p>
                 </div>
-              </details>
-              <details class="trade-rule-item">
-                <summary>
+              </article>
+              <article class="buy-rule-card">
+                <div class="buy-rule-card-head">
                   <span class="rule-index">02</span>
                   <span class="rule-title">
                     <strong class="rule-heading">推演次日平盘完成 5破10</strong>
                     <span class="rule-tag">确认力度</span>
                   </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
+                </div>
+                <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>把信号日收盘价复制为下一交易日收盘价，重新计算 MA5 / MA10，要求推演后的 MA5 &gt; MA10。</p>
                   <p><b>说明：</b>不必上涨，只要次日横盘就能完成 5 破 10，说明突破主要来自均线结构改善，对次日涨幅依赖较低。</p>
                 </div>
-              </details>
-              <details class="trade-rule-item">
-                <summary>
+              </article>
+              <article class="buy-rule-card">
+                <div class="buy-rule-card-head">
                   <span class="rule-index">03</span>
                   <span class="rule-title">
                     <strong class="rule-heading">间距增幅 &gt; 1.5 个百分点</strong>
                     <span class="rule-tag">突破强度</span>
                   </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
+                </div>
+                <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>推演次日 5–10 间距% 减去当日 5–10 间距%，保留正负号，结果必须大于 1.5pp。</p>
                   <p><b>说明：</b>避免 MA5 与 MA10 只是勉强粘合后交叉。间距扩张越快，说明短线均线相对中期均线正在加速转强。</p>
                 </div>
-              </details>
-              <details class="trade-rule-item">
-                <summary>
+              </article>
+              <article class="buy-rule-card">
+                <div class="buy-rule-card-head">
                   <span class="rule-index">04</span>
                   <span class="rule-title">
                     <strong class="rule-heading">判定分组多占比 ≥ 10%</strong>
                     <span class="rule-tag">板块共振</span>
                   </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
+                </div>
+                <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>判定分组内，同时满足 MA5 向上、MA10 向上、MA5 在 MA10 上方的股票数，除以该组有效股票总数。</p>
                   <p><b>说明：</b>多占比低于 10% 时不买，避免个股形态孤立转强、但所属板块整体仍弱。多分组股票取多占比最高的分组作为判定分组。</p>
                 </div>
-              </details>
-              <details class="trade-rule-item">
-                <summary>
+              </article>
+              <article class="buy-rule-card">
+                <div class="buy-rule-card-head">
                   <span class="rule-index">05</span>
                   <span class="rule-title">
                     <strong class="rule-heading">综合评分 ≥ 0.25</strong>
                     <span class="rule-tag">风险下限</span>
                   </span>
-                </summary>
-                <div class="rule-copy trade-rule-detail">
+                </div>
+                <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>30% MA10拐头价涨幅 + 30% 分组多占比 + 20% 间距增幅 + 20% 推演后间距。</p>
                   <p><b>说明：</b>评分用于同组和同日候选的质量排序，更像是风险下限，不是主要选股条件。</p>
                 </div>
-              </details>
+              </article>
             </div>
           </article>
 
