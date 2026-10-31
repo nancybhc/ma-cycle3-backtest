@@ -1633,12 +1633,14 @@ function renderExitReasonChart() {
   const ordered = [...rows].reverse();
   const colorFor = (reason) => {
     if (reason.includes("强制卖出（低开）")) return COLOR.amber;
+    if (reason.includes("MFE")) return COLOR.amber;
     if (reason.includes("强制卖出")) return COLOR.green;
     if (reason === "跌破MA5") return COLOR.cyan;
     return COLOR.dim;
   };
   const compactLabel = (reason) => {
     if (reason.includes("低开")) return "−8% 强制止损（低开）";
+    if (reason.includes("MFE")) return "前2日 MFE<2% 提前退出";
     if (reason.includes("AI硬件") && reason.includes("指数多转空")) {
       return reason.includes("最高价首次下移")
         ? "最高点下移 · AI 硬件强平"
