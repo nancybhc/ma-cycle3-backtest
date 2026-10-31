@@ -2053,17 +2053,6 @@ main {
   letter-spacing: 0.14em;
 }
 
-.rule-count {
-  flex: 0 0 auto;
-  padding: 4px 8px;
-  border: 1px solid rgba(72, 225, 209, 0.22);
-  border-radius: 999px;
-  background: var(--cyan-soft);
-  color: var(--cyan);
-  font-family: var(--mono);
-  font-size: 8px;
-}
-
 .trade-rule-list {
   display: flex;
   flex-direction: column;
@@ -2081,7 +2070,7 @@ main {
 
 .trade-rule-item > summary {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 18px;
+  grid-template-columns: 34px minmax(0, 1fr);
   gap: 13px;
   align-items: center;
   padding: 13px 22px;
@@ -2098,15 +2087,14 @@ main {
   background: rgba(72, 225, 209, 0.025);
 }
 
-.trade-rule-item > summary::after {
+.rule-title::after {
   color: rgba(72, 225, 209, 0.58);
   font-family: var(--mono);
   font-size: 12px;
-  text-align: center;
   content: "+";
 }
 
-.trade-rule-item[open] > summary::after {
+.trade-rule-item[open] .rule-title::after {
   content: "−";
 }
 
