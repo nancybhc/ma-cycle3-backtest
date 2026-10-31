@@ -650,7 +650,7 @@ function candidateRowHtml(row, showDailyChange = true) {
           ? "持仓未动"
           : row.isBuy
             ? "买入候选"
-            : row.reason;
+            : signalReasonText(row.reason);
   return `
     <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
       <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
@@ -728,6 +728,13 @@ function groupRatioText(value) {
 function isOnlyLimitUpReason(value) {
   const text = String(value || "").trim();
   return text.includes("尾盘涨停") && !/[；;]/.test(text);
+}
+
+function signalReasonText(value) {
+  return String(value || "").replace(
+    /尾盘涨停(?:\s*[·,，]\s*)买不进/g,
+    "涨停无法买进"
+  );
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
@@ -1793,7 +1800,7 @@ function openSignal(code, scope = "changes") {
           : signal.changeType === "hold"
             ? "hold"
             : "skip"
-    }">${escapeHtml(signal.reason)}</span>
+    }">${escapeHtml(signalReasonText(signal.reason))}</span>
     <span class="tag status-badge">${escapeHtml(signal.group)}</span>`;
   const positionReturn = holdingReturnPct(signal);
   const positionMetrics =
