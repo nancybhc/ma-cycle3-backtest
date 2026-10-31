@@ -1711,6 +1711,10 @@ main {
 .candidate-table .hold-days-col {
   min-width: 66px;
   text-align: right;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .mfe-pair {
