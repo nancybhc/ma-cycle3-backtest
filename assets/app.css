@@ -1869,47 +1869,22 @@ main {
   display: grid;
   grid-template-columns: repeat(8, minmax(108px, 1fr));
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 0;
 }
 
-.position-pool-guide {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+.position-pool-card {
   margin-top: 18px;
-  padding: 13px 16px;
+  padding: 14px;
   border: 1px solid rgba(111, 171, 255, 0.18);
-  border-radius: 10px;
+  border-radius: 14px;
   background: rgba(4, 13, 22, 0.32);
 }
 
-.position-pool-guide span {
-  color: var(--cyan);
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.08em;
-}
-
-.position-pool-guide strong {
-  display: block;
-  margin-top: 3px;
+.position-pool-title {
+  margin-bottom: 9px;
   color: var(--text-soft);
   font-size: 11px;
-}
-
-.position-pool-guide p {
-  margin: 4px 0 0;
-  color: var(--text-dim);
-  font-size: 9px;
-  line-height: 1.65;
-}
-
-.position-pool-guide i {
-  color: rgba(72, 225, 209, 0.62);
-  font-family: var(--mono);
-  font-size: 18px;
-  font-style: normal;
+  font-weight: 600;
 }
 
 .position-stage {
