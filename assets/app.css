@@ -1052,6 +1052,8 @@ main {
 }
 
 .score-dimension {
+  display: flex;
+  flex-direction: column;
   padding: 13px 14px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -1076,10 +1078,15 @@ main {
 }
 
 .score-dimension p {
+  display: -webkit-box;
+  min-height: 34px;
   margin: 6px 0 0;
+  overflow: hidden;
   color: var(--text-dim);
   font-size: 10px;
   line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .score-rule-note {
