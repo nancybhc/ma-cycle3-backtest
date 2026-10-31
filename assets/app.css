@@ -687,8 +687,8 @@ main {
   gap: 10px;
   margin: -2px 0 14px;
   padding: 9px 13px;
-  border-left: 2px solid rgba(246, 185, 75, 0.65);
-  background: rgba(246, 185, 75, 0.045);
+  border-left: 2px solid rgba(72, 225, 209, 0.65);
+  background: rgba(72, 225, 209, 0.035);
   color: var(--text-dim);
   font-size: 9px;
   line-height: 1.65;
@@ -696,8 +696,10 @@ main {
 
 .dynamic-signal-note strong {
   flex: 0 0 auto;
-  color: var(--amber);
+  color: var(--cyan);
+  font-size: 9px;
   font-weight: 600;
+  opacity: 0.82;
 }
 
 .signal-color-legend {
