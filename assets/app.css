@@ -688,7 +688,7 @@ main {
   margin: -2px 0 14px;
   padding: 9px 13px;
   border-left: 0;
-  background: rgba(72, 225, 209, 0.035);
+  background: transparent;
   color: var(--text-dim);
   font-size: 9px;
   line-height: 1.65;
