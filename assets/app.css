@@ -1279,6 +1279,14 @@ main {
     min-width: 96px;
 }
 
+.candidate-table td.first-selected-col {
+    color: var(--text-soft);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
 .candidate-table th:last-child,
 .candidate-table td:last-child {
     width: 220px;
@@ -2173,6 +2181,12 @@ main {
 .rule-copy p b {
   color: rgba(220, 233, 242, 0.82);
   font-weight: 600;
+}
+
+.buy-rule-panel .rule-copy p b {
+  color: inherit;
+  font-size: inherit;
+  font-weight: 400;
 }
 
 .rule-footnote {
