@@ -354,50 +354,192 @@
           </div>
           <div class="section-note">先看规则，再看收益；避免把研究回测当成实盘承诺</div>
         </div>
-        <div class="rules-grid rules-grid-stacked">
-          <article class="panel playbook-panel">
-            <div class="playbook-step">
-              <span class="step-number">01</span>
+        <div class="trade-rule-grid">
+          <article class="panel trade-rule-panel buy-rule-panel">
+            <div class="trade-rule-panel-head">
               <div>
-                <h3>空转多进度3首次出现</h3>
-                <p>09:15 启动盘中监控，每 60 秒按正式规则重算全部信号，并记录首次入选时间。盘中满足买入条件也只进入信号表，真实买入统一放到尾盘集合竞价；15:00 停止监控，15:05 统一按当日收盘价确认成本、成交、持仓和网页文件。</p>
+                <span class="rule-kicker">买入 BUY</span>
+                <h3>5 项条件全部满足，才进入尾盘买入候选</h3>
+              </div>
+              <span class="rule-count">5 / 5</span>
+            </div>
+            <div class="trade-rule-list">
+              <div class="trade-rule-item">
+                <span class="rule-index">01</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>空转多进度3首次出现</h3>
+                    <span class="rule-tag">趋势前提</span>
+                  </div>
+                  <p><b>定义：</b>个股首次进入“空转多进度3”，即 MA5 向上、MA10 向上，且 MA5 仍不高于 MA10。</p>
+                  <p><b>说明：</b>它表示下跌或调整结构已经修复，但 5 日线尚未正式站到 10 日线上方，属于趋势转强前最接近确认的位置。</p>
+                </div>
+              </div>
+              <div class="trade-rule-item">
+                <span class="rule-index">02</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>推演次日平盘完成 5破10</h3>
+                    <span class="rule-tag">确认力度</span>
+                  </div>
+                  <p><b>定义：</b>把信号日收盘价复制为下一交易日收盘价，重新计算 MA5 / MA10，要求推演后的 MA5 &gt; MA10。</p>
+                  <p><b>说明：</b>不必上涨，只要次日横盘就能完成 5 破 10，说明突破主要来自均线结构改善，对次日涨幅依赖较低。</p>
+                </div>
+              </div>
+              <div class="trade-rule-item">
+                <span class="rule-index">03</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>间距增幅 &gt; 1.5 个百分点</h3>
+                    <span class="rule-tag">突破强度</span>
+                  </div>
+                  <p><b>定义：</b>推演次日 5–10 间距% 减去当日 5–10 间距%，保留正负号，结果必须大于 1.5pp。</p>
+                  <p><b>说明：</b>避免 MA5 与 MA10 只是勉强粘合后交叉。间距扩张越快，说明短线均线相对中期均线正在加速转强。</p>
+                </div>
+              </div>
+              <div class="trade-rule-item">
+                <span class="rule-index">04</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>判定分组多占比 ≥ 10%</h3>
+                    <span class="rule-tag">板块共振</span>
+                  </div>
+                  <p><b>定义：</b>判定分组内，同时满足 MA5 向上、MA10 向上、MA5 在 MA10 上方的股票数，除以该组有效股票总数。</p>
+                  <p><b>说明：</b>多占比低于 10% 时不买，避免个股形态孤立转强、但所属板块整体仍弱。多分组股票取多占比最高的分组作为判定分组。</p>
+                </div>
+              </div>
+              <div class="trade-rule-item">
+                <span class="rule-index">05</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>综合评分 ≥ 0.25</h3>
+                    <span class="rule-tag">质量排序</span>
+                  </div>
+                  <p><b>定义：</b>综合评分由 MA10 拐头价涨幅分位 30%、分组多占比分位 30%、间距增幅分位 20%、推演后 5–10 间距分位 20% 合成。</p>
+                  <p><b>说明：</b>评分低于 0.25 不进入资金分配。评分用于同组和同日候选的质量排序，不替代前四项硬条件。</p>
+                  <div class="rule-formula">
+                    <span>30% MA10拐头价</span><b>+</b>
+                    <span>30% 分组多占比</span><b>+</b>
+                    <span>20% 间距增幅</span><b>+</b>
+                    <span>20% 推演间距</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="playbook-step">
-              <span class="step-number">02</span>
+            <div class="rule-footnote">
+              09:15 启动盘中监控，每 60 秒重算并记录首次入选时间；盘中入选不等于成交，实际买入统一在尾盘集合竞价，15:05 按收盘快照确认。
+            </div>
+          </article>
+
+          <article class="panel trade-rule-panel sell-rule-panel">
+            <div class="trade-rule-panel-head">
               <div>
-                <h3>推演次日平盘完成 5破10</h3>
-                <p>假设下一交易日收盘价等于买入日收盘价，重算 MA5 / MA10，要求 MA5 &gt; MA10。同时展示推演次日 MA10 相对今日的方向，仅作参考，暂不进入评分。</p>
+                <span class="rule-kicker">卖出 SELL</span>
+                <h3>三类离场规则，谁先触发谁执行</h3>
+              </div>
+              <span class="rule-count">3 类</span>
+            </div>
+            <div class="trade-rule-list">
+              <div class="trade-rule-item">
+                <span class="rule-index">01</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>最高点下移分批止盈</h3>
+                    <span class="rule-tag">收益 &gt; 0%</span>
+                  </div>
+                  <p>最高价首次低于前一日，按当日收盘价先卖半仓；此后任一时点再次形成连续两天下移，就清掉剩余半仓。</p>
+                  <p>没有再次连续下移时，剩余半仓继续持有。首次减半后，资金池只按剩余半仓占用，但该股票仍占一个分组名额。</p>
+                </div>
+              </div>
+              <div class="trade-rule-item">
+                <span class="rule-index">02</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>跌破 MA5</h3>
+                    <span class="rule-tag">趋势破坏</span>
+                  </div>
+                  <p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p>
+                </div>
+              </div>
+              <div class="trade-rule-item">
+                <span class="rule-index">03</span>
+                <div class="rule-copy">
+                  <div class="rule-title">
+                    <h3>持仓收益 ≤ -8%</h3>
+                    <span class="rule-tag">强制止损</span>
+                  </div>
+                  <p>从买入后的下一交易日起，盘中最低价触及 -8% 即卖出；若跳空低开并直接低于止损价，按开盘价成交。</p>
+                </div>
               </div>
             </div>
-            <div class="playbook-step">
-              <span class="step-number">03</span>
-              <div>
-                <h3>间距增幅 &gt; 1.5 个百分点</h3>
-                <p>推演次日 5-10 间距% 减当日 5-10 间距%，保留正负号；增量必须大于 1.5 个百分点。</p>
-              </div>
+            <div class="rule-footnote">
+              指数多转空时，AI 硬件还会触发独立的仓位强平规则；该规则属于仓位管理，并列入下方执行优先级第 2 条。
             </div>
-            <div class="playbook-step">
-              <span class="step-number">04</span>
+          </article>
+
+          <article class="panel trade-rule-panel allocation-rule-panel">
+            <div class="trade-rule-panel-head">
               <div>
-                <h3>AI硬件资金池与分组上限</h3>
-                <p>AI硬件按上证指数阶段依次为：空 20%、空转多1/2/3 30%/50%/70%、多 80%、多转空1/2/3 0%。进入多转空当日，已有 AI 硬件持仓按收盘价强制清仓。</p>
-                <p><b>为什么指数多转空先清仓AI硬件：</b>多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤；等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
-                <p>一只股票同时属于多个分组时，取信号日多占比最高的分组作为判定分组；多占比相同时，再取固定分组顺序最靠前的分组。普通分组每组最多 20% 资金。候选与已有持仓合并计数，每组最多 2 只，已有 2 只时不再加仓。多组同时有信号而总仓位不足时，按分组多占比从高到低分配，组内按综合评分从高到低选取。只有当判定分组多占比 ≥10% 且综合评分 ≥0.25 时，信号才进入资金分配。</p>
+                <span class="rule-kicker">仓位 ALLOCATION</span>
+                <h3>先满足硬条件，再按分组和资金池分配</h3>
               </div>
+              <span class="rule-count">2 层</span>
             </div>
-            <div class="playbook-step">
-              <span class="step-number">05</span>
-              <div>
-                <h3>高回落半仓止盈 + MA5 / -8% 离场</h3>
-                <p>持仓收益超过 0% 后，最高价首次低于前一日，先按当日收盘价卖半仓。此后不要求紧接下一日，只要持仓期间任一时点再次出现连续两天最高价下移，就在第二天按收盘价清掉剩余半仓；没有再次连续下移时，剩余半仓继续持有。</p>
-                <p><b>资金占用：</b>首次减半后，资金池从减仓日起只按剩余半仓占用，释放的一半额度可以进入后续资金分配；这只股票仍占一个分组持仓名额，直到剩余半仓全部清仓。</p>
-                <p><b>执行优先级：</b>① 下一交易日起，盘中收益触及 -8% 的条件止损最先成交，低开按开盘价；② 上证指数进入多转空时，AI 硬件剩余仓位当日收盘强制清仓；③ 收益超过 0% 的高回落规则决定首次半仓、后续连续两日下移清剩余半仓；④ 运行价或收盘价跌破 MA5 时，清掉当时仍持有的仓位。若同日既触发首次半仓又跌破 MA5，则两半都按同一收盘价退出。</p>
-                <p>正式持仓和网页统一在 15:05 用当日收盘价更新。</p>
+            <div class="allocation-rule-grid">
+              <div class="allocation-rule-card">
+                <span class="rule-index">01</span>
+                <div>
+                  <h3>各分组 20% 资金上限</h3>
+                  <p>普通分组每组最多 20% 资金、同时最多 2 只股票。已有持仓先占额度和名额，剩余额度再给新候选。</p>
+                  <p>总仓位不足时，先按分组多占比从高到低，再按组内综合评分从高到低分配。</p>
+                </div>
+              </div>
+              <div class="allocation-rule-card ai-allocation-card">
+                <span class="rule-index">02</span>
+                <div>
+                  <h3>AI 硬件资金池特殊规则</h3>
+                  <p>资金池按上证指数阶段变化：空 20%；空转多 1/2/3 为 30%/50%/70%；多 80%；多转空 1/2/3 全部 0%。</p>
+                  <div class="stage-chip-row">
+                    <span>空 20%</span><span>空转多 30/50/70%</span><span>多 80%</span><span class="danger">多转空 0%</span>
+                  </div>
+                  <p>进入多转空当日，已有 AI 硬件持仓按收盘价强制清仓，避免高波动方向在趋势首次转弱后拖成深度回撤。</p>
+                </div>
               </div>
             </div>
           </article>
         </div>
+
+        <article class="panel execution-priority-panel">
+          <div class="trade-rule-panel-head">
+            <div>
+              <span class="rule-kicker">优先级 PRIORITY</span>
+              <h3>同一天发生多条信号时的执行顺序</h3>
+            </div>
+            <span class="rule-count">1 → 4</span>
+          </div>
+          <div class="priority-flow">
+            <div class="priority-item">
+              <span>01</span>
+              <div><strong>-8% 条件止损</strong><p>下一交易日起，盘中收益触及 -8% 最先成交；低开按开盘价。</p></div>
+            </div>
+            <div class="priority-arrow">→</div>
+            <div class="priority-item">
+              <span>02</span>
+              <div><strong>AI 硬件多转空强平</strong><p>上证指数进入多转空，AI 硬件剩余仓位当日收盘强制清仓。</p></div>
+            </div>
+            <div class="priority-arrow">→</div>
+            <div class="priority-item">
+              <span>03</span>
+              <div><strong>高回落分批止盈</strong><p>收益 &gt;0% 后首次下移卖半仓，后续连续两日下移清剩余半仓。</p></div>
+            </div>
+            <div class="priority-arrow">→</div>
+            <div class="priority-item">
+              <span>04</span>
+              <div><strong>跌破 MA5</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
+            </div>
+          </div>
+          <p class="priority-note">若同日首次高回落减半与跌破 MA5 重叠，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
+        </article>
         <article class="panel score-rules-panel">
           <div class="panel-head">
             <div>
