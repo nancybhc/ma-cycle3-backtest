@@ -1073,17 +1073,6 @@ main {
   background: rgba(4, 13, 22, 0.38);
 }
 
-.score-dimension > span {
-  display: inline-block;
-  margin-bottom: 8px;
-  padding: 2px 6px;
-  border: 1px solid rgba(72, 225, 209, 0.22);
-  border-radius: 5px;
-  color: var(--cyan);
-  font-family: var(--mono);
-  font-size: 8px;
-}
-
 .score-dimension strong {
   display: block;
   color: var(--text);

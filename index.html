@@ -213,7 +213,7 @@
 
       <div class="dynamic-signal-note">
         <strong>盘中为动态数据</strong>
-        <span>每次扫描都按最新行情重算，满足空转多进度3则进入全部信号。行情波动导致多次出现时，仅保留首次出现时间。盘中入选不等于成交，实际买入统一放在尾盘集合竞价。</span>
+        <span>每次扫描都按最新行情重算，满足空转多进度3则进入全部信号。行情波动导致多次出现时，仅保留首次出现时间。盘中入选不等于成交，实际买入统一放在尾盘集合竞价。15:00 会再执行一轮收盘行情扫描，确认拿到收盘时间戳后停止。</span>
       </div>
       <div class="signal-color-legend">
         <strong>颜色标注</strong>
@@ -225,7 +225,7 @@
           <span class="monitor-dot" id="monitorStatusDot"></span>
           <div>
             <strong id="monitorStatusText">正在读取监控状态</strong>
-            <small id="monitorStatusDetail">计划：交易日 09:15 自动启动，15:00 自动停止</small>
+            <small id="monitorStatusDetail">计划：交易日 09:15 自动启动，15:00 完成收盘快照后停止</small>
             <small class="monitor-refresh-rule">刷新规则：本地网页每 10 秒刷新；GitHub 网页每 60 秒同步数据。</small>
           </div>
         </div>
@@ -322,7 +322,7 @@
             <strong id="positionIndexState">—</strong>
           </div>
           <div>
-            <span>当前阶段AI硬件仓位目标</span>
+            <span>当前阶段AI硬件仓位上限</span>
             <strong id="positionStageTarget">—</strong>
           </div>
           <div>
@@ -370,7 +370,7 @@
                 </div>
                 <div class="rule-copy buy-rule-detail">
                   <p><b>定义：</b>个股首次进入“空转多进度3”，即 MA5 向上、MA10 向上，且 MA5 仍不高于 MA10。</p>
-                  <p><b>说明：</b>它表示下跌或调整结构已经修复，但 5 日线尚未正式站到 10 日线上方，属于趋势转强前最接近确认的位置。</p>
+                  <p><b>说明：</b>它表示下跌或调整结构已经修复，但 MA5 尚未正式站到 10 日线上方，属于趋势转强前最接近确认的位置。</p>
                 </div>
               </article>
               <article class="buy-rule-card">
@@ -461,7 +461,7 @@
                 <div class="priority-arrow arrow-3">←</div>
                 <div class="priority-item priority-4">
                   <span>04</span>
-                  <div><strong>跌破 MA5 清仓</strong><p>运行价或收盘价跌破 MA5，清掉当时仍持有的仓位。14:50 使用实时快照价，盘后正式口径使用当日收盘价。</p></div>
+                  <div><strong>跌破 MA5 清仓</strong><p>收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
                 </div>
               </div>
               <p class="priority-note">若同日首次高回落减半与跌破 MA5 重叠，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
@@ -505,27 +505,24 @@
           </div>
           <div class="score-formula">
             <span>综合评分 =</span>
-            <strong>40% 分组多占比分位</strong>
+            <strong>20% 分组多占比分位</strong>
+            <b>+</b>
+            <strong>40% 推演后 5–10 间距分位</strong>
             <b>+</b>
             <strong>40% 间距增幅分位</strong>
-            <b>+</b>
-            <strong>20% 推演后 5–10 间距分位</strong>
           </div>
           <div class="score-dimension-grid">
             <div class="score-dimension">
-              <span>40%</span>
               <strong>分组多占比</strong>
-              <p>统计分组内 MA5 向上、MA10 向上且 MA5 在 MA10 上方的股票占比；占比越高，板块多头越一致。</p>
+              <p>统计分组内 MA5与MA10均向上且 MA5＞MA10的股票占比；占比越高，分组内多头越一致。</p>
             </div>
             <div class="score-dimension">
-              <span>40%</span>
+              <strong>推演后 5–10 间距</strong>
+              <p>推演次日平盘，重新计算 MA5 / MA10；数值越大，推演后的多头间隔越充分。</p>
+            </div>
+            <div class="score-dimension">
               <strong>间距增幅</strong>
               <p>推演次日 5–10 间距减去当日间距；数值越大，说明 MA5 相对 MA10 的分离越快。</p>
-            </div>
-            <div class="score-dimension">
-              <span>20%</span>
-              <strong>推演后 5–10 间距</strong>
-              <p>用信号日收盘价推演次日 MA5 / MA10 并计算最终间距；数值越大，推演后的多头间隔越充分。</p>
             </div>
           </div>
           <small class="score-rule-note">三个原始指标先转为分位排名，再按权重合成；三项均按数值越大分位越高。评分只用于横向参考，不替代买入硬条件和持仓上限。</small>
@@ -539,19 +536,19 @@
               <div class="eyebrow"><span>多空进度</span></div>
               <h2>多转空与空转多：各三步</h2>
             </div>
-            <div class="section-note">用 MA5 是否拐头、MA5 与 MA10 的上下关系、MA10 是否同向确认，拆成可跟踪的进度</div>
+            <div class="section-note">用 MA5与MA10的拐头情况、上下关系、同向确认，拆成可跟踪的进度</div>
           </div>
 
           <div class="stage-base-grid">
             <div class="stage-base long">
               <span class="stage-base-label">多</span>
               <strong>MA5 ↑ · MA10 ↑ · MA5 &gt; MA10</strong>
-              <small>完整多头：两条均线都向上，5 在 10 上方<br>AI硬件资金池 80%</small>
+              <small>完整多头：两条均线都向上，5 在 10 上方</small>
             </div>
             <div class="stage-base short">
               <span class="stage-base-label">空</span>
               <strong>MA5 ↓ · MA10 ↓ · MA5 &lt; MA10</strong>
-              <small>完整空头：两条均线都向下，5 在 10 下方<br>AI硬件资金池 20%</small>
+              <small>完整空头：两条均线都向下，5 在 10 下方</small>
             </div>
           </div>
 
@@ -559,7 +556,7 @@
             <article class="panel stage-panel to-short">
               <div class="stage-panel-head">
                 <div>
-                  <h3>多转空 · 5 日均线先向下拐头</h3>
+                  <h3>多转空 · MA5先向下拐头</h3>
                 </div>
                 <span class="stage-sort">排序：进度 1 → 3</span>
               </div>
@@ -590,7 +587,7 @@
             <article class="panel stage-panel to-long">
               <div class="stage-panel-head">
                 <div>
-                  <h3>空转多 · 5 日均线先向上拐头</h3>
+                  <h3>空转多 · MA5先向上拐头</h3>
                 </div>
                 <span class="stage-sort">排序：进度 3 → 1</span>
               </div>
@@ -620,16 +617,16 @@
           </div>
 
           <div class="position-pool-card">
-            <div class="position-pool-title">上证指数当前阶段及AI硬件仓位分配</div>
+            <div class="position-pool-title">上证指数当前阶段及AI硬件仓位上限</div>
             <div class="position-stage-ladder" id="positionStageLadder">
               <div class="position-stage" data-stage-key="空"><span>空</span><strong>20%</strong></div>
               <div class="position-stage" data-stage-key="空转多1"><span>空转多 · 进度1</span><strong>30%</strong></div>
               <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>50%</strong></div>
               <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
               <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
-              <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1 · 清仓</span><strong>0%</strong></div>
-              <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2 · 清仓</span><strong>0%</strong></div>
-              <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3 · 清仓</span><strong>0%</strong></div>
+              <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1</span><strong>0%</strong></div>
+              <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2</span><strong>0%</strong></div>
+              <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3</span><strong>0%</strong></div>
             </div>
           </div>
 
@@ -804,6 +801,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261031-gap-growth-label"></script>
+  <script src="assets/app.js?v=20261101-close-snapshot"></script>
 </body>
 </html>

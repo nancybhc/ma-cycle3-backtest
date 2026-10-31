@@ -1,6 +1,8 @@
 const state = {
   data: null,
   staticSignals: [],
+  staticDailyChanges: [],
+  staticCurrentHoldings: [],
   liveData: null,
   liveApplied: false,
   monitorStatus: null,
@@ -64,6 +66,8 @@ async function init() {
     if (!response.ok) throw new Error(`数据读取失败：HTTP ${response.status}`);
     state.data = await response.json();
     state.staticSignals = [...(state.data.signals || [])];
+    state.staticDailyChanges = [...(state.data.dailyChanges || [])];
+    state.staticCurrentHoldings = [...(state.data.currentHoldings || [])];
     state.liveData = await fetchLiveSignals();
     applyLiveSignals(state.liveData);
     state.trades = [...(state.data.strategyTransactions || [])].sort((a, b) => {
@@ -237,12 +241,32 @@ function applyLiveSignals(live) {
   const useLive = shouldUseLiveSignals(live);
   state.liveApplied = useLive;
   state.liveData = live;
+  const liveGroupRatios = {};
+  if (useLive) {
+    [...(live.signals || []), ...(live.intradayJumps || [])].forEach((row) => {
+      const ratio = Number(row.groupManyRatioPct);
+      if (row.group && Number.isFinite(ratio)) {
+        liveGroupRatios[row.group] = ratio;
+      }
+    });
+    Object.assign(liveGroupRatios, live.groupRatios || {});
+  }
+  const applyLiveRatio = (row) => {
+    const ratio = Number(liveGroupRatios[row.group]);
+    return Number.isFinite(ratio)
+      ? { ...row, groupManyRatioPct: ratio }
+      : { ...row };
+  };
   state.data.intradayJumps = Array.isArray(live?.intradayJumps)
-    ? [...live.intradayJumps]
+    ? live.intradayJumps.map(applyLiveRatio)
     : [];
   state.data.signals = useLive
-    ? [...live.signals]
+    ? live.signals.map(applyLiveRatio)
     : [...state.staticSignals];
+  state.data.dailyChanges = state.staticDailyChanges.map(applyLiveRatio);
+  state.data.currentHoldings = (state.staticCurrentHoldings || []).map(
+    applyLiveRatio
+  );
   syncCandidateFocusPhase();
   return useLive;
 }
@@ -339,7 +363,7 @@ function renderMonitorStatus(status) {
           running ? `实际运行${started ? ` · 启动于 ${started}` : ""}` : "实际已停止",
           `最后心跳 ${heartbeat}`,
           `${status.interval_seconds || 10}秒轮询`,
-          `${status.session_phase || "—"} · 计划 ${schedule.start || "09:15"} 启动 / ${schedule.stop || "15:00"} 停止`,
+          `${status.session_phase || "—"} · 计划 ${schedule.start || "09:15"} 启动 / ${schedule.stop || "15:00"} 完成收盘快照后停止`,
         ].join(" · ")
       : status.detail
   );
