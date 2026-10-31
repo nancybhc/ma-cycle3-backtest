@@ -641,7 +641,7 @@ function candidateRowHtml(row, showDailyChange = true) {
     row.intradayJumpToMany
       ? row.reason || "盘中直接跳级转多"
       : limitUpBlocked
-      ? row.reason || "尾盘涨停 · 买不进"
+      ? "无法买进"
       : changeType === "sell"
       ? row.actionLabel || "当天卖出"
       : changeType === "buy"
@@ -1769,7 +1769,7 @@ function openSignal(code, scope = "changes") {
     signal.intradayJumpToMany
       ? "盘中跳级转多 · 非买入"
       : Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
-      ? "尾盘涨停 · 买不进"
+      ? "无法买进"
       : signal.changeType === "sell"
       ? signal.actionLabel || "当天卖出"
       : signal.changeType === "buy"
