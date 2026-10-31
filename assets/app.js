@@ -731,10 +731,9 @@ function isOnlyLimitUpReason(value) {
 }
 
 function signalReasonText(value) {
-  return String(value || "").replace(
-    /尾盘涨停(?:\s*[·,，]\s*)买不进/g,
-    "涨停无法买进"
-  );
+  return String(value || "")
+    .replace(/尾盘涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
+    .replace(/1\.5pp/g, "1.5%");
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
