@@ -649,7 +649,7 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
-      <td class="num hold-days-col">${holdingDaysHtml(row)}</td>
+      <td class="hold-days-col">${holdingDaysHtml(row)}</td>
       <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
       <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
       <td>${projectedMa10DirectionHtml(row)}</td>
@@ -849,7 +849,9 @@ function holdingDaysHtml(row) {
   if (!Number.isFinite(days)) {
     return '<span class="flat">—</span>';
   }
-  return `${formatInt(Math.max(0, days))} 天`;
+  return `<span class="price-pair"><strong>${formatInt(
+    Math.max(0, days)
+  )}</strong></span>`;
 }
 
 function levelHtml(price, pct) {

@@ -636,13 +636,13 @@ main {
 }
 
 .monitor-dot.running {
-  background: var(--cyan);
-  box-shadow: 0 0 0 4px rgba(72, 225, 209, 0.12);
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(32, 201, 140, 0.14);
 }
 
 .monitor-dot.stopped {
-  background: var(--amber);
-  box-shadow: 0 0 0 4px rgba(246, 185, 75, 0.1);
+  background: var(--red);
+  box-shadow: 0 0 0 4px rgba(255, 91, 110, 0.13);
 }
 
 .monitor-actions {
@@ -1710,10 +1710,12 @@ main {
 
 .candidate-table .hold-days-col {
   min-width: 66px;
-  text-align: right;
-  color: var(--text-soft);
-  font-family: var(--mono);
+  text-align: left;
+}
+
+.candidate-table .first-selected-col {
   font-size: 10px;
+  font-weight: 500;
   line-height: 1.4;
 }
 
