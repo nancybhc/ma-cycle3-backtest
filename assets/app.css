@@ -1376,6 +1376,7 @@ main {
 }
 
 .price-pair strong,
+.score-only,
 .ma-level strong {
   color: var(--text);
   font-family: var(--mono);

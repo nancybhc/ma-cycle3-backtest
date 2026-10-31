@@ -659,7 +659,15 @@ function candidateRowHtml(row) {
       <td>${levelHtml(row.ma5Rebound, row.ma5ReboundPct)}</td>
       <td class="projection-col">${gapProjectionHtml(row.projectedGapPct, row.gapDeltaPct)}</td>
       <td class="num group-ratio-col">${groupRatioText(row.groupManyRatioPct)}</td>
-      <td class="score-col">${scorePositionHtml(row.score, row.suggestedPositionPct, row.holdingWeightPct)}</td>
+      <td class="score-col">${
+        row.intradayJumpToMany
+          ? scoreOnlyHtml(row.score)
+          : scorePositionHtml(
+              row.score,
+              row.suggestedPositionPct,
+              row.holdingWeightPct
+            )
+      }</td>
       <td class="num position-context-col">${positionContextHtml(row)}</td>
       <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
     </tr>`;
@@ -725,6 +733,13 @@ function scorePositionHtml(score, positionPct, holdingWeightPct) {
       <strong>${formatNumber(score, 3)}</strong>
       <small>${detail}</small>
     </span>`;
+}
+
+function scoreOnlyHtml(score) {
+  if (score === null || score === undefined || Number.isNaN(Number(score))) {
+    return `<span class="flat">—</span>`;
+  }
+  return `<span class="score-only">${formatNumber(score, 3)}</span>`;
 }
 
 function positionContextHtml(row) {
