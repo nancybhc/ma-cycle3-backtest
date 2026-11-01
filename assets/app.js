@@ -237,35 +237,59 @@ function syncCandidateFocusPhase() {
   return true;
 }
 
+function groupRatioMapFromRows(rows, explicitRatios = {}) {
+  const ratios = {};
+  (rows || []).forEach((row) => {
+    const ratio = Number(row.groupManyRatioPct);
+    if (row.group && Number.isFinite(ratio)) {
+      ratios[row.group] = ratio;
+    }
+  });
+  Object.assign(ratios, explicitRatios || {});
+  return ratios;
+}
+
+function applyGroupRatios(rows, ratios) {
+  return (rows || []).map((row) => {
+    const ratio = Number(ratios[row.group]);
+    return Number.isFinite(ratio)
+      ? { ...row, groupManyRatioPct: ratio }
+      : { ...row };
+  });
+}
+
 function applyLiveSignals(live) {
   const useLive = shouldUseLiveSignals(live);
   state.liveApplied = useLive;
   state.liveData = live;
-  const liveGroupRatios = {};
-  if (useLive) {
-    [...(live.signals || []), ...(live.intradayJumps || [])].forEach((row) => {
-      const ratio = Number(row.groupManyRatioPct);
-      if (row.group && Number.isFinite(ratio)) {
-        liveGroupRatios[row.group] = ratio;
-      }
-    });
-    Object.assign(liveGroupRatios, live.groupRatios || {});
-  }
-  const applyLiveRatio = (row) => {
-    const ratio = Number(liveGroupRatios[row.group]);
-    return Number.isFinite(ratio)
-      ? { ...row, groupManyRatioPct: ratio }
-      : { ...row };
-  };
-  state.data.intradayJumps = Array.isArray(live?.intradayJumps)
-    ? live.intradayJumps.map(applyLiveRatio)
-    : [];
-  state.data.signals = useLive
-    ? live.signals.map(applyLiveRatio)
-    : [...state.staticSignals];
-  state.data.dailyChanges = state.staticDailyChanges.map(applyLiveRatio);
-  state.data.currentHoldings = (state.staticCurrentHoldings || []).map(
-    applyLiveRatio
+  const displayRatios = useLive
+    ? groupRatioMapFromRows(
+        [...(live.signals || []), ...(live.intradayJumps || [])],
+        live.groupRatios
+      )
+    : groupRatioMapFromRows(
+        [
+          ...state.staticSignals,
+          ...state.staticDailyChanges,
+          ...(state.staticCurrentHoldings || []),
+        ],
+        state.data.groupRatios
+      );
+  state.data.intradayJumps = applyGroupRatios(
+    Array.isArray(live?.intradayJumps) ? live.intradayJumps : [],
+    displayRatios
+  );
+  state.data.signals = applyGroupRatios(
+    useLive ? live.signals : state.staticSignals,
+    displayRatios
+  );
+  state.data.dailyChanges = applyGroupRatios(
+    state.staticDailyChanges,
+    displayRatios
+  );
+  state.data.currentHoldings = applyGroupRatios(
+    state.staticCurrentHoldings || [],
+    displayRatios
   );
   syncCandidateFocusPhase();
   return useLive;
@@ -281,9 +305,30 @@ async function refreshLiveSignals() {
   ) {
     // 收盘后到下一交易日首次扫描前，持续保留同一交易日的最后一份信号。
     state.liveData = live;
-    state.data.intradayJumps = Array.isArray(live.intradayJumps)
-      ? [...live.intradayJumps]
-      : [];
+    const staticRatios =
+      state.data.groupRatioDate === live.marketDate
+        ? state.data.groupRatios
+        : {};
+    const displayRatios = groupRatioMapFromRows(
+      [...(live.signals || []), ...(live.intradayJumps || [])],
+      live.groupRatios || staticRatios
+    );
+    state.data.signals = applyGroupRatios(
+      state.data.signals,
+      displayRatios
+    );
+    state.data.intradayJumps = applyGroupRatios(
+      Array.isArray(live.intradayJumps) ? live.intradayJumps : [],
+      displayRatios
+    );
+    state.data.dailyChanges = applyGroupRatios(
+      state.data.dailyChanges,
+      displayRatios
+    );
+    state.data.currentHoldings = applyGroupRatios(
+      state.data.currentHoldings,
+      displayRatios
+    );
     const focusChanged = syncCandidateFocusPhase();
     renderIntradayJumpTable();
     updateCandidateRunHeader();
@@ -501,6 +546,12 @@ function populatePositionRules() {
     (sum, row) => sum + Number(row.weightPct || 0),
     0
   );
+  const lastEquity = Number(
+    state.data.equity?.[state.data.equity.length - 1]?.equity
+  );
+  const totalAssets = Number.isFinite(lastEquity)
+    ? 1000000 * lastEquity
+    : null;
   const holdingCodes = new Set(holdings.map((row) => row.code));
   const pendingTotal = signals
     .filter((row) => row.isBuy && !holdingCodes.has(row.code))
@@ -510,26 +561,6 @@ function populatePositionRules() {
     POSITION_STAGE_TARGETS[stageKey] ??
     Number(representative.aiTargetPct || 0);
 
-  setText(
-    "positionIndexState",
-    representative.indexState
-      ? `${representative.indexState} · ${stageKey || "—"}`
-      : "—"
-  );
-  setText(
-    "positionStageTarget",
-    stageTarget > 0 ? `${formatNumber(stageTarget, 0)}%` : "—"
-  );
-  setText(
-    "allocationStageHint",
-    stageKey && stageTarget > 0
-      ? `当前${stageKey}，AI硬件资金池按 ${formatNumber(
-          stageTarget,
-          0
-        )}% 计；持仓先占，余额再分。`
-      : "当前持仓先消耗对应资金池，剩余空间才分给新候选。"
-  );
-  setText("positionCurrentTotal", `${formatNumber(currentTotal, 1)}%`);
   setText("positionPendingTotal", `${formatNumber(pendingTotal, 1)}%`);
   setText("positionPlannedTotal", `${formatNumber(plannedTotal, 1)}%`);
   setText(
@@ -590,33 +621,39 @@ function populatePositionRules() {
   });
 
   const body = document.getElementById("allocationTableBody");
-  body.innerHTML = [...groups.values()]
+  const isEmpty = holdings.length === 0;
+  const groupRows = [...groups.values()]
     .filter((group) => Number(group.currentWeight || 0) > 0.0001)
     .sort((a, b) => {
-      const aBuy = [...a.candidates.values()].some(
-        (row) => !holdingCodes.has(row.code)
-      );
-      const bBuy = [...b.candidates.values()].some(
-        (row) => !holdingCodes.has(row.code)
-      );
-      if (aBuy !== bBuy) return aBuy ? -1 : 1;
       if (a.currentWeight !== b.currentWeight) {
         return b.currentWeight - a.currentWeight;
       }
       return a.name.localeCompare(b.name, "zh-CN");
     })
-    .map((group) => {
-      const currentText = group.currentNames.length
-        ? `${formatNumber(group.currentWeight, 1)}%`
-        : "0%";
-      return `
+    .map(
+      (group) => `
         <tr>
           <td><strong>${escapeHtml(group.name)}</strong></td>
-          <td title="${escapeAttr(group.currentNames.join(" · "))}">${currentText}</td>
+          <td class="num">${formatNumber(group.currentWeight, 1)}%</td>
           <td class="num">${formatInt(group.currentNames.length)} / ${MAX_POSITIONS_PER_GROUP}</td>
-        </tr>`;
-    })
-    .join("");
+        </tr>`
+    );
+  setText(
+    "positionTotalAssets",
+    totalAssets === null ? "—" : `¥${formatAmount(totalAssets)}`
+  );
+  setText(
+    "positionTotalPosition",
+    isEmpty ? "空仓" : `${formatNumber(currentTotal, 1)}%`
+  );
+  body.innerHTML = isEmpty
+    ? `
+      <tr class="allocation-empty-row">
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>`
+    : groupRows.join("");
 }
 
 function renderCandidateTable() {
@@ -728,7 +765,7 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td class="num position-context-col">${positionContextHtml(row)}</td>
       ${
         showDailyChange
-          ? `<td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>`
+          ? `<td><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>`
           : ""
       }
     </tr>`;
@@ -776,6 +813,14 @@ function signalReasonText(value) {
   return String(value || "")
     .replace(/尾盘涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
     .replace(/1\.5pp/g, "1.5%");
+}
+
+function signalStatusHtml(value) {
+  const parts = String(value || "").split("；");
+  if (parts.length < 3) return escapeHtml(value);
+  return `${escapeHtml(parts.slice(0, 2).join("；"))}；<br>${escapeHtml(
+    parts.slice(2).join("；")
+  )}`;
 }
 
 function scorePositionHtml(score, positionPct, holdingWeightPct) {
@@ -955,7 +1000,7 @@ function gapProjectionHtml(projectedGap, gapDelta) {
   return `
     <span class="ma-cell">
       <strong class="${pctClass(projectedGap)}">${formatPct(projectedGap, true)}</strong>
-      <span class="${pass ? "up" : "flat"}">增量 ${formatPct(gapDelta, true)}</span>
+      <span class="${pass ? "up" : "flat"}">增幅 ${formatPct(gapDelta, true)}</span>
     </span>`;
 }
 
@@ -1358,16 +1403,38 @@ function renderDrawdownChart() {
 
 function renderMonthlyChart() {
   const chart = getChart("monthlyChart");
-  const rows = state.data.monthly;
+  const storedRows = state.data.monthly || [];
+  const year =
+    String(
+      storedRows[0]?.month ||
+        state.data.meta?.end ||
+        state.data.meta?.candidateDate ||
+        ""
+    ).slice(0, 4) || String(new Date().getFullYear());
+  const byMonth = new Map(storedRows.map((row) => [row.month, row]));
+  const rows = Array.from({ length: 12 }, (_, index) => {
+    const month = `${year}-${String(index + 1).padStart(2, "0")}`;
+    return (
+      byMonth.get(month) || {
+        month,
+        returnPct: null,
+        days: 0,
+      }
+    );
+  });
   chart.setOption({
     ...chartBase(),
-    grid: { left: 52, right: 20, top: 28, bottom: 40 },
+    grid: { left: 56, right: 32, top: 32, bottom: 42 },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
       axisPointer: { type: "shadow" },
       formatter(params) {
         const row = rows[params[0].dataIndex];
+        if (row.returnPct === null || row.returnPct === undefined) {
+          return `<div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${row.month}</div>
+            <div style="margin-top:5px;color:${COLOR.dim}">暂无交易</div>`;
+        }
         return `<div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${row.month}</div>
           <div style="margin-top:5px;color:${row.returnPct >= 0 ? COLOR.red : COLOR.green}">
             组合收益 <b style="float:right;margin-left:18px">${signed(row.returnPct)}%</b>
@@ -1395,8 +1462,18 @@ function renderMonthlyChart() {
         data: rows.map((row) => ({
           value: row.returnPct,
           itemStyle: {
-            color: row.returnPct >= 0 ? "rgba(255,91,110,0.72)" : "rgba(32,201,140,0.72)",
-            borderRadius: row.returnPct >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4],
+            color:
+              row.returnPct === null || row.returnPct === undefined
+                ? "transparent"
+                : row.returnPct >= 0
+                  ? "rgba(255,91,110,0.72)"
+                  : "rgba(32,201,140,0.72)",
+            borderRadius:
+              row.returnPct === null || row.returnPct === undefined
+                ? [0, 0, 0, 0]
+                : row.returnPct >= 0
+                  ? [4, 4, 0, 0]
+                  : [0, 0, 4, 4],
           },
         })),
         label: {
@@ -1405,7 +1482,10 @@ function renderMonthlyChart() {
           color: COLOR.soft,
           fontFamily: FONT_MONO,
           fontSize: 8,
-          formatter: (params) => `${params.value >= 0 ? "+" : ""}${params.value.toFixed(1)}%`,
+          formatter: (params) =>
+            params.value === null || params.value === undefined
+              ? ""
+              : `${params.value >= 0 ? "+" : ""}${Number(params.value).toFixed(1)}%`,
         },
       },
     ],
@@ -1423,7 +1503,7 @@ function renderDistributionChart() {
       : allRows.slice(firstActive, lastActive + 1);
   chart.setOption({
     ...chartBase(),
-    grid: { left: 45, right: 20, top: 28, bottom: 54 },
+    grid: { left: 50, right: 30, top: 34, bottom: 56 },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
@@ -1436,10 +1516,16 @@ function renderDistributionChart() {
     },
     xAxis: {
       type: "category",
-      data: rows.map((row) => row.label.replace("~", "\n")),
+      data: rows.map((row) => row.label),
       axisLine: { lineStyle: { color: COLOR.axis } },
       axisTick: { show: false },
-      axisLabel: { color: COLOR.dim, fontSize: 8, interval: 0, rotate: 30 },
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 7,
+        interval: 0,
+        rotate: 0,
+        hideOverlap: false,
+      },
     },
     yAxis: {
       type: "value",
@@ -1479,7 +1565,7 @@ function renderGroupChart() {
     .reverse();
   chart.setOption({
     ...chartBase(),
-    grid: { left: 105, right: 48, top: 18, bottom: 30 },
+    grid: { left: 105, right: 120, top: 18, bottom: 30 },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",

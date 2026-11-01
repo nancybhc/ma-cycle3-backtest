@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261031-holding-group-ratio">
+<link rel="stylesheet" href="assets/app.css?v=20261101-mfe-mae-font-9">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -212,11 +212,9 @@
       </div>
 
       <div class="dynamic-signal-note">
-        <strong>盘中为动态数据</strong>
-        <span>每次扫描都按最新行情重算，满足空转多进度3则进入全部信号。行情波动导致多次出现时，仅保留首次出现时间。盘中入选不等于成交，实际买入统一放在尾盘集合竞价。15:00 会再执行一轮收盘行情扫描，确认拿到收盘时间戳后停止。</span>
+        <span>每次扫描都按最新行情重算，满足空转多进度3则进入全部信号。行情波动导致多次出现时，仅保留首次出现时间。盘中入选不等于成交，实际买入统一放在尾盘集合竞价。</span>
       </div>
       <div class="signal-color-legend">
-        <strong>颜色标注</strong>
         <span><b class="legend-red">红色</b>：满足盘中买入条件，仅表示进入买入候选；<b class="legend-amber">橙色</b>：仅因涨停无法买进。</span>
       </div>
 
@@ -318,31 +316,45 @@
             <h3>今日仓位管理明细</h3>
           </div>
         </div>
-        <div class="allocation-facts">
-          <div>
-            <span>指数状态</span>
-            <strong id="positionIndexState">—</strong>
+        <div class="position-management-capsule">
+          <div class="allocation-summary-capsule">
+            <div>
+              <span>总资产</span>
+              <strong id="positionTotalAssets">—</strong>
+            </div>
+            <i aria-hidden="true"></i>
+            <div>
+              <span>总仓位</span>
+              <strong id="positionTotalPosition">—</strong>
+            </div>
           </div>
-          <div>
-            <span>当前阶段AI硬件仓位上限</span>
-            <strong id="positionStageTarget">—</strong>
-          </div>
-          <div>
-            <span>当前仓位</span>
-            <strong id="positionCurrentTotal">—</strong>
+          <div class="table-scroll">
+            <table class="data-table allocation-table">
+              <thead>
+                <tr>
+                  <th>分组</th>
+                  <th class="num">当前仓位</th>
+                  <th>同组持仓 / 持仓上限</th>
+                </tr>
+              </thead>
+              <tbody id="allocationTableBody"></tbody>
+            </table>
           </div>
         </div>
-        <div class="table-scroll">
-          <table class="data-table allocation-table">
-            <thead>
-              <tr>
-                <th>分组</th>
-                <th>当前仓位</th>
-                <th>同组持仓 / 持仓上限</th>
-              </tr>
-            </thead>
-            <tbody id="allocationTableBody"></tbody>
-          </table>
+        <div class="position-pool-card">
+          <div class="position-pool-title">
+            <span>上证指数当前阶段及AI硬件仓位上限（高亮标注）</span>
+          </div>
+          <div class="position-stage-ladder" id="positionStageLadder">
+            <div class="position-stage" data-stage-key="空"><span>空</span><strong>20%</strong></div>
+            <div class="position-stage" data-stage-key="空转多1"><span>空转多 · 进度1</span><strong>30%</strong></div>
+            <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>50%</strong></div>
+            <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
+            <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
+            <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1</span><strong>0%</strong></div>
+            <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2</span><strong>0%</strong></div>
+            <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3</span><strong>0%</strong></div>
+          </div>
         </div>
       </article>
 
@@ -442,9 +454,9 @@
                 <div class="priority-item priority-1">
                   <span>01</span>
                   <div>
-                    <strong>早期失败与 -8% 强平</strong>
+                    <strong>早期MFE低于2%与持仓-8%止损</strong>
+                    <p>买入后第 2 个交易日，前两日最高价形成的最大浮盈仍低于 2%，且当日收盘弱于买入价，按当日收盘价卖出。</p>
                     <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即卖出。若跳空低开至止损价下方，按开盘价卖出。</p>
-                    <p><b>早期失败：</b>买入后第 2 个交易日，前两日最高价形成的 MFE 仍低于 2%，且当日收盘弱于买入价，按当日收盘价退出。</p>
                     <p>实盘注意了解条件单设置规则以及学会竞价挂跌停价保证止损成功。</p>
                   </div>
                 </div>
@@ -452,7 +464,7 @@
                 <div class="priority-item priority-2">
                   <span>02</span>
                   <div>
-                    <strong>AI 硬件多转空强平</strong>
+                    <strong>指数多转空AI 硬件强平</strong>
                     <p>上证指数进入多转空，AI 硬件剩余仓位当日按收盘价强制清仓。多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此策略先清掉已有持仓，避免把一次趋势转弱拖成深度回撤。等指数重新进入空转多并在进度 3 确认后，再按新的仓位分档恢复参与。</p>
                   </div>
                 </div>
@@ -507,7 +519,8 @@
             <span class="panel-tip">评分 0–1 · 参考比较</span>
           </div>
           <div class="score-formula">
-            <span>综合评分 =</span>
+            <span>综合评分</span>
+            <span class="score-formula-operator">=</span>
             <strong>20% 分组多占比分位</strong>
             <b>+</b>
             <strong>80% 推演后 5–10 间距分位</strong>
@@ -611,20 +624,6 @@
                 </div>
               </div>
             </article>
-          </div>
-
-          <div class="position-pool-card">
-            <div class="position-pool-title">上证指数当前阶段及AI硬件仓位上限</div>
-            <div class="position-stage-ladder" id="positionStageLadder">
-              <div class="position-stage" data-stage-key="空"><span>空</span><strong>20%</strong></div>
-              <div class="position-stage" data-stage-key="空转多1"><span>空转多 · 进度1</span><strong>30%</strong></div>
-              <div class="position-stage" data-stage-key="空转多2"><span>空转多 · 进度2</span><strong>50%</strong></div>
-              <div class="position-stage" data-stage-key="空转多3"><span>空转多 · 进度3</span><strong>70%</strong></div>
-              <div class="position-stage" data-stage-key="多"><span>多</span><strong>80%</strong></div>
-              <div class="position-stage" data-stage-key="多转空1"><span>多转空 · 进度1</span><strong>0%</strong></div>
-              <div class="position-stage" data-stage-key="多转空2"><span>多转空 · 进度2</span><strong>0%</strong></div>
-              <div class="position-stage" data-stage-key="多转空3"><span>多转空 · 进度3</span><strong>0%</strong></div>
-            </div>
           </div>
 
         </div>
@@ -798,6 +797,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261101-close-snapshot"></script>
+  <script src="assets/app.js?v=20261101-third-signal-reason-newline"></script>
 </body>
 </html>
