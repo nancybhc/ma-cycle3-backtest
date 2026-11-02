@@ -1631,9 +1631,7 @@ function renderDistributionChart() {
     },
     xAxis: {
       type: "category",
-      data: rows.map((row) =>
-        row.label.includes("~") ? row.label.replace("%", "") : row.label
-      ),
+      data: rows.map((row) => row.label),
       axisLine: { lineStyle: { color: COLOR.axis } },
       axisTick: { show: false },
       axisLabel: {
