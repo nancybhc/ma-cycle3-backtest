@@ -1649,9 +1649,9 @@ function renderDistributionChart() {
               wave: {
                 align: "center",
                 color: COLOR.dim,
-                fontSize: 7,
+                fontSize: 8,
                 fontWeight: 400,
-                lineHeight: 7,
+                lineHeight: 8,
                 rotation: Math.PI / 2,
               },
             }
