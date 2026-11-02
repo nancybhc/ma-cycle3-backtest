@@ -721,6 +721,10 @@ main {
   color: var(--amber);
 }
 
+.legend-cyan {
+  color: var(--cyan);
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -1473,6 +1477,18 @@ main {
   background: #20231f;
 }
 
+.candidate-table tr.group-cap-row td {
+  background: rgba(72, 225, 209, 0.055);
+}
+
+.candidate-table tr.group-cap-row .sticky-col {
+  background: #0a202b;
+}
+
+.candidate-table tr.group-cap-row:hover .sticky-col {
+  background: #0e2b36;
+}
+
 .candidate-table tr.sell-row td {
   background: rgba(32, 201, 140, 0.035);
 }
@@ -1575,6 +1591,12 @@ main {
   border-color: rgba(246, 185, 75, 0.32);
   background: var(--amber-soft);
   color: var(--amber);
+}
+
+.status-badge.group-cap {
+  border-color: rgba(72, 225, 209, 0.32);
+  background: var(--cyan-soft);
+  color: var(--cyan);
 }
 
 .status-badge.sell {
