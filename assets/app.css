@@ -1517,6 +1517,30 @@ main {
   table-layout: auto;
 }
 
+.candidate-table:not(.changes-view) .change-first-col {
+  display: none;
+}
+
+.candidate-table.changes-view .change-last-col {
+  display: none;
+}
+
+.candidate-table.changes-view .change-first-col {
+  width: 96px;
+  min-width: 96px;
+  white-space: nowrap;
+}
+
+.candidate-table.changes-view .change-first-col .status-badge {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .candidate-table.changes-view th,
 .candidate-table.changes-view td {
   padding: 8px 5px;
@@ -1539,21 +1563,6 @@ main {
   left: 64px;
   width: 100px;
   min-width: 100px;
-}
-
-.candidate-table.changes-view th:last-child,
-.candidate-table.changes-view td:last-child {
-  width: 96px;
-  min-width: 96px;
-  white-space: nowrap;
-}
-
-.candidate-table.changes-view td:last-child .status-badge {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .candidate-table .group-ratio-col {

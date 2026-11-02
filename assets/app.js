@@ -792,6 +792,7 @@ function candidateRowHtml(row, showDailyChange = true) {
             : signalReasonText(row.reason);
   return `
     <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
+      <td class="change-first-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>
       <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
       <td class="sticky-col col-name">
         <span class="name-cell">
@@ -843,7 +844,7 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td class="num position-context-col">${positionContextHtml(row)}</td>
       ${
         showDailyChange
-          ? `<td><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>`
+          ? `<td class="change-last-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>`
           : ""
       }
     </tr>`;
