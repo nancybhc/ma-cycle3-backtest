@@ -26,6 +26,10 @@
   --display: "Bahnschrift", "DIN Alternate", "Microsoft YaHei UI", sans-serif;
 }
 
+.text-cyan {
+  color: var(--cyan);
+}
+
 * {
   box-sizing: border-box;
 }
