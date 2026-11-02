@@ -1616,7 +1616,7 @@ function renderDistributionChart() {
       left: compact ? 24 : 50,
       right: compact ? 52 : 30,
       top: 34,
-      bottom: compact ? 72 : 56,
+      bottom: compact ? 64 : 56,
       containLabel: compact,
     },
     tooltip: {
@@ -1637,21 +1637,21 @@ function renderDistributionChart() {
       axisLabel: {
         color: COLOR.dim,
         fontSize: compact ? 6.2 : 7,
-        lineHeight: compact ? 8 : 12,
+        lineHeight: compact ? 7 : 12,
         interval: 0,
         rotate: 0,
         hideOverlap: false,
         formatter: compact
-          ? (value) => String(value).replace("~", "\n{wave|～}\n")
+          ? (value) => String(value).replace("~", "\n{wave|ⸯ}\n")
           : undefined,
         rich: compact
           ? {
               wave: {
                 align: "center",
-                color: COLOR.soft,
-                fontSize: 9,
-                fontWeight: 700,
-                lineHeight: 8,
+                color: COLOR.dim,
+                fontSize: 7,
+                fontWeight: 400,
+                lineHeight: 7,
               },
             }
           : undefined,
