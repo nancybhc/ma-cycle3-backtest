@@ -1638,10 +1638,14 @@ function renderDistributionChart() {
       axisTick: { show: false },
       axisLabel: {
         color: COLOR.dim,
-        fontSize: compact ? 5.8 : 7,
+        fontSize: compact ? 6.2 : 7,
+        lineHeight: compact ? 8 : 12,
         interval: 0,
         rotate: 0,
         hideOverlap: false,
+        formatter: compact
+          ? (value) => String(value).replace("~", "~\n")
+          : undefined,
       },
     },
     yAxis: {
