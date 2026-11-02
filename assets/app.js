@@ -1578,8 +1578,8 @@ function renderDistributionChart() {
   chart.setOption({
     ...chartBase(),
     grid: {
-      left: compact ? 30 : 50,
-      right: compact ? 72 : 30,
+      left: compact ? 28 : 50,
+      right: compact ? 64 : 30,
       top: 34,
       bottom: compact ? 60 : 56,
     },
@@ -1600,7 +1600,7 @@ function renderDistributionChart() {
       axisTick: { show: false },
       axisLabel: {
         color: COLOR.dim,
-        fontSize: compact ? 5.5 : 7,
+        fontSize: compact ? 5.8 : 7,
         interval: 0,
         rotate: 0,
         hideOverlap: false,
@@ -1646,8 +1646,8 @@ function renderGroupChart() {
   chart.setOption({
     ...chartBase(),
     grid: {
-      left: compact ? 82 : 105,
-      right: compact ? 82 : 120,
+      left: compact ? 62 : 105,
+      right: compact ? 72 : 120,
       top: 18,
       bottom: 30,
     },
@@ -1704,7 +1704,7 @@ function renderGroupChart() {
           fontSize: 8,
           formatter: (params) => {
             const row = rows[params.dataIndex];
-            return `${params.value >= 0 ? "+" : ""}${Number(params.value).toFixed(1)}% · ${row.count}笔`;
+            return `${params.value >= 0 ? "+" : ""}${Number(params.value).toFixed(1)}% ${row.count}笔`;
           },
         },
       },
