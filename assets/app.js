@@ -1567,6 +1567,7 @@ function renderMonthlyChart() {
 
 function renderDistributionChart() {
   const chart = getChart("distributionChart");
+  const compact = window.innerWidth <= 640;
   const allRows = state.data.distribution;
   const firstActive = allRows.findIndex((row) => row.count > 0);
   const lastActive = allRows.findLastIndex((row) => row.count > 0);
@@ -1576,7 +1577,12 @@ function renderDistributionChart() {
       : allRows.slice(firstActive, lastActive + 1);
   chart.setOption({
     ...chartBase(),
-    grid: { left: 50, right: 30, top: 34, bottom: 56 },
+    grid: {
+      left: compact ? 36 : 50,
+      right: compact ? 52 : 30,
+      top: 34,
+      bottom: compact ? 60 : 56,
+    },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
@@ -1594,7 +1600,7 @@ function renderDistributionChart() {
       axisTick: { show: false },
       axisLabel: {
         color: COLOR.dim,
-        fontSize: 7,
+        fontSize: compact ? 6.5 : 7,
         interval: 0,
         rotate: 0,
         hideOverlap: false,
