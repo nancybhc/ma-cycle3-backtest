@@ -1399,6 +1399,25 @@ main {
 
 .candidate-scroll {
   max-height: 610px;
+  overflow-x: scroll;
+  scrollbar-width: auto;
+}
+
+.candidate-scroll::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.candidate-scroll::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(72, 225, 209, 0.06);
+}
+
+.candidate-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(72, 225, 209, 0.55);
+  background-clip: padding-box;
 }
 
 .data-table {
@@ -1493,15 +1512,15 @@ main {
 }
 
 .candidate-table.changes-view {
-  width: 100%;
-  min-width: 0;
-  table-layout: fixed;
+  width: max-content;
+  min-width: 1600px;
+  table-layout: auto;
 }
 
 .candidate-table.changes-view th,
 .candidate-table.changes-view td {
   padding: 8px 5px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .candidate-table.changes-view th {
@@ -1524,8 +1543,8 @@ main {
 
 .candidate-table.changes-view th:last-child,
 .candidate-table.changes-view td:last-child {
-  width: 72px;
-  min-width: 72px;
+  width: 96px;
+  min-width: 96px;
   white-space: nowrap;
 }
 
@@ -3137,7 +3156,7 @@ main {
 
   .candidate-table.changes-view {
     width: max-content;
-    min-width: 1180px;
+    min-width: 1600px;
     table-layout: auto;
   }
 
