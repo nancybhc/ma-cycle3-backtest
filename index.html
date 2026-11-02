@@ -288,9 +288,10 @@
                 <th class="first-selected-col">首次出现时间</th>
                 <th>现价 / 涨幅</th>
                 <th class="num position-col">成本 / 持仓收益</th>
+                <th class="num position-context-col">仓位</th>
+                <th class="hold-days-col">持有天数</th>
                 <th class="num mfe-col">MFE</th>
                 <th class="num mae-col">MAE</th>
-                <th class="hold-days-col">持有天数</th>
                 <th>趋势</th>
                 <th>MA10方向 / 连续</th>
                 <th title="假设次日收盘价等于当日收盘价，比较重算后的 MA10 与今日 MA10；仅作参考，不进入评分。">推演次日MA10方向</th>
@@ -302,7 +303,6 @@
                 <th class="projection-col">推演次日5-10 / 增幅</th>
                 <th class="group-ratio-col">分组多占比</th>
                 <th class="score-col">评分 / 建议仓位</th>
-                <th class="num position-context-col">仓位</th>
                 <th class="change-last-col" id="candidateChangeHeader">当日变动</th>
               </tr>
             </thead>
@@ -834,6 +834,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261102-change-first-column-v2"></script>
+  <script src="assets/app.js?v=20261102-position-order-v1"></script>
 </body>
 </html>

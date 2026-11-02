@@ -803,6 +803,8 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td class="first-selected-col">${escapeHtml(firstSelectedTime(row.firstSelectedAt))}</td>
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
+      <td class="num position-context-col">${positionContextHtml(row)}</td>
+      ${showDailyChange ? `<td class="hold-days-col">${holdingDaysHtml(row)}</td>` : ""}
       <td class="num mfe-col ${
         row.mfePct === null || row.mfePct === undefined
           ? ""
@@ -821,7 +823,6 @@ function candidateRowHtml(row, showDailyChange = true) {
           ? '<span class="flat">—</span>'
           : formatPct(row.maePct, true)
       }</td>
-      ${showDailyChange ? `<td class="hold-days-col">${holdingDaysHtml(row)}</td>` : ""}
       <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
       <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
       <td>${projectedMa10DirectionHtml(row)}</td>
@@ -841,7 +842,6 @@ function candidateRowHtml(row, showDailyChange = true) {
               row.holdingWeightPct
             )
       }</td>
-      <td class="num position-context-col">${positionContextHtml(row)}</td>
       ${
         showDailyChange
           ? `<td class="change-last-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>`
