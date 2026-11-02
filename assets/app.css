@@ -2939,6 +2939,41 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .candidate-scroll {
+    overflow-x: scroll;
+    overflow-y: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: auto;
+  }
+
+  .candidate-scroll::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .candidate-scroll::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: rgba(72, 225, 209, 0.06);
+  }
+
+  .candidate-scroll::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(72, 225, 209, 0.55);
+    background-clip: padding-box;
+  }
+
+  .candidate-table.changes-view {
+    width: max-content;
+    min-width: 1180px;
+    table-layout: auto;
+  }
+
+  .candidate-table.changes-view th,
+  .candidate-table.changes-view td {
+    overflow: visible;
+  }
+
 }
 
 @media (max-width: 640px) {
