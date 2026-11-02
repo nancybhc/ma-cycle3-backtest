@@ -170,6 +170,23 @@ function previousWeekday(date) {
   return previous.date;
 }
 
+function marketSessionDate(clock = shanghaiClock()) {
+  return ["Sat", "Sun"].includes(clock.weekday)
+    ? previousWeekday(clock.date)
+    : clock.date;
+}
+
+function dailyChangesForSession(rows, clock = shanghaiClock()) {
+  const sessionDate = marketSessionDate(clock);
+  return (rows || []).filter(
+    (row) =>
+      row &&
+      (row.isHolding ||
+        !row.date ||
+        String(row.date) === sessionDate)
+  );
+}
+
 function marketDisplayState(clock = shanghaiClock()) {
   const weekend = ["Sat", "Sun"].includes(clock.weekday);
   if (weekend) {
@@ -260,6 +277,9 @@ function applyGroupRatios(rows, ratios) {
 
 function applyLiveSignals(live) {
   const useLive = shouldUseLiveSignals(live);
+  const sessionDailyChanges = dailyChangesForSession(
+    state.staticDailyChanges
+  );
   state.liveApplied = useLive;
   state.liveData = live;
   const displayRatios = useLive
@@ -270,7 +290,7 @@ function applyLiveSignals(live) {
     : groupRatioMapFromRows(
         [
           ...state.staticSignals,
-          ...state.staticDailyChanges,
+          ...sessionDailyChanges,
           ...(state.staticCurrentHoldings || []),
         ],
         state.data.groupRatios
@@ -284,7 +304,7 @@ function applyLiveSignals(live) {
     displayRatios
   );
   state.data.dailyChanges = applyGroupRatios(
-    state.staticDailyChanges,
+    sessionDailyChanges,
     displayRatios
   );
   state.data.currentHoldings = applyGroupRatios(
