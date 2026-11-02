@@ -1449,6 +1449,13 @@ main {
   line-height: 1.6;
 }
 
+.candidate-table-note {
+  margin: 5px 0 0;
+  color: var(--text-dim);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
 .empty-cell {
   padding: 28px 16px !important;
   text-align: center;
