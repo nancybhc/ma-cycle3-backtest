@@ -1646,6 +1646,11 @@ main {
     color: var(--red) !important;
 }
 
+.candidate-table tr.group-cap-row .code-cell,
+.candidate-table tr.group-cap-row .name-cell strong {
+    color: var(--cyan) !important;
+}
+
 .candidate-table tr.limit-up-row .code-cell,
 .candidate-table tr.limit-up-row .name-cell strong {
     color: var(--amber) !important;
