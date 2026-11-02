@@ -62,9 +62,10 @@ async function init() {
     if (location.protocol === "file:") {
       throw new Error("请通过本地网址打开看板，不能直接双击 index.html。");
     }
-    const response = await fetch("data/backtest.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`数据读取失败：HTTP ${response.status}`);
-    state.data = await response.json();
+    state.data = await fetchJsonWithRetry(
+      `data/backtest.json?ts=${Date.now()}`,
+      5
+    );
     state.staticSignals = [...(state.data.signals || [])];
     state.staticDailyChanges = [...(state.data.dailyChanges || [])];
     state.staticCurrentHoldings = [...(state.data.currentHoldings || [])];
@@ -104,6 +105,27 @@ async function init() {
         <span>${escapeHtml(error.message || String(error))}</span>
       </div>`;
   }
+}
+
+async function fetchJsonWithRetry(url, attempts = 4) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`数据读取失败：HTTP ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        await new Promise((resolve) =>
+          window.setTimeout(resolve, 600 * attempt)
+        );
+      }
+    }
+  }
+  throw lastError || new Error("数据读取失败");
 }
 
 async function fetchLiveSignals() {
