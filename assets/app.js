@@ -1589,7 +1589,7 @@ function renderDistributionChart() {
     },
     xAxis: {
       type: "category",
-      data: rows.map((row) => row.label),
+      data: rows.map((row) => row.label.replace("%~", "-")),
       axisLine: { lineStyle: { color: COLOR.axis } },
       axisTick: { show: false },
       axisLabel: {
