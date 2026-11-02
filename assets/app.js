@@ -1642,7 +1642,7 @@ function renderDistributionChart() {
         rotate: 0,
         hideOverlap: false,
         formatter: compact
-          ? (value) => String(value).replace("~", "\n{wave|ⸯ}\n")
+          ? (value) => String(value).replace("~", "\n{wave|~}\n")
           : undefined,
         rich: compact
           ? {
@@ -1652,6 +1652,7 @@ function renderDistributionChart() {
                 fontSize: 7,
                 fontWeight: 400,
                 lineHeight: 7,
+                rotation: Math.PI / 2,
               },
             }
           : undefined,
