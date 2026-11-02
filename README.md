@@ -10,8 +10,7 @@ MA5-to-MA10 bearish transition. A stock with positive holding return sells
 half on the first lower high and clears the remainder after any later pair
 of consecutive lower highs. A break below MA5 exits the remaining position,
 and a -8% stop is enforced intraday from the next trading day. If MFE remains
-below 2% after the second trading day and the close is below the entry price,
-the position exits at that close.
+below 2% after the second trading day, the position exits at that close.
 
 Portfolio overlay: AI-hardware exposure follows the Shanghai Composite
 MA5/MA10 stage using a 20%-80% sleeve. Every non-AI group is capped at 20%.
