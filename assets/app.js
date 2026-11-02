@@ -209,6 +209,22 @@ function dailyChangesForSession(rows, clock = shanghaiClock()) {
   );
 }
 
+function displayDateTime(value) {
+  const text = String(value || "");
+  return text ? text.replace("T", " ").slice(0, 19) : "—";
+}
+
+function updateMarketSyncDetail(live = state.liveData) {
+  const syncedAt = displayDateTime(live?.generatedAt);
+  const marketTime = String(live?.marketTime || "");
+  setText(
+    "marketSyncDetail",
+    `本地行情同步：${syncedAt}${
+      marketTime ? ` · 行情快照：${marketTime}` : ""
+    }`
+  );
+}
+
 function marketDisplayState(clock = shanghaiClock()) {
   const weekend = ["Sat", "Sun"].includes(clock.weekday);
   if (weekend) {
@@ -333,6 +349,7 @@ function applyLiveSignals(live) {
     state.staticCurrentHoldings || [],
     displayRatios
   );
+  updateMarketSyncDetail(live);
   syncCandidateFocusPhase();
   return useLive;
 }
@@ -347,6 +364,7 @@ async function refreshLiveSignals() {
   ) {
     // 收盘后到下一交易日首次扫描前，持续保留同一交易日的最后一份信号。
     state.liveData = live;
+    updateMarketSyncDetail(live);
     const staticRatios =
       state.data.groupRatioDate === live.marketDate
         ? state.data.groupRatios
