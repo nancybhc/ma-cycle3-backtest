@@ -1512,8 +1512,8 @@ main {
 }
 
 .candidate-table.changes-view {
-  width: max-content;
-  min-width: 1240px;
+  width: 100%;
+  min-width: max-content;
   table-layout: auto;
 }
 
@@ -3155,8 +3155,8 @@ main {
   }
 
   .candidate-table.changes-view {
-    width: max-content;
-    min-width: 1240px;
+    width: 100%;
+    min-width: max-content;
     table-layout: auto;
   }
 
