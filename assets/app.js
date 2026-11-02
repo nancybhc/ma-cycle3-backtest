@@ -1567,7 +1567,7 @@ function renderMonthlyChart() {
 
 function renderDistributionChart() {
   const chart = getChart("distributionChart");
-  const compact = window.innerWidth <= 640;
+  const compact = chart.getWidth() <= 420;
   const allRows = state.data.distribution;
   const firstActive = allRows.findIndex((row) => row.count > 0);
   const lastActive = allRows.findLastIndex((row) => row.count > 0);
@@ -1578,8 +1578,8 @@ function renderDistributionChart() {
   chart.setOption({
     ...chartBase(),
     grid: {
-      left: compact ? 36 : 50,
-      right: compact ? 52 : 30,
+      left: compact ? 30 : 50,
+      right: compact ? 72 : 30,
       top: 34,
       bottom: compact ? 60 : 56,
     },
@@ -1600,7 +1600,7 @@ function renderDistributionChart() {
       axisTick: { show: false },
       axisLabel: {
         color: COLOR.dim,
-        fontSize: compact ? 6.5 : 7,
+        fontSize: compact ? 5.5 : 7,
         interval: 0,
         rotate: 0,
         hideOverlap: false,
@@ -1637,6 +1637,7 @@ function renderDistributionChart() {
 
 function renderGroupChart() {
   const chart = getChart("groupChart");
+  const compact = chart.getWidth() <= 420;
   const rows = state.data.groups
     .filter((row) => row.count > 8)
     .sort((a, b) => b.avgReturnPct - a.avgReturnPct)
@@ -1644,7 +1645,12 @@ function renderGroupChart() {
     .reverse();
   chart.setOption({
     ...chartBase(),
-    grid: { left: 105, right: 120, top: 18, bottom: 30 },
+    grid: {
+      left: compact ? 82 : 105,
+      right: compact ? 82 : 120,
+      top: 18,
+      bottom: 30,
+    },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
@@ -1659,7 +1665,11 @@ function renderGroupChart() {
     },
     xAxis: {
       type: "value",
-      axisLabel: { color: COLOR.dim, fontSize: 8, formatter: (value) => `${value}%` },
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: compact ? 7 : 8,
+        formatter: (value) => `${value}%`,
+      },
       splitLine: { lineStyle: { color: COLOR.grid } },
       axisLine: { show: false },
     },
@@ -1668,7 +1678,12 @@ function renderGroupChart() {
       data: rows.map((row) => row.group),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: COLOR.soft, fontSize: 9, width: 84, overflow: "truncate" },
+      axisLabel: {
+        color: COLOR.soft,
+        fontSize: compact ? 8 : 9,
+        width: compact ? 68 : 84,
+        overflow: "truncate",
+      },
     },
     series: [
       {
@@ -1689,7 +1704,7 @@ function renderGroupChart() {
           fontSize: 8,
           formatter: (params) => {
             const row = rows[params.dataIndex];
-            return `${params.value >= 0 ? "+" : ""}${Number(params.value).toFixed(1)}%  ·  ${row.count}笔`;
+            return `${params.value >= 0 ? "+" : ""}${Number(params.value).toFixed(1)}% · ${row.count}笔`;
           },
         },
       },
