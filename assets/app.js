@@ -1613,10 +1613,11 @@ function renderDistributionChart() {
   chart.setOption({
     ...chartBase(),
     grid: {
-      left: compact ? 28 : 50,
-      right: compact ? 64 : 30,
+      left: compact ? 24 : 50,
+      right: compact ? 52 : 30,
       top: 34,
       bottom: compact ? 60 : 56,
+      containLabel: compact,
     },
     tooltip: {
       ...chartBase().tooltip,

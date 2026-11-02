@@ -3244,6 +3244,11 @@ main {
     height: 260px;
   }
 
+  .distribution-panel {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
   .today-summary {
     grid-template-columns: 1fr;
   }
