@@ -1133,13 +1133,48 @@ function bindInteractions() {
   });
   document.getElementById("exportTrades").addEventListener("click", exportFilteredTrades);
 
+  document
+    .getElementById("mobileNavToggle")
+    .addEventListener("click", () => setMobileNavigation(true));
+  document
+    .getElementById("mobileNavClose")
+    .addEventListener("click", closeMobileNavigation);
+  document
+    .getElementById("mobileNavBackdrop")
+    .addEventListener("click", closeMobileNavigation);
+  document.querySelectorAll(".mobile-nav-links a").forEach((link) => {
+    link.addEventListener("click", closeMobileNavigation);
+  });
+
   document.getElementById("drawerClose").addEventListener("click", closeDrawer);
   document.getElementById("drawerBackdrop").addEventListener("click", closeDrawer);
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && document.getElementById("drawer").classList.contains("open")) {
+    if (event.key !== "Escape") return;
+    if (document.getElementById("mobileNavPanel").classList.contains("open")) {
+      closeMobileNavigation();
+    } else if (document.getElementById("drawer").classList.contains("open")) {
       closeDrawer();
     }
   });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) closeMobileNavigation();
+  });
+}
+
+function setMobileNavigation(open) {
+  const panel = document.getElementById("mobileNavPanel");
+  const backdrop = document.getElementById("mobileNavBackdrop");
+  const toggle = document.getElementById("mobileNavToggle");
+  panel.classList.toggle("open", open);
+  backdrop.classList.toggle("open", open);
+  panel.setAttribute("aria-hidden", String(!open));
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", open ? "关闭快捷菜单" : "打开快捷菜单");
+  syncPageScrollLock();
+}
+
+function closeMobileNavigation() {
+  setMobileNavigation(false);
 }
 
 function applyTradeFilters() {
@@ -1595,7 +1630,7 @@ function renderDistributionChart() {
     },
     xAxis: {
       type: "category",
-      data: rows.map((row) => row.label.replace("%~", "-")),
+      data: rows.map((row) => row.label.replace("%", "")),
       axisLine: { lineStyle: { color: COLOR.axis } },
       axisTick: { show: false },
       axisLabel: {
@@ -2099,19 +2134,26 @@ function detailTable(rows) {
 }
 
 function openDrawer() {
-  document.body.classList.add("no-scroll");
   document.getElementById("drawerBackdrop").classList.add("open");
   const drawer = document.getElementById("drawer");
   drawer.classList.add("open");
   drawer.setAttribute("aria-hidden", "false");
+  syncPageScrollLock();
 }
 
 function closeDrawer() {
-  document.body.classList.remove("no-scroll");
   document.getElementById("drawerBackdrop").classList.remove("open");
   const drawer = document.getElementById("drawer");
   drawer.classList.remove("open");
   drawer.setAttribute("aria-hidden", "true");
+  syncPageScrollLock();
+}
+
+function syncPageScrollLock() {
+  const locked =
+    document.getElementById("drawer").classList.contains("open") ||
+    document.getElementById("mobileNavPanel").classList.contains("open");
+  document.body.classList.toggle("no-scroll", locked);
 }
 
 function renderTradeChart(item) {
@@ -2293,10 +2335,16 @@ function csvCell(value) {
 }
 
 function setupNavigation() {
-  const links = [...document.querySelectorAll(".main-nav a")];
-  const sections = links
-    .map((link) => document.querySelector(link.getAttribute("href")))
-    .filter(Boolean);
+  const links = [
+    ...document.querySelectorAll(".main-nav a, .mobile-nav-links a"),
+  ];
+  const sections = [
+    ...new Set(
+      links
+        .map((link) => document.querySelector(link.getAttribute("href")))
+        .filter(Boolean)
+    ),
+  ];
   const observer = new IntersectionObserver(
     (entries) => {
       const visible = entries

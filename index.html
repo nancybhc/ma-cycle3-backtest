@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111d">
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261102-group-cap-name-color">
+<link rel="stylesheet" href="assets/app.css?v=20261102-mobile-quick-nav">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -33,11 +33,44 @@
       <a href="#analytics">统计分析</a>
       <a href="#trades">交易明细</a>
     </nav>
-    <div class="top-status">
-      <span class="status-dot"></span>
-      <span id="topDataDate">数据装载中</span>
+    <div class="topbar-actions">
+      <div class="top-status">
+        <span class="status-dot"></span>
+        <span id="topDataDate">数据装载中</span>
+      </div>
+      <button
+        class="mobile-nav-toggle"
+        id="mobileNavToggle"
+        type="button"
+        aria-label="打开快捷菜单"
+        aria-controls="mobileNavPanel"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
+  <aside class="mobile-nav-panel" id="mobileNavPanel" aria-hidden="true">
+    <div class="mobile-nav-head">
+      <div>
+        <span class="panel-kicker">快捷导航</span>
+        <strong>5破10量化策略</strong>
+      </div>
+      <button class="mobile-nav-close" id="mobileNavClose" type="button" aria-label="关闭快捷菜单">×</button>
+    </div>
+    <nav class="mobile-nav-links" aria-label="手机快捷导航">
+      <a href="#overview"><span>总览</span><i>→</i></a>
+      <a href="#today"><span>今日操作</span><i>→</i></a>
+      <a href="#rules"><span>策略口径</span><i>→</i></a>
+      <a href="#stages"><span>多空进度</span><i>→</i></a>
+      <a href="#analytics"><span>统计分析</span><i>→</i></a>
+      <a href="#trades"><span>交易明细</span><i>→</i></a>
+    </nav>
+  </aside>
 
   <main>
     <section class="hero section" id="overview">
@@ -799,6 +832,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261102-mobile-analysis-layout-v4"></script>
+  <script src="assets/app.js?v=20261102-mobile-quick-nav-tilde-axis"></script>
 </body>
 </html>
