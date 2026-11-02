@@ -1567,7 +1567,7 @@ function renderMonthlyChart() {
 
 function renderDistributionChart() {
   const chart = getChart("distributionChart");
-  const compact = chart.getWidth() <= 420;
+  const compact = chart.getWidth() <= 560;
   const allRows = state.data.distribution;
   const firstActive = allRows.findIndex((row) => row.count > 0);
   const lastActive = allRows.findLastIndex((row) => row.count > 0);
@@ -1637,7 +1637,7 @@ function renderDistributionChart() {
 
 function renderGroupChart() {
   const chart = getChart("groupChart");
-  const compact = chart.getWidth() <= 420;
+  const compact = chart.getWidth() <= 560;
   const rows = state.data.groups
     .filter((row) => row.count > 8)
     .sort((a, b) => b.avgReturnPct - a.avgReturnPct)
