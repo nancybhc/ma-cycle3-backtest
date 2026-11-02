@@ -266,7 +266,19 @@ function shouldUseLiveSignals(live) {
     return false;
   }
   const clock = shanghaiClock();
-  // 同一交易日内保留最后一份盘中信号；15:00 后和收盘正式更新前都不清空。
+  const formalDate = String(state.data?.meta?.candidateDate || "");
+  const formalAt = Date.parse(state.data?.meta?.generatedAt || "");
+  const liveAt = Date.parse(live.generatedAt || "");
+  if (
+    formalDate === live.marketDate &&
+    Number.isFinite(formalAt) &&
+    Number.isFinite(liveAt) &&
+    formalAt >= liveAt
+  ) {
+    // 收盘正式数据一旦生成，就覆盖同一交易日最后一份盘中快照。
+    return false;
+  }
+  // 正式收盘数据生成前，保留同一交易日最后一份盘中信号。
   return clock.date === live.marketDate;
 }
 
