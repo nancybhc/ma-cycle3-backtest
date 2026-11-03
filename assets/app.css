@@ -2468,6 +2468,21 @@ main {
   border-bottom: 0;
 }
 
+.buy-rule-pair {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.buy-rule-pair .buy-rule-card {
+  grid-column: auto;
+  border-bottom: 0;
+}
+
+.buy-rule-pair .buy-rule-card:first-child {
+  border-right: 1px solid rgba(131, 173, 207, 0.10);
+}
+
 .buy-rule-list .buy-rule-card:nth-child(5),
 .buy-rule-list .buy-rule-card:nth-child(6) {
   grid-column: auto;
