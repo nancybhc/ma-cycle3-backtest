@@ -103,7 +103,7 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成 5 破 10 的强度来定义尾盘买入策略，并严格执行跌破 MA5、持仓收益触及-8%、最高点下移、早期MFE低于2%等卖出策略。</p>
+        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成 5 破 10 的强度来定义尾盘买入策略，并严格执行跌破 MA5、持仓收益触及-8%、最高价下移、早期MFE低于2%等卖出策略。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -553,10 +553,10 @@
                 <div class="priority-item priority-3">
                   <span>03</span>
                   <div>
-                    <strong>最高点下移条件式止盈</strong>
+                    <strong>最高价下移条件式止盈</strong>
                     <p>持仓收益为正时：</p>
-                    <p>1. 指数处于空或多转空阶段，最高价首次低于前一日先卖半仓，此后连续两天下移清掉剩余半仓。减半后资金池只按剩余半仓占用，仍占一个分组名额。</p>
-                    <p>2. 指数处于多或空转多阶段，第一天不动，连续两天下移后一次性清仓。</p>
+                    <p>1. 指数处于空或多转空阶段，最高价首日下移先卖半仓，次日继续下移或此后出现连续两天下移清掉剩余半仓，减半后资金池只按剩余半仓占用，仍占一个分组名额；</p>
+                    <p>2. 指数处于多或空转多阶段，连续两天下移则一次性清仓。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-3">←</div>
@@ -565,7 +565,7 @@
                   <div><strong>跌破 MA5 清仓</strong><p>收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
                 </div>
               </div>
-              <p class="priority-note">空或多转空阶段，若同日首次最高点下移减半与跌破 MA5 重叠，两半按同一收盘价退出；多或空转多阶段仅在连续两天下移时清仓。若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
+              <p class="priority-note">空或多转空阶段，若同日首次最高价下移减半与跌破 MA5 重叠，两半按同一收盘价退出；多或空转多阶段仅在连续两天下移时清仓。若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
             </div>
           </article>
 
@@ -885,6 +885,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261103-holdings-focus-v1"></script>
+  <script src="assets/app.js?v=20261103-highest-price-wording-v1"></script>
 </body>
 </html>

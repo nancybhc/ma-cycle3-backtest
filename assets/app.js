@@ -2028,7 +2028,7 @@ function renderExitReasonChart() {
       cleanReason.includes("指数多转空")
     ) {
       return cleanReason.includes("最高价首次下移")
-        ? "最高点下移 · AI 硬件强平"
+        ? "最高价下移 · AI 硬件强平"
         : "指数多转空 · AI 硬件强平";
     }
     if (
@@ -2048,18 +2048,18 @@ function renderExitReasonChart() {
         cleanReason.includes("持仓收益≤-8%") ||
         cleanReason.includes("持仓收益触及-8%")
       ) {
-        return "最高点下移 · 剩余半仓 −8% 止损";
+        return "最高价下移 · 剩余半仓 −8% 止损";
       }
       if (cleanReason.includes("同日原卖出规则")) {
-        return "最高点下移 · 同日跌破 MA5 清仓";
+        return "最高价下移 · 同日跌破 MA5 清仓";
       }
       if (cleanReason.includes("次日继续下移")) {
-        return "最高点下移 · 次日下移清仓";
+        return "最高价下移 · 次日下移清仓";
       }
       if (cleanReason.includes("后续最高价连续两天下移")) {
-        return "最高点下移 · 后续下移清仓";
+        return "最高价下移 · 后续下移清仓";
       }
-      return "最高点下移 · 剩余半仓跌破 MA5";
+      return "最高价下移 · 剩余半仓跌破 MA5";
     }
     if (
       cleanReason.includes("持仓收益≤-8%") ||
