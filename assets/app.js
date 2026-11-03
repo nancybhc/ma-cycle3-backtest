@@ -862,7 +862,7 @@ function candidateRowHtml(row, showDailyChange = true) {
           ? "持仓未动"
           : row.isBuy
             ? "买入候选"
-            : signalReasonText(row.reason);
+            : signalReasonText(row.reason, row.priorHighBreak);
   return `
     <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
       <td class="change-first-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>
@@ -897,17 +897,13 @@ function candidateRowHtml(row, showDailyChange = true) {
           : formatPct(row.maePct, true)
       }</td>
       <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
-      ${
-        showDailyChange
-          ? `<td class="prior-high-col">${
-              row.priorHighBreak === true
-                ? '<strong class="up">是</strong>'
-                : row.priorHighBreak === false
-                  ? '<strong class="flat">否</strong>'
-                  : '<span class="flat">—</span>'
-            }</td>`
-          : ""
-      }
+      <td class="prior-high-col">${
+        row.priorHighBreak === true
+          ? '<strong class="up">是</strong>'
+          : row.priorHighBreak === false
+            ? '<strong class="flat">否</strong>'
+            : '<span class="flat">—</span>'
+      }</td>
       <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
       <td>${projectedMa10DirectionHtml(row)}</td>
       <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
@@ -940,7 +936,7 @@ function renderIntradayJumpTable() {
   if (!rows.length) {
     body.innerHTML = `
       <tr>
-        <td colspan="17" class="empty-cell">暂无盘中直接跳级转多信号</td>
+        <td colspan="18" class="empty-cell">暂无盘中直接跳级转多信号</td>
       </tr>`;
     return;
   }
@@ -979,10 +975,14 @@ function isOnlyGroupCapReason(value) {
   );
 }
 
-function signalReasonText(value) {
-  return String(value || "")
+function signalReasonText(value, priorHighBreak) {
+  const reason = String(value || "")
     .replace(/尾盘涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
     .replace(/(\d+(?:\.\d+)?)pp/g, "$1%");
+  if (priorHighBreak !== false || reason.includes("最高价未超前两日")) {
+    return reason;
+  }
+  return reason ? `最高价未超前两日；${reason}` : "最高价未超前两日";
 }
 
 function signalStatusHtml(value) {
@@ -2277,7 +2277,7 @@ function openSignal(code, scope = "changes") {
           : signal.changeType === "hold"
             ? "hold"
             : "skip"
-    }">${escapeHtml(signalReasonText(signal.reason))}</span>
+    }">${escapeHtml(signalReasonText(signal.reason, signal.priorHighBreak))}</span>
     <span class="tag status-badge">${escapeHtml(signal.group)}</span>`;
   const positionReturn = holdingReturnPct(signal);
   const positionMetrics =
