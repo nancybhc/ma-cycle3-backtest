@@ -1358,6 +1358,12 @@ function applyTradeFilters() {
   populateTradeTable();
 }
 
+function tradeReasonText(value) {
+  return String(value || "—")
+    .replace(/持仓收益[>＞]0%(?:且)?/g, "")
+    .trim() || "—";
+}
+
 function populateTradeTable() {
   const total = state.filteredTrades.length;
   const pageCount = Math.max(1, Math.ceil(total / state.pageSize));
@@ -1402,7 +1408,7 @@ function populateTradeTable() {
                   : `<strong style="font-weight:600">${formatPct(trade.returnPct, true)}</strong>`
               }
             </td>
-            <td class="trade-reason">${escapeHtml(trade.reason || "—")}</td>
+            <td class="trade-reason">${escapeHtml(tradeReasonText(trade.reason))}</td>
           </tr>`;
       })
       .join("");
@@ -2518,7 +2524,7 @@ function exportFilteredTrades() {
       row.price,
       row.weightPct,
       row.returnPct,
-      row.reason,
+      tradeReasonText(row.reason),
     ];
     lines.push(values.map(csvCell).join(","));
   });
