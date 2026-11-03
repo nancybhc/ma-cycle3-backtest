@@ -1634,6 +1634,22 @@ main {
     white-space: nowrap;
 }
 
+.candidate-table td.prior-high-col,
+.candidate-table td.prior-high-col strong {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.candidate-table td.projection-col .ma-cell strong,
+.candidate-table td.projection-col .ma-cell span {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
 .candidate-table td.group-ratio-col {
     color: var(--text-soft);
     font-family: var(--mono);
