@@ -2006,7 +2006,10 @@ function renderExitReasonChart() {
         : "指数多转空 · AI 硬件强平";
     }
     if (reason.includes("最高价首次下移")) {
-      if (reason.includes("持仓收益≤-8%")) {
+      if (
+        reason.includes("持仓收益≤-8%") ||
+        reason.includes("持仓收益触及-8%")
+      ) {
         return "最高点下移 · 剩余半仓 −8% 止损";
       }
       if (reason.includes("同日原卖出规则")) {
@@ -2020,7 +2023,12 @@ function renderExitReasonChart() {
       }
       return "最高点下移 · 剩余半仓跌破 MA5";
     }
-    if (reason.includes("持仓收益≤-8%")) return "−8% 强制止损";
+    if (
+      reason.includes("持仓收益≤-8%") ||
+      reason.includes("持仓收益触及-8%")
+    ) {
+      return "−8% 强制止损";
+    }
     if (reason === "跌破MA5") return "跌破 MA5";
     return reason;
   };
