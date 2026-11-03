@@ -18,6 +18,8 @@
   --green-soft: rgba(32, 201, 140, 0.12);
   --amber: #f6b94b;
   --amber-soft: rgba(246, 185, 75, 0.12);
+  --pink: #f472b6;
+  --pink-soft: rgba(244, 114, 182, 0.12);
   --blue: #5a9bff;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
   --radius: 18px;
@@ -908,8 +910,8 @@ main {
   color: var(--amber);
 }
 
-.legend-cyan {
-  color: var(--cyan);
+.legend-pink {
+  color: var(--pink);
 }
 
 .panel {
@@ -1700,15 +1702,15 @@ main {
 }
 
 .candidate-table tr.group-cap-row td {
-  background: rgba(72, 225, 209, 0.055);
+  background: rgba(244, 114, 182, 0.06);
 }
 
 .candidate-table tr.group-cap-row .sticky-col {
-  background: #0a202b;
+  background: #251827;
 }
 
 .candidate-table tr.group-cap-row:hover .sticky-col {
-  background: #0e2b36;
+  background: #30202f;
 }
 
 .candidate-table tr.sell-row td {
@@ -1816,9 +1818,9 @@ main {
 }
 
 .status-badge.group-cap {
-  border-color: rgba(72, 225, 209, 0.32);
-  background: var(--cyan-soft);
-  color: var(--cyan);
+  border-color: rgba(244, 114, 182, 0.34);
+  background: var(--pink-soft);
+  color: var(--pink);
 }
 
 .status-badge.sell {
@@ -1870,7 +1872,7 @@ main {
 
 .candidate-table tr.group-cap-row .code-cell,
 .candidate-table tr.group-cap-row .name-cell strong {
-    color: var(--cyan) !important;
+    color: var(--pink) !important;
 }
 
 .candidate-table tr.limit-up-row .code-cell,
@@ -3508,6 +3510,8 @@ html[data-theme="light"] {
   --green-soft: rgba(17, 139, 100, 0.09);
   --amber: #b77700;
   --amber-soft: rgba(183, 119, 0, 0.10);
+  --pink: #c13b78;
+  --pink-soft: rgba(193, 59, 120, 0.09);
   --blue: #326ec7;
   --shadow: 0 22px 60px rgba(36, 61, 83, 0.12);
 }
@@ -3669,12 +3673,12 @@ html[data-theme="light"] .candidate-table tr.limit-up-row:hover .sticky-col {
 }
 
 html[data-theme="light"] .candidate-table tr.group-cap-row td {
-  background: rgba(11, 143, 134, 0.055);
+  background: rgba(193, 59, 120, 0.05);
 }
 
 html[data-theme="light"] .candidate-table tr.group-cap-row .sticky-col,
 html[data-theme="light"] .candidate-table tr.group-cap-row:hover .sticky-col {
-  background: #f0faf8;
+  background: #fff5fa;
 }
 
 html[data-theme="light"] .candidate-table tr.sell-row td {
