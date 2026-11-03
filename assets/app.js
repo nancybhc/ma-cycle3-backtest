@@ -1746,22 +1746,13 @@ function renderDistributionChart() {
       axisLabel: {
         color: COLOR.dim,
         fontSize: compact ? 6.2 : 7,
-        lineHeight: compact ? 7 : 10,
+        lineHeight: compact ? 7 : 12,
         interval: 0,
         rotate: 0,
         hideOverlap: false,
-        formatter: (value) =>
-          String(value).replace("~", "\n{wave|≀}\n"),
-        rich: {
-          wave: {
-            align: "center",
-            color: COLOR.dim,
-            fontSize: compact ? 8 : 9,
-            fontFamily: FONT_MONO,
-            fontWeight: 400,
-            lineHeight: compact ? 8 : 10,
-          },
-        },
+        formatter: compact
+          ? (value) => String(value).replace("~", "\n~\n")
+          : undefined,
       },
     },
     yAxis: {
