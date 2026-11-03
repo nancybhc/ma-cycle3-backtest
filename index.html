@@ -3,10 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07111d">
+  <meta name="theme-color" id="themeColorMeta" content="#07111d">
+  <script>
+    try {
+      if (localStorage.getItem("ma-cycle3-theme") === "light") {
+        document.documentElement.dataset.theme = "light";
+      }
+    } catch (_) {}
+  </script>
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/app.css?v=20261102-change-first-badge-fit">
+<link rel="stylesheet" href="assets/app.css?v=20261103-theme-toggle-v2">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -38,6 +45,22 @@
         <span class="status-dot"></span>
         <span id="topDataDate">数据装载中</span>
       </div>
+      <button
+        class="theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="切换到浅色主题"
+        aria-pressed="false"
+      >
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+        </svg>
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"></path>
+        </svg>
+        <span class="theme-toggle-label" id="themeToggleLabel">浅色</span>
+      </button>
       <button
         class="mobile-nav-toggle"
         id="mobileNavToggle"
@@ -834,6 +857,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261102-position-order-v1"></script>
+  <script src="assets/app.js?v=20261103-theme-toggle-v1"></script>
 </body>
 </html>

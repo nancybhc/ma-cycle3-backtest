@@ -17,7 +17,7 @@ const state = {
   charts: {},
 };
 
-const COLOR = {
+const DARK_CHART_COLORS = {
   text: "#e8f2f7",
   soft: "#9cb1c1",
   dim: "#627b8e",
@@ -29,7 +29,36 @@ const COLOR = {
   grid: "rgba(131,173,207,0.08)",
   axis: "rgba(131,173,207,0.18)",
   panel: "#0a1726",
+  tooltipBg: "rgba(5,15,24,0.96)",
+  tooltipBorder: "rgba(131,173,207,0.22)",
+  tooltipShadow: "0 14px 40px rgba(0,0,0,.35)",
+  zoomBg: "rgba(131,173,207,0.04)",
+  zoomFill: "rgba(72,225,209,0.08)",
+  zoomLine: "rgba(72,225,209,0.3)",
+  zoomArea: "rgba(72,225,209,0.06)",
 };
+const LIGHT_CHART_COLORS = {
+  text: "#162638",
+  soft: "#50667a",
+  dim: "#7b8b99",
+  cyan: "#0c8f86",
+  red: "#d63d50",
+  green: "#118b64",
+  amber: "#b77700",
+  blue: "#326ec7",
+  grid: "rgba(40,69,94,0.10)",
+  axis: "rgba(40,69,94,0.20)",
+  panel: "#ffffff",
+  tooltipBg: "rgba(255,255,255,0.98)",
+  tooltipBorder: "rgba(40,69,94,0.18)",
+  tooltipShadow: "0 14px 40px rgba(28,52,76,.16)",
+  zoomBg: "rgba(40,69,94,0.05)",
+  zoomFill: "rgba(12,143,134,0.09)",
+  zoomLine: "rgba(12,143,134,0.3)",
+  zoomArea: "rgba(12,143,134,0.07)",
+};
+const COLOR = { ...DARK_CHART_COLORS };
+const THEME_STORAGE_KEY = "ma-cycle3-theme";
 
 const FONT_MONO = '"Cascadia Code","Consolas",monospace';
 const FONT_SANS = '"Microsoft YaHei UI","PingFang SC",sans-serif';
@@ -58,6 +87,7 @@ const AI_HARDWARE_GROUPS = new Set([
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+  setupThemeToggle();
   try {
     if (location.protocol === "file:") {
       throw new Error("请通过本地网址打开看板，不能直接双击 index.html。");
@@ -1174,6 +1204,72 @@ function bindInteractions() {
   });
 }
 
+function currentTheme() {
+  return document.documentElement.dataset.theme === "light"
+    ? "light"
+    : "dark";
+}
+
+function setupThemeToggle() {
+  syncChartTheme();
+  syncThemeToggle();
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const theme = currentTheme() === "light" ? "dark" : "light";
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (_) {
+      // Theme still applies for this page view when storage is unavailable.
+    }
+    syncThemeToggle();
+    syncChartTheme();
+    rerenderChartsForTheme();
+  });
+}
+
+function syncThemeToggle() {
+  const theme = currentTheme();
+  const nextTheme = theme === "light" ? "dark" : "light";
+  const button = document.getElementById("themeToggle");
+  const label = document.getElementById("themeToggleLabel");
+  const meta = document.getElementById("themeColorMeta");
+  button.setAttribute(
+    "aria-label",
+    nextTheme === "light" ? "切换到浅色主题" : "切换到深色主题"
+  );
+  button.setAttribute("aria-pressed", String(theme === "light"));
+  label.textContent = nextTheme === "light" ? "浅色" : "深色";
+  meta.setAttribute(
+    "content",
+    theme === "light" ? "#f3f7fa" : "#07111d"
+  );
+}
+
+function syncChartTheme() {
+  Object.assign(
+    COLOR,
+    currentTheme() === "light" ? LIGHT_CHART_COLORS : DARK_CHART_COLORS
+  );
+}
+
+function rerenderChartsForTheme() {
+  if (!state.data) return;
+  const openDrawer = document.getElementById("drawer").classList.contains("open");
+  Object.values(state.charts).forEach((chart) => chart.dispose());
+  state.charts = {};
+  renderAllCharts();
+  if (openDrawer) {
+    const collection =
+      state.drawerType === "trade"
+        ? state.data.trades
+        : state.data.signals;
+    const item = (collection || []).find(
+      (row) => row.id === state.drawerId || row.code === state.drawerId
+    );
+    if (item) window.setTimeout(() => renderTradeChart(item), 40);
+  }
+}
+
 function setMobileNavigation(open) {
   const panel = document.getElementById("mobileNavPanel");
   const backdrop = document.getElementById("mobileNavBackdrop");
@@ -1335,11 +1431,11 @@ function chartBase() {
     animationEasing: "cubicOut",
     textStyle: { fontFamily: FONT_SANS },
     tooltip: {
-      backgroundColor: "rgba(5,15,24,0.96)",
-      borderColor: "rgba(131,173,207,0.22)",
+      backgroundColor: COLOR.tooltipBg,
+      borderColor: COLOR.tooltipBorder,
       borderWidth: 1,
       textStyle: { color: COLOR.text, fontSize: 10, fontFamily: FONT_SANS },
-      extraCssText: "box-shadow:0 14px 40px rgba(0,0,0,.35);border-radius:9px;",
+      extraCssText: `box-shadow:${COLOR.tooltipShadow};border-radius:9px;`,
     },
   };
 }
@@ -1404,13 +1500,13 @@ function renderEquityChart() {
         height: 16,
         bottom: 14,
         borderColor: "transparent",
-        backgroundColor: "rgba(131,173,207,0.04)",
-        fillerColor: "rgba(72,225,209,0.08)",
+        backgroundColor: COLOR.zoomBg,
+        fillerColor: COLOR.zoomFill,
         handleStyle: { color: COLOR.cyan, borderColor: COLOR.cyan },
         textStyle: { color: COLOR.dim, fontSize: 8 },
         dataBackground: {
-          lineStyle: { color: "rgba(72,225,209,0.3)" },
-          areaStyle: { color: "rgba(72,225,209,0.06)" },
+          lineStyle: { color: COLOR.zoomLine },
+          areaStyle: { color: COLOR.zoomArea },
         },
       },
     ],
