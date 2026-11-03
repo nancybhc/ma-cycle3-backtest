@@ -897,6 +897,17 @@ function candidateRowHtml(row, showDailyChange = true) {
           : formatPct(row.maePct, true)
       }</td>
       <td><span class="trend-badge">${escapeHtml(row.trendLabel || row.trend || "—")}</span></td>
+      ${
+        showDailyChange
+          ? `<td class="prior-high-col">${
+              row.priorHighBreak === true
+                ? '<strong class="up">是</strong>'
+                : row.priorHighBreak === false
+                  ? '<strong class="flat">否</strong>'
+                  : '<span class="flat">—</span>'
+            }</td>`
+          : ""
+      }
       <td>${maDirectionHtml(row.ma10Dir, row.ma10Run)}</td>
       <td>${projectedMa10DirectionHtml(row)}</td>
       <td>${levelHtml(row.ma10Turn, row.ma10TurnPct)}</td>
@@ -971,7 +982,7 @@ function isOnlyGroupCapReason(value) {
 function signalReasonText(value) {
   return String(value || "")
     .replace(/尾盘涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
-    .replace(/1\.5pp/g, "1.5%");
+    .replace(/(\d+(?:\.\d+)?)pp/g, "$1%");
 }
 
 function signalStatusHtml(value) {
@@ -1155,7 +1166,7 @@ function projectedMa10DirectionHtml(row) {
 }
 
 function gapProjectionHtml(projectedGap, gapDelta) {
-  const pass = Number(gapDelta) > 1.5;
+  const pass = Number(gapDelta) > 1.0;
   return `
     <span class="ma-cell">
       <strong class="${pctClass(projectedGap)}">${formatPct(projectedGap, true)}</strong>

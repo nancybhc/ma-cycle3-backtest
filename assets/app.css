@@ -1566,7 +1566,8 @@ main {
 
 .candidate-table.changes-view .projection-col,
 .candidate-table.changes-view .score-col,
-.candidate-table.changes-view .first-selected-col {
+.candidate-table.changes-view .first-selected-col,
+.candidate-table.changes-view .prior-high-col {
   display: none;
 }
 
@@ -1626,6 +1627,11 @@ main {
 
 .candidate-table .group-ratio-col {
     min-width: 92px;
+}
+
+.candidate-table .prior-high-col {
+    min-width: 84px;
+    white-space: nowrap;
 }
 
 .candidate-table td.group-ratio-col {
@@ -2459,6 +2465,12 @@ main {
 
 .buy-rule-card:last-child {
   grid-column: 1 / -1;
+  border-bottom: 0;
+}
+
+.buy-rule-list .buy-rule-card:nth-child(5),
+.buy-rule-list .buy-rule-card:nth-child(6) {
+  grid-column: auto;
   border-bottom: 0;
 }
 
