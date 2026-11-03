@@ -1166,7 +1166,7 @@ function projectedMa10DirectionHtml(row) {
 }
 
 function gapProjectionHtml(projectedGap, gapDelta) {
-  const pass = Number(gapDelta) > 1.0;
+  const pass = Number(gapDelta) >= 1.0;
   return `
     <span class="ma-cell">
       <strong class="${pctClass(projectedGap)}">${formatPct(projectedGap, true)}</strong>
