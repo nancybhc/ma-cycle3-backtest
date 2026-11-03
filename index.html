@@ -1,14 +1,18 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" id="themeColorMeta" content="#07111d">
+  <meta name="theme-color" id="themeColorMeta" content="#f3f7fa">
   <script>
     try {
-      if (localStorage.getItem("ma-cycle3-theme") === "light") {
-        document.documentElement.dataset.theme = "light";
-      }
+      const savedTheme = localStorage.getItem("ma-cycle3-theme");
+      const theme = savedTheme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = theme;
+      document.getElementById("themeColorMeta").setAttribute(
+        "content",
+        theme === "light" ? "#f3f7fa" : "#07111d"
+      );
     } catch (_) {}
   </script>
   <title>5破10推演量化策略 · 回测面板</title>
