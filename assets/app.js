@@ -15,6 +15,7 @@ const state = {
   drawerType: "",
   drawerId: "",
   charts: {},
+  formalCloseReloadCheckedAt: 0,
 };
 
 const DARK_CHART_COLORS = {
@@ -357,6 +358,10 @@ function applyGroupRatios(rows, ratios) {
 
 function applyLiveSignals(live) {
   const useLive = shouldUseLiveSignals(live);
+  const liveHoldingPreview =
+    useLive && Array.isArray(live?.holdingPreview)
+      ? live.holdingPreview
+      : [];
   const sessionDailyChanges = dailyChangesForSession(
     state.staticDailyChanges
   );
@@ -384,11 +389,13 @@ function applyLiveSignals(live) {
     displayRatios
   );
   state.data.dailyChanges = applyGroupRatios(
-    sessionDailyChanges,
+    liveHoldingPreview.length ? liveHoldingPreview : sessionDailyChanges,
     displayRatios
   );
   state.data.currentHoldings = applyGroupRatios(
-    state.staticCurrentHoldings || [],
+    liveHoldingPreview.length
+      ? liveHoldingPreview.filter((row) => row.isHolding)
+      : state.staticCurrentHoldings || [],
     displayRatios
   );
   updateMarketSyncDetail(live);
@@ -399,6 +406,9 @@ function applyLiveSignals(live) {
 async function refreshLiveSignals() {
   const live = await fetchLiveSignals();
   if (!live) return;
+  if (!shouldUseLiveSignals(live)) {
+    await reloadAfterOfficialCloseIfReady();
+  }
   if (
     state.liveApplied &&
     live.marketDate === state.liveData?.marketDate &&
@@ -445,6 +455,39 @@ async function refreshLiveSignals() {
   if (wasApplied || state.liveApplied || focusChanged) {
     populateCandidates();
     populatePositionRules();
+  }
+}
+
+async function reloadAfterOfficialCloseIfReady() {
+  const clock = shanghaiClock();
+  if (
+    ["Sat", "Sun"].includes(clock.weekday) ||
+    clock.minuteOfDay < 15 * 60 + 5 ||
+    Date.now() - state.formalCloseReloadCheckedAt < 30_000
+  ) {
+    return;
+  }
+  state.formalCloseReloadCheckedAt = Date.now();
+  try {
+    const official = await fetchJsonWithRetry(
+      `data/backtest.json?ts=${Date.now()}`,
+      2
+    );
+    const generatedAt = String(official?.meta?.generatedAt || "");
+    const generatedDate = generatedAt.slice(0, 10);
+    const generatedClock = generatedAt.slice(11, 16);
+    const currentGeneratedAt = String(
+      state.data?.meta?.generatedAt || ""
+    );
+    if (
+      generatedDate === clock.date &&
+      generatedClock >= "15:05" &&
+      generatedAt !== currentGeneratedAt
+    ) {
+      window.location.reload();
+    }
+  } catch {
+    // Keep the last intraday preview until the 15:05 official data is ready.
   }
 }
 
