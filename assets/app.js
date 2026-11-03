@@ -2040,39 +2040,57 @@ function renderExitReasonChart() {
     return COLOR.dim;
   };
   const compactLabel = (reason) => {
-    if (reason.includes("低开")) return "−8% 强制止损（低开）";
-    if (reason.includes("MFE")) return "前2日 MFE<2% 提前退出";
-    if (reason.includes("AI硬件") && reason.includes("指数多转空")) {
-      return reason.includes("最高价首次下移")
+    const cleanReason = String(reason)
+      .replace("持仓收益>0%且", "")
+      .replace("持仓收益＞0%且", "");
+    if (cleanReason.includes("低开")) return "−8% 强制止损（低开）";
+    if (cleanReason.includes("MFE")) return "前2日 MFE<2% 提前退出";
+    if (
+      cleanReason.includes("AI硬件") &&
+      cleanReason.includes("指数多转空")
+    ) {
+      return cleanReason.includes("最高价首次下移")
         ? "最高点下移 · AI 硬件强平"
         : "指数多转空 · AI 硬件强平";
     }
-    if (reason.includes("最高价首次下移")) {
+    if (
+      cleanReason.includes("指数空转多") &&
+      cleanReason.includes("最高价连续2日下移")
+    ) {
+      return "空转多 · 连续两日下移清仓";
+    }
+    if (
+      cleanReason.includes("指数多") &&
+      cleanReason.includes("最高价连续2日下移")
+    ) {
+      return "多 · 连续两日下移清仓";
+    }
+    if (cleanReason.includes("最高价首次下移")) {
       if (
-        reason.includes("持仓收益≤-8%") ||
-        reason.includes("持仓收益触及-8%")
+        cleanReason.includes("持仓收益≤-8%") ||
+        cleanReason.includes("持仓收益触及-8%")
       ) {
         return "最高点下移 · 剩余半仓 −8% 止损";
       }
-      if (reason.includes("同日原卖出规则")) {
+      if (cleanReason.includes("同日原卖出规则")) {
         return "最高点下移 · 同日跌破 MA5 清仓";
       }
-      if (reason.includes("次日继续下移")) {
+      if (cleanReason.includes("次日继续下移")) {
         return "最高点下移 · 次日下移清仓";
       }
-      if (reason.includes("后续最高价连续两天下移")) {
+      if (cleanReason.includes("后续最高价连续两天下移")) {
         return "最高点下移 · 后续下移清仓";
       }
       return "最高点下移 · 剩余半仓跌破 MA5";
     }
     if (
-      reason.includes("持仓收益≤-8%") ||
-      reason.includes("持仓收益触及-8%")
+      cleanReason.includes("持仓收益≤-8%") ||
+      cleanReason.includes("持仓收益触及-8%")
     ) {
       return "−8% 强制止损";
     }
-    if (reason === "跌破MA5") return "跌破 MA5";
-    return reason;
+    if (cleanReason === "跌破MA5") return "跌破 MA5";
+    return cleanReason;
   };
   const compact = chart.getWidth() < 720;
   const chartHeight = Math.max(
