@@ -65,14 +65,14 @@ const FONT_MONO = '"Cascadia Code","Consolas",monospace';
 const FONT_SANS = '"Microsoft YaHei UI","PingFang SC",sans-serif';
 const MAX_POSITIONS_PER_GROUP = 2;
 const POSITION_STAGE_TARGETS = {
-  "空": 20,
+  "空": 30,
   "空转多1": 30,
   "空转多2": 50,
   "空转多3": 70,
   "多": 80,
-  "多转空1": 60,
-  "多转空2": 30,
-  "多转空3": 20,
+  "多转空1": 0,
+  "多转空2": 0,
+  "多转空3": 0,
 };
 const AI_HARDWARE_GROUPS = new Set([
   "PCB",
@@ -729,7 +729,7 @@ function populatePositionRules() {
         currentNames: [],
         candidates: new Map(),
         fundCap: AI_HARDWARE_GROUPS.has(key)
-          ? Number(representative.aiTargetPct || 20)
+          ? Number(representative.aiTargetPct || 30)
           : 20,
         candidateCount: 0,
         stageKey,
