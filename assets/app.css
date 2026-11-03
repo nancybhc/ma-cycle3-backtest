@@ -2077,6 +2077,13 @@ main {
   line-height: 1.55;
 }
 
+.trade-table td.trade-reason {
+  font-size: 9px;
+  line-height: 1.5;
+  white-space: normal;
+  -webkit-text-size-adjust: 100%;
+}
+
 .trade-date {
   display: flex;
   flex-direction: column;
@@ -3236,6 +3243,12 @@ main {
 }
 
 @media (max-width: 640px) {
+  .trade-table td.trade-reason {
+    min-width: 180px;
+    font-size: 8px;
+    line-height: 1.45;
+  }
+
   .topbar {
     padding: 0 12px;
   }

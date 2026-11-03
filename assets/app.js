@@ -1348,7 +1348,7 @@ function populateTradeTable() {
                   : `<strong style="font-weight:600">${formatPct(trade.returnPct, true)}</strong>`
               }
             </td>
-            <td>${escapeHtml(trade.reason || "—")}</td>
+            <td class="trade-reason">${escapeHtml(trade.reason || "—")}</td>
           </tr>`;
       })
       .join("");
