@@ -3232,6 +3232,47 @@ main {
 }
 
 @media (max-width: 640px) {
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-copy {
+    min-width: 0;
+  }
+
+  .brand-copy strong {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .brand-copy small {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+  .top-status {
+    gap: 6px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
   .theme-toggle {
     width: 36px;
     padding: 0;

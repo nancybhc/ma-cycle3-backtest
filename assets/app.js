@@ -260,27 +260,27 @@ function marketDisplayState(clock = shanghaiClock()) {
   if (weekend) {
     return {
       date: previousWeekday(clock.date),
-      label: "收盘行情",
+      label: "收盘",
       intraday: false,
     };
   }
   if (clock.minuteOfDay < 9 * 60 + 30) {
     return {
       date: previousWeekday(clock.date),
-      label: "收盘行情",
+      label: "收盘",
       intraday: false,
     };
   }
   if (clock.minuteOfDay < 15 * 60) {
     return {
       date: clock.date,
-      label: "盘中行情",
+      label: "盘中",
       intraday: true,
     };
   }
   return {
     date: clock.date,
-    label: "收盘行情",
+    label: "收盘",
     intraday: false,
   };
 }
@@ -547,7 +547,7 @@ async function controlMonitor(action) {
 
 function populateOverview() {
   const { meta, funnel, portfolio, stats } = state.data;
-  setText("topDataDate", `${meta.dataEnd} 收盘行情`);
+  setText("topDataDate", `${meta.dataEnd} 收盘`);
   setText("heroRange", `${meta.start} → ${meta.end}`);
   setText("heroUpdated", meta.latestUpdateAt || meta.runTime);
   setText("heroSamples", `${formatInt(stats.all.count)} 笔`);
