@@ -1180,6 +1180,12 @@ main {
   background: transparent;
 }
 
+.position-management-capsule .table-scroll {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+}
+
 .allocation-summary-capsule {
   position: relative;
   display: grid;
