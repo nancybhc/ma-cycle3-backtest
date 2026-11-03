@@ -2075,11 +2075,17 @@ function renderExitReasonChart() {
     return reason;
   };
   const compact = chart.getWidth() < 720;
+  const chartHeight = Math.max(
+    compact ? 360 : 340,
+    ordered.length * (compact ? 27 : 24) + 44
+  );
+  chart.getDom().style.height = `${chartHeight}px`;
+  chart.resize();
   chart.setOption({
     ...chartBase(),
     grid: {
-      left: compact ? 190 : 245,
-      right: compact ? 105 : 140,
+      left: compact ? 175 : 265,
+      right: compact ? 100 : 140,
       top: 18,
       bottom: 24,
     },
@@ -2098,7 +2104,13 @@ function renderExitReasonChart() {
     },
     xAxis: {
       type: "value",
-      axisLabel: { color: COLOR.dim, fontSize: 8 },
+      minInterval: 1,
+      splitNumber: compact ? 3 : 4,
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 8,
+        hideOverlap: true,
+      },
       splitLine: { lineStyle: { color: COLOR.grid } },
       axisLine: { show: false },
     },
@@ -2110,11 +2122,12 @@ function renderExitReasonChart() {
       axisLabel: {
         color: COLOR.soft,
         fontSize: 9,
-        width: compact ? 165 : 220,
-        overflow: "break",
+        width: compact ? 150 : 250,
+        overflow: "truncate",
         lineHeight: 12,
         align: "left",
-        margin: compact ? 175 : 225,
+        interval: 0,
+        margin: compact ? 160 : 255,
         formatter: compactLabel,
       },
     },
