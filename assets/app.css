@@ -2072,6 +2072,15 @@ main {
   padding: 10px 12px;
 }
 
+.trade-panel .table-scroll {
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+}
+
+.trade-panel .trade-table th {
+  border-top: 0;
+}
+
 .trade-table td {
   font-size: 9px;
   line-height: 1.55;
