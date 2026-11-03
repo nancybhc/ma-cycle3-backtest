@@ -7,7 +7,6 @@ const state = {
   liveApplied: false,
   monitorStatus: null,
   candidateScope: "changes",
-  candidatePhase: "",
   trades: [],
   filteredTrades: [],
   page: 1,
@@ -313,28 +312,6 @@ function shouldUseLiveSignals(live) {
   return clock.date === live.marketDate;
 }
 
-function isIntradayFocusWindow(clock = shanghaiClock()) {
-  return (
-    !["Sat", "Sun"].includes(clock.weekday) &&
-    clock.minuteOfDay >= 9 * 60 + 15 &&
-    clock.minuteOfDay < 15 * 60
-  );
-}
-
-function syncCandidateFocusPhase() {
-  const phase = isIntradayFocusWindow() ? "intraday" : "closed";
-  if (state.candidatePhase === phase) return false;
-  state.candidatePhase = phase;
-  state.candidateScope = phase === "intraday" ? "all" : "changes";
-  document.querySelectorAll("#candidateScope button").forEach((button) => {
-    button.classList.toggle(
-      "active",
-      button.dataset.scope === state.candidateScope
-    );
-  });
-  return true;
-}
-
 function groupRatioMapFromRows(rows, explicitRatios = {}) {
   const ratios = {};
   (rows || []).forEach((row) => {
@@ -399,7 +376,6 @@ function applyLiveSignals(live) {
     displayRatios
   );
   updateMarketSyncDetail(live);
-  syncCandidateFocusPhase();
   return useLive;
 }
 
@@ -441,18 +417,14 @@ async function refreshLiveSignals() {
       state.data.currentHoldings,
       displayRatios
     );
-    const focusChanged = syncCandidateFocusPhase();
     renderIntradayJumpTable();
     updateCandidateRunHeader();
-    if (focusChanged) populateCandidates();
     return;
   }
   const wasApplied = state.liveApplied;
-  const previousScope = state.candidateScope;
   applyLiveSignals(live);
-  const focusChanged = state.candidateScope !== previousScope;
   updateCandidateRunHeader();
-  if (wasApplied || state.liveApplied || focusChanged) {
+  if (wasApplied || state.liveApplied) {
     populateCandidates();
     populatePositionRules();
   }
