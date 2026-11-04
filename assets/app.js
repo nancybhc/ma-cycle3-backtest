@@ -79,8 +79,8 @@ const AI_HARDWARE_GROUPS = new Set([
   "光上游",
   "半导体上游",
   "半导体芯片",
+  "半导体设备",
   "MLCC",
-  "算力",
   "存储",
 ]);
 const SIGNAL_GROUP_ORDER = new Map(
@@ -93,14 +93,17 @@ const SIGNAL_GROUP_ORDER = new Map(
     "半导体上游",
     "MLCC",
     "存储",
+    "AIDC",
     "散热液冷",
     "算力",
     "AI应用",
     "机器人",
     "药",
     "互金证券",
+    "固态锂电",
     "电力",
     "电网设备",
+    "储能",
     "商业航天",
   ].map((group, index) => [group, index])
 );
