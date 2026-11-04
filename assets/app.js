@@ -997,9 +997,13 @@ function isOnlyGroupCapReason(value) {
 }
 
 function signalReasonText(value, priorHighBreak) {
-  const reason = String(value || "")
+  let reason = String(value || "")
     .replace(/尾盘涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
-    .replace(/(\d+(?:\.\d+)?)pp/g, "$1%");
+    .replace(/(\d+(?:\.\d+)?)pp/g, "$1%")
+    .replace(
+      /买入日最高价未突破前2日高点(?:超过0(?:\.0+)?%)?/g,
+      "最高价未超前两日"
+    );
   if (priorHighBreak !== false || reason.includes("最高价未超前两日")) {
     return reason;
   }
