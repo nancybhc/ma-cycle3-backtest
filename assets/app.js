@@ -83,6 +83,27 @@ const AI_HARDWARE_GROUPS = new Set([
   "算力",
   "存储",
 ]);
+const SIGNAL_GROUP_ORDER = new Map(
+  [
+    "PCB",
+    "CPO",
+    "光上游",
+    "半导体芯片",
+    "半导体设备",
+    "半导体上游",
+    "MLCC",
+    "存储",
+    "散热液冷",
+    "算力",
+    "AI应用",
+    "机器人",
+    "药",
+    "互金证券",
+    "电力",
+    "电网设备",
+    "商业航天",
+  ].map((group, index) => [group, index])
+);
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -330,6 +351,30 @@ function applyGroupRatios(rows, ratios) {
     return Number.isFinite(ratio)
       ? { ...row, groupManyRatioPct: ratio }
       : { ...row };
+  });
+}
+
+function sortSignalRows(rows) {
+  return [...(rows || [])].sort((a, b) => {
+    const ratioA = Number(a.groupManyRatioPct);
+    const ratioB = Number(b.groupManyRatioPct);
+    const safeRatioA = Number.isFinite(ratioA) ? ratioA : Number.NEGATIVE_INFINITY;
+    const safeRatioB = Number.isFinite(ratioB) ? ratioB : Number.NEGATIVE_INFINITY;
+    if (safeRatioA !== safeRatioB) return safeRatioB - safeRatioA;
+
+    const groupA = String(a.group || "");
+    const groupB = String(b.group || "");
+    const rankA = SIGNAL_GROUP_ORDER.get(groupA) ?? Number.MAX_SAFE_INTEGER;
+    const rankB = SIGNAL_GROUP_ORDER.get(groupB) ?? Number.MAX_SAFE_INTEGER;
+    if (rankA !== rankB) return rankA - rankB;
+    if (groupA !== groupB) return groupA.localeCompare(groupB, "zh-CN");
+
+    const scoreA = Number(a.score);
+    const scoreB = Number(b.score);
+    const safeScoreA = Number.isFinite(scoreA) ? scoreA : Number.NEGATIVE_INFINITY;
+    const safeScoreB = Number.isFinite(scoreB) ? scoreB : Number.NEGATIVE_INFINITY;
+    if (safeScoreA !== safeScoreB) return safeScoreB - safeScoreA;
+    return String(a.code || "").localeCompare(String(b.code || ""));
   });
 }
 
@@ -777,10 +822,11 @@ function renderCandidateTable() {
   const allSignals = state.data.signals || [];
   const holdings = state.data.currentHoldings || [];
   const dailyChanges = state.data.dailyChanges || holdings;
-  const rows =
+  const rows = sortSignalRows(
     state.candidateScope === "changes"
       ? dailyChanges
-      : allSignals;
+      : allSignals
+  );
   document
     .getElementById("candidateTable")
     .classList.toggle("changes-view", state.candidateScope === "changes");
@@ -903,7 +949,7 @@ function candidateRowHtml(row, showDailyChange = true) {
 }
 
 function renderIntradayJumpTable() {
-  const rows = state.data.intradayJumps || [];
+  const rows = sortSignalRows(state.data.intradayJumps || []);
   const body = document.getElementById("intradayJumpTableBody");
   if (!rows.length) {
     body.innerHTML = `
