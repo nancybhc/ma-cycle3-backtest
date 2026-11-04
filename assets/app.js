@@ -94,7 +94,6 @@ const SIGNAL_GROUP_ORDER = new Map(
     "MLCC",
     "存储",
     "AIDC",
-    "散热液冷",
     "算力",
     "AI应用",
     "机器人",
