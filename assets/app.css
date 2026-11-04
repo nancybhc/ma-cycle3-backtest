@@ -3422,6 +3422,14 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .buy-rule-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .buy-rule-pair .buy-rule-card:first-child {
+    border-bottom: 1px solid rgba(131, 173, 207, 0.10);
+  }
+
   .buy-rule-card,
   .buy-rule-card:nth-child(odd):not(:last-child) {
     grid-column: auto;
