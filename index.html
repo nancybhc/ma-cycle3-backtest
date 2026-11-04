@@ -406,7 +406,7 @@
             </table>
           </div>
         </div>
-        <p class="allocation-shared-note">电力、电网设备、储能、固态锂电共享 20% 仓位上限；AIDC 单独计算 20% 仓位上限。</p>
+        <p class="allocation-shared-note">电力、电网设备、储能、固态锂电分别为独立普通分组，每组 20% 仓位上限；AIDC 并入 AI 硬件资金池。</p>
         <div class="position-pool-card">
           <div class="position-pool-title">
             <span>上证指数当前阶段及AI硬件仓位上限（高亮标注）</span>
@@ -497,13 +497,13 @@
                   <div class="buy-rule-card-head">
                     <span class="rule-index">05</span>
                     <span class="rule-title">
-                      <strong class="rule-heading">判定分组多占比 ≥ 8%</strong>
+                      <strong class="rule-heading">判定分组多占比 ≥ 10%</strong>
                       <span class="rule-tag">板块共振</span>
                     </span>
                   </div>
                   <div class="rule-copy buy-rule-detail">
                     <p><b>定义：</b>判定分组内，同时满足 MA5 向上、MA10 向上、MA5 在 MA10 上方的股票数，除以该组有效股票总数。</p>
-                    <p><b>说明：</b>多占比低于 8% 时不买，避免个股形态孤立转强但所属板块整体仍弱。</p>
+                    <p><b>说明：</b>多占比低于 10% 时不买，避免个股形态孤立转强但所属板块整体仍弱。</p>
                   </div>
                 </article>
                 <article class="buy-rule-card">
@@ -521,7 +521,7 @@
                 </article>
               </div>
             </div>
-            <p class="rule-footnote">尾盘买入可避免盘中分时波动扰乱心态，并以接近收盘的完整信息消除当天不确定性。<br>本策略样本范围包含：AI 硬件（PCB、CPO、光上游、半导体芯片、半导体设备、半导体上游、MLCC、存储），以及算力、AIDC、AI 应用、机器人、药、互金证券、电力、电网设备、储能、固态锂电、商业航天。</p>
+            <p class="rule-footnote">尾盘买入可避免盘中分时波动扰乱心态，并以接近收盘的完整信息消除当天不确定性。<br>本策略样本范围包含：AI 硬件（PCB、CPO、光上游、半导体芯片、半导体设备、半导体上游、MLCC、存储、AIDC），以及算力、AI 应用、机器人、药、互金证券、电力、电网设备、储能、固态锂电、商业航天。</p>
           </article>
 
           <article class="panel trade-rule-panel sell-rule-panel">
@@ -590,7 +590,7 @@
                 <div>
                   <h3>AI 硬件仓位特殊规则</h3>
                   <p>仓位按上证指数阶段变化：空 30%；空转多 1/2/3 为 30%/50%/70%；多 90%；多转空 1/2/3 全部 0%。</p>
-                  <p>空和空转多都设为30%，是因为买入条件包含分组多占比≥8%等约束作为保障，策略经常能以较低成本提前布局AI硬件的反弹或反转。</p>
+                  <p>空和空转多都设为30%，是因为买入条件包含分组多占比≥10%等约束作为保障，策略经常能以较低成本提前布局AI硬件的反弹或反转。</p>
                 </div>
               </div>
             </div>
@@ -884,6 +884,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=20261104-aidc-storage-groups-v1"></script>
+  <script src="assets/app.js?v=20261105-aidc-ai-hardware-v2"></script>
 </body>
 </html>

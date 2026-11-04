@@ -82,6 +82,7 @@ const AI_HARDWARE_GROUPS = new Set([
   "半导体设备",
   "MLCC",
   "存储",
+  "AIDC",
 ]);
 const SIGNAL_GROUP_ORDER = new Map(
   [
