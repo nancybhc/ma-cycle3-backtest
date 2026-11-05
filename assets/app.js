@@ -1040,6 +1040,7 @@ function isSingleGroupCapReason(value) {
     /^评分第\d+[，,]\s*同组已有持仓[，,]\s*超过仓位上限$/.test(text) ||
     /^同组已有持仓[，,]\s*超过仓位上限$/.test(text) ||
     /^同组已有持仓$/.test(text) ||
+    /^评分第\d+$/.test(text) ||
     /^评分第\d+[，,]\s*超过同组持仓上限\d+只$/.test(text) ||
     /^评分第\d+[，,]\s*未进入同组评分前(?:两名|\d+名)$/.test(text) ||
     /^同分组已有[^，,；;]+持仓，仓位已达到[\d.]+%上限$/.test(text) ||
