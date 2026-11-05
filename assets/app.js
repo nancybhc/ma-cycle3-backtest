@@ -1026,16 +1026,28 @@ function passesNonPositionSignalChecks(row = {}) {
 }
 
 function isOnlyGroupCapReason(value) {
+  const parts = String(value || "")
+    .split(/[；;]/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.length > 0 && parts.every(isSingleGroupCapReason);
+}
+
+function isSingleGroupCapReason(value) {
   const text = String(value || "").trim();
-  if (/[；;]/.test(text)) return false;
   return (
     /^同组综合评分第\d+[，,]\s*超过每组(?:持仓)?上限\d+$/.test(text) ||
     /^评分第\d+[，,]\s*同组已有持仓[，,]\s*超过仓位上限$/.test(text) ||
+    /^同组已有持仓[，,]\s*超过仓位上限$/.test(text) ||
+    /^同组已有持仓$/.test(text) ||
     /^评分第\d+[，,]\s*超过同组持仓上限\d+只$/.test(text) ||
     /^评分第\d+[，,]\s*未进入同组评分前(?:两名|\d+名)$/.test(text) ||
     /^同分组已有[^，,；;]+持仓，仓位已达到[\d.]+%上限$/.test(text) ||
     /^同组已持有\d+只，达到上限\d+$/.test(text) ||
     /^评分第\d+[，,]\s*和(?:储能|固态锂电)共享仓位上限[，,]\s*已有持仓且达到上限$/.test(
+      text
+    ) ||
+    /^和(?:储能|固态锂电)共享仓位上限[，,]\s*已有持仓且达到上限$/.test(
       text
     ) ||
     text === "总仓位不足，资金优先分配给多占比较高的分组" ||
