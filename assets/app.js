@@ -104,8 +104,12 @@ const SIGNAL_GROUP_ORDER = new Map(
     "电网设备",
     "储能",
     "商业航天",
+    "黄金白银",
+    "金属矿业",
+    "军工",
   ].map((group, index) => [group, index])
 );
+const OBSERVATION_GROUPS = new Set(["黄金白银", "金属矿业", "军工"]);
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -347,8 +351,22 @@ function applyGroupRatios(rows, ratios) {
   });
 }
 
+function isObservationSignal(row) {
+  return Boolean(
+    row?.observeOnly ||
+      OBSERVATION_GROUPS.has(String(row?.group || "")) ||
+      String(row?.reasonRaw || row?.reason || "").includes("仅观察")
+  );
+}
+
 function sortSignalRows(rows) {
   return [...(rows || [])].sort((a, b) => {
+    const observationRankA = isObservationSignal(a) ? 1 : 0;
+    const observationRankB = isObservationSignal(b) ? 1 : 0;
+    if (observationRankA !== observationRankB) {
+      return observationRankA - observationRankB;
+    }
+
     const ratioA = Number(a.groupManyRatioPct);
     const ratioB = Number(b.groupManyRatioPct);
     const safeRatioA = Number.isFinite(ratioA) ? ratioA : Number.NEGATIVE_INFINITY;
