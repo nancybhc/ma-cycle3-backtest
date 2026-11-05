@@ -857,6 +857,7 @@ function candidateRowHtml(row, showDailyChange = true) {
   const groupCapBlocked =
     !row.isBuy &&
     !row.isHolding &&
+    passesNonPositionSignalChecks(row) &&
     isOnlyGroupCapReason(row.reason);
   const statusClass =
     row.intradayJumpToMany
@@ -994,15 +995,7 @@ function isOnlyLimitUpReason(value) {
 function isLimitUpPositionReason(value, row = {}) {
   const text = String(value || "").trim();
   if (!text) return false;
-  const groupRatio = Number(row.groupManyRatioPct);
-  if (Number.isFinite(groupRatio) && groupRatio < 10) return false;
-  const gapDelta = Number(row.gapDeltaPct);
-  if (Number.isFinite(gapDelta) && gapDelta < 1) return false;
-  const score = Number(row.score);
-  if (Number.isFinite(score) && score < 0.25) return false;
-  if (row.projectedSuccess === false) return false;
-  if (row.priorHighBreak === false) return false;
-  if (row.projectedMa10Dir && row.projectedMa10Dir !== "向上") return false;
+  if (!passesNonPositionSignalChecks(row)) return false;
   const parts = text
     .split(/[；;]/)
     .map((part) => part.trim())
@@ -1017,6 +1010,19 @@ function isLimitUpPositionReason(value, row = {}) {
       (part.includes("涨停") && part.includes("买不进")) ||
       isOnlyGroupCapReason(part)
   );
+}
+
+function passesNonPositionSignalChecks(row = {}) {
+  const groupRatio = Number(row.groupManyRatioPct);
+  if (Number.isFinite(groupRatio) && groupRatio < 10) return false;
+  const gapDelta = Number(row.gapDeltaPct);
+  if (Number.isFinite(gapDelta) && gapDelta < 1) return false;
+  const score = Number(row.score);
+  if (Number.isFinite(score) && score < 0.25) return false;
+  if (row.projectedSuccess === false) return false;
+  if (row.priorHighBreak === false) return false;
+  if (row.projectedMa10Dir && row.projectedMa10Dir !== "向上") return false;
+  return true;
 }
 
 function isOnlyGroupCapReason(value) {
