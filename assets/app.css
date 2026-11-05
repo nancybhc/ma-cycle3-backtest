@@ -992,7 +992,7 @@ main {
 
 .chart-xl {
   width: 100%;
-  height: 430px;
+  height: 480px;
 }
 
 .chart-lg {
@@ -1002,7 +1002,7 @@ main {
 
 .chart-md {
   width: 100%;
-  height: 220px;
+  height: 240px;
 }
 
 .risk-panel {
@@ -1065,20 +1065,21 @@ main {
 
 .position-mini-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 0 12px 2px 0;
-  color: var(--text-soft);
-  font-size: 9px;
+  gap: 16px;
+  margin-bottom: 8px;
+  padding: 0 12px 0 0;
 }
 
-.position-mini-head span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+.position-mini-head h3 {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .position-mini-head small {
+  margin-top: 5px;
   color: var(--text-dim);
   font-family: var(--font-mono);
   font-size: 8px;
@@ -1086,7 +1087,7 @@ main {
 
 .chart-position {
   width: 100%;
-  height: 92px;
+  height: 105px;
 }
 
 .today-summary {
@@ -3502,7 +3503,7 @@ main {
   }
 
   .chart-xl {
-    height: 330px;
+    height: 360px;
   }
 
   .chart-lg {
