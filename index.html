@@ -103,7 +103,7 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成 5 破 10 的强度来定义尾盘买入策略，并严格执行跌破 MA5、持仓收益触及-8%、最高价下移、早期MFE低于2%等卖出策略。</p>
+        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成 5 破 10 且 MA10 保持向上的强度来定义尾盘买入策略，并严格执行跌破 MA5、持仓收益触及-8%、最高价下移、早期MFE低于2%等卖出策略。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -436,7 +436,7 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">买入</span>
-                <h3>六项条件全部满足，才进入<span class="text-cyan">尾盘买入</span>候选</h3>
+                <h3>七项条件全部满足，才进入<span class="text-cyan">尾盘买入</span>候选</h3>
               </div>
             </div>
             <div class="trade-rule-list buy-rule-list">
@@ -520,6 +520,19 @@
                   </div>
                 </article>
               </div>
+              <article class="buy-rule-card">
+                <div class="buy-rule-card-head">
+                  <span class="rule-index">07</span>
+                  <span class="rule-title">
+                    <strong class="rule-heading">推演次日MA10必须向上</strong>
+                    <span class="rule-tag">中期方向</span>
+                  </span>
+                </div>
+                <div class="rule-copy buy-rule-detail">
+                  <p><b>定义：</b>假设次日收盘价等于信号日收盘价，重新计算后的 MA10 必须高于信号日 MA10。</p>
+                  <p><b>说明：</b>在完成 5 破 10 的基础上，进一步确认中期均线方向没有转弱，过滤掉结构短暂交叉但 MA10 已开始走平的信号。</p>
+                </div>
+              </article>
             </div>
             <p class="rule-footnote">尾盘买入可避免盘中分时波动扰乱心态，并以接近收盘的完整信息消除当天不确定性。<br>本策略样本范围包含：AI 硬件（PCB、CPO、光上游、半导体芯片、半导体设备、半导体上游、MLCC、存储、AIDC），以及算力、AI 应用、机器人、药、互金证券、电力、电网设备、储能、固态锂电、商业航天。</p>
           </article>
