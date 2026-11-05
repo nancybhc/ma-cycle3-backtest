@@ -554,8 +554,8 @@
                 <div class="priority-item priority-3">
                   <span>03</span>
                   <div>
-                    <strong>最高价下移固定半仓止盈</strong>
-                    <p>持仓收益为正时，最高价首次低于前一日，先按收盘价卖出半仓；此后任一时点出现连续两天下移，清掉剩余半仓。减半后资金池只按剩余半仓占用，仍占一个分组名额。</p>
+                    <strong>最高价连续两日下移清仓</strong>
+                    <p>持仓收益为正时，最高价连续两日严格下移，按当日收盘价一次性清仓，不再首日卖半仓。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-3">←</div>
@@ -564,7 +564,7 @@
                   <div><strong>跌破 MA5 清仓</strong><p>收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
                 </div>
               </div>
-              <p class="priority-note">若同日首次最高价下移减半与跌破 MA5 重叠，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交，不拆分。</p>
+              <p class="priority-note">若连续两日下移清仓与跌破 MA5 同日触发，按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
             </div>
           </article>
 
