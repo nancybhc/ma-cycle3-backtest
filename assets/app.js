@@ -695,8 +695,9 @@ function populateCandidates() {
 }
 
 function populatePositionRules() {
-  const signals = state.data.signals || [];
-  const holdings = state.data.currentHoldings || [];
+  const signals = state.staticSignals || state.data.signals || [];
+  const holdings =
+    state.staticCurrentHoldings || state.data.currentHoldings || [];
   const representative =
     signals.find((row) => row.indexStage) || {};
   const stage = String(representative.indexStage || "");
