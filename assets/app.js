@@ -851,7 +851,7 @@ function candidateRowHtml(row, showDailyChange = true) {
   const isHolding = Boolean(row.isHolding);
   const changeType = String(row.changeType || "");
   const limitUpBlocked =
-    Boolean(row.limitUp) && isOnlyLimitUpReason(row.reason);
+    Boolean(row.limitUp) && isLimitUpPositionReason(row.reason);
   const groupCapBlocked =
     !row.isBuy &&
     !row.isHolding &&
@@ -987,6 +987,25 @@ function groupRatioText(value) {
 function isOnlyLimitUpReason(value) {
   const text = String(value || "").trim();
   return text.includes("尾盘涨停") && !/[；;]/.test(text);
+}
+
+function isLimitUpPositionReason(value) {
+  const text = String(value || "").trim();
+  if (!text) return false;
+  const parts = text
+    .split(/[；;]/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (!parts.length) return false;
+  const hasLimitUp = parts.some(
+    (part) => part.includes("涨停") && part.includes("买不进")
+  );
+  if (!hasLimitUp) return false;
+  return parts.every(
+    (part) =>
+      (part.includes("涨停") && part.includes("买不进")) ||
+      isOnlyGroupCapReason(part)
+  );
 }
 
 function isOnlyGroupCapReason(value) {
@@ -2286,7 +2305,7 @@ function openSignal(code, scope = "changes") {
     "drawerKicker",
     signal.intradayJumpToMany
       ? "盘中跳级转多 · 非买入"
-      : Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
+      : Boolean(signal.limitUp) && isLimitUpPositionReason(signal.reason)
       ? "涨停无法买进"
       : signal.changeType === "sell"
       ? signal.actionLabel || "当天卖出"
@@ -2302,7 +2321,7 @@ function openSignal(code, scope = "changes") {
     <span class="tag status-badge ${
       signal.intradayJumpToMany
         ? "jump"
-        : Boolean(signal.limitUp) && isOnlyLimitUpReason(signal.reason)
+        : Boolean(signal.limitUp) && isLimitUpPositionReason(signal.reason)
         ? "limit-up"
         : groupCapBlocked
         ? "group-cap"

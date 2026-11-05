@@ -275,7 +275,7 @@
         <span>每次扫描都按最新行情重算，满足空转多进度3则进入全部信号。行情波动导致多次出现时，仅保留首次出现时间。盘中入选不等于成交，实际买入统一放在尾盘集合竞价。</span>
       </div>
       <div class="signal-color-legend">
-        <span><b class="legend-red">红色</b>：满足盘中买入条件，仅表示进入候选；<b class="legend-amber">橙色</b>：仅因涨停无法买进；<b class="legend-cyan">青绿色</b>：仅因仓位约束未进入候选（备选）。</span>
+        <span><b class="legend-red">红色</b>：满足盘中买入条件，仅表示进入候选；<b class="legend-amber">橙色</b>：因涨停(或涨停且同时仓位不足)无法买进；<b class="legend-cyan">青绿色</b>：仅因仓位约束未进入候选（备选）。</span>
       </div>
 
       <div class="monitor-console" id="monitorConsole">
