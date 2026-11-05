@@ -708,10 +708,11 @@ function populatePositionRules() {
       : stage
         ? `${stage}${progress}`
         : "";
-  const currentTotal = holdings.reduce(
+  const currentTotalRaw = holdings.reduce(
     (sum, row) => sum + Number(row.weightPct || 0),
     0
   );
+  const currentTotal = Math.min(100, currentTotalRaw);
   const lastEquity = Number(
     state.data.equity?.[state.data.equity.length - 1]?.equity
   );
