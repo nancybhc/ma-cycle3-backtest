@@ -851,7 +851,7 @@ function candidateRowHtml(row, showDailyChange = true) {
   const isHolding = Boolean(row.isHolding);
   const changeType = String(row.changeType || "");
   const limitUpBlocked =
-    Boolean(row.limitUp) && isLimitUpPositionReason(row.reason);
+    Boolean(row.limitUp) && isLimitUpPositionReason(row.reason, row);
   const groupCapBlocked =
     !row.isBuy &&
     !row.isHolding &&
@@ -989,9 +989,18 @@ function isOnlyLimitUpReason(value) {
   return text.includes("尾盘涨停") && !/[；;]/.test(text);
 }
 
-function isLimitUpPositionReason(value) {
+function isLimitUpPositionReason(value, row = {}) {
   const text = String(value || "").trim();
   if (!text) return false;
+  const groupRatio = Number(row.groupManyRatioPct);
+  if (Number.isFinite(groupRatio) && groupRatio < 10) return false;
+  const gapDelta = Number(row.gapDeltaPct);
+  if (Number.isFinite(gapDelta) && gapDelta < 1) return false;
+  const score = Number(row.score);
+  if (Number.isFinite(score) && score < 0.25) return false;
+  if (row.projectedSuccess === false) return false;
+  if (row.priorHighBreak === false) return false;
+  if (row.projectedMa10Dir && row.projectedMa10Dir !== "向上") return false;
   const parts = text
     .split(/[；;]/)
     .map((part) => part.trim())
@@ -2308,7 +2317,8 @@ function openSignal(code, scope = "changes") {
     "drawerKicker",
     signal.intradayJumpToMany
       ? "盘中跳级转多 · 非买入"
-      : Boolean(signal.limitUp) && isLimitUpPositionReason(signal.reason)
+      : Boolean(signal.limitUp) &&
+        isLimitUpPositionReason(signal.reason, signal)
       ? "涨停无法买进"
       : signal.changeType === "sell"
       ? signal.actionLabel || "当天卖出"
@@ -2324,7 +2334,8 @@ function openSignal(code, scope = "changes") {
     <span class="tag status-badge ${
       signal.intradayJumpToMany
         ? "jump"
-        : Boolean(signal.limitUp) && isLimitUpPositionReason(signal.reason)
+        : Boolean(signal.limitUp) &&
+          isLimitUpPositionReason(signal.reason, signal)
         ? "limit-up"
         : groupCapBlocked
         ? "group-cap"
