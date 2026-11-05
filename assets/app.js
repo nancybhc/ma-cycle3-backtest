@@ -1574,9 +1574,10 @@ function renderEquityChart() {
   const points = state.data.equity;
   const dates = points.map((point) => point.date);
   const values = points.map((point) => point.equity);
+  const positions = points.map((point) => point.positionPct ?? 0);
   chart.setOption({
     ...chartBase(),
-    grid: { left: 52, right: 20, top: 28, bottom: 62 },
+    grid: { left: 52, right: 52, top: 28, bottom: 62 },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
@@ -1589,6 +1590,9 @@ function renderEquityChart() {
           </div>
           <div style="margin-top:3px;color:${COLOR.soft};font-size:10px">
             当日 <b style="float:right;margin-left:24px;color:${point.dailyReturnPct >= 0 ? COLOR.red : COLOR.green}">${signed(point.dailyReturnPct)}%</b>
+          </div>
+          <div style="margin-top:3px;color:${COLOR.amber};font-size:10px">
+            总仓位 <b style="float:right;margin-left:24px">${(point.positionPct ?? 0).toFixed(1)}%</b>
           </div>
           <div style="margin-top:3px;color:${COLOR.dim};font-size:9px">
             在场持仓 <b style="float:right;margin-left:24px;color:${COLOR.soft}">${point.active} 笔</b>
@@ -1609,19 +1613,35 @@ function renderEquityChart() {
         hideOverlap: true,
       },
     },
-    yAxis: {
-      type: "value",
-      scale: true,
-      splitNumber: 4,
-      axisLabel: {
-        color: COLOR.dim,
-        fontSize: 9,
-        fontFamily: FONT_MONO,
-        formatter: (value) => value.toFixed(2),
+    yAxis: [
+      {
+        type: "value",
+        scale: true,
+        splitNumber: 4,
+        axisLabel: {
+          color: COLOR.dim,
+          fontSize: 9,
+          fontFamily: FONT_MONO,
+          formatter: (value) => value.toFixed(2),
+        },
+        splitLine: { lineStyle: { color: COLOR.grid } },
+        axisLine: { show: false },
       },
-      splitLine: { lineStyle: { color: COLOR.grid } },
-      axisLine: { show: false },
-    },
+      {
+        type: "value",
+        min: 0,
+        max: 100,
+        interval: 25,
+        axisLabel: {
+          color: COLOR.amber,
+          fontSize: 9,
+          fontFamily: FONT_MONO,
+          formatter: (value) => `${Math.round(value)}%`,
+        },
+        splitLine: { show: false },
+        axisLine: { show: false },
+      },
+    ],
     dataZoom: [
       { type: "inside", start: 0, end: 100 },
       {
@@ -1679,6 +1699,21 @@ function renderEquityChart() {
           },
           data: [{ xAxis: "2026-07-01" }],
         },
+      },
+      {
+        name: "总仓位",
+        type: "line",
+        yAxisIndex: 1,
+        data: positions,
+        symbol: "none",
+        lineStyle: {
+          width: 1.4,
+          color: COLOR.amber,
+          type: [5, 4],
+          opacity: 0.9,
+        },
+        itemStyle: { color: COLOR.amber },
+        z: 3,
       },
     ],
   });
