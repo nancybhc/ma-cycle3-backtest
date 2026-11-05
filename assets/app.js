@@ -1547,6 +1547,7 @@ function populateHoldingBars() {
 function renderAllCharts() {
   renderEquityChart();
   renderDrawdownChart();
+  renderPositionChart();
   renderMonthlyChart();
   renderDistributionChart();
   renderGroupChart();
@@ -1574,10 +1575,9 @@ function renderEquityChart() {
   const points = state.data.equity;
   const dates = points.map((point) => point.date);
   const values = points.map((point) => point.equity);
-  const positions = points.map((point) => point.positionPct ?? 0);
   chart.setOption({
     ...chartBase(),
-    grid: { left: 52, right: 52, top: 28, bottom: 62 },
+    grid: { left: 52, right: 20, top: 28, bottom: 62 },
     tooltip: {
       ...chartBase().tooltip,
       trigger: "axis",
@@ -1590,9 +1590,6 @@ function renderEquityChart() {
           </div>
           <div style="margin-top:3px;color:${COLOR.soft};font-size:10px">
             当日 <b style="float:right;margin-left:24px;color:${point.dailyReturnPct >= 0 ? COLOR.red : COLOR.green}">${signed(point.dailyReturnPct)}%</b>
-          </div>
-          <div style="margin-top:3px;color:${COLOR.amber};font-size:10px">
-            总仓位 <b style="float:right;margin-left:24px">${(point.positionPct ?? 0).toFixed(1)}%</b>
           </div>
           <div style="margin-top:3px;color:${COLOR.dim};font-size:9px">
             在场持仓 <b style="float:right;margin-left:24px;color:${COLOR.soft}">${point.active} 笔</b>
@@ -1613,35 +1610,19 @@ function renderEquityChart() {
         hideOverlap: true,
       },
     },
-    yAxis: [
-      {
-        type: "value",
-        scale: true,
-        splitNumber: 4,
-        axisLabel: {
-          color: COLOR.dim,
-          fontSize: 9,
-          fontFamily: FONT_MONO,
-          formatter: (value) => value.toFixed(2),
-        },
-        splitLine: { lineStyle: { color: COLOR.grid } },
-        axisLine: { show: false },
+    yAxis: {
+      type: "value",
+      scale: true,
+      splitNumber: 4,
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 9,
+        fontFamily: FONT_MONO,
+        formatter: (value) => value.toFixed(2),
       },
-      {
-        type: "value",
-        min: 0,
-        max: 100,
-        interval: 25,
-        axisLabel: {
-          color: COLOR.amber,
-          fontSize: 9,
-          fontFamily: FONT_MONO,
-          formatter: (value) => `${Math.round(value)}%`,
-        },
-        splitLine: { show: false },
-        axisLine: { show: false },
-      },
-    ],
+      splitLine: { lineStyle: { color: COLOR.grid } },
+      axisLine: { show: false },
+    },
     dataZoom: [
       { type: "inside", start: 0, end: 100 },
       {
@@ -1699,21 +1680,6 @@ function renderEquityChart() {
           },
           data: [{ xAxis: "2026-07-01" }],
         },
-      },
-      {
-        name: "总仓位",
-        type: "line",
-        yAxisIndex: 1,
-        data: positions,
-        symbol: "none",
-        lineStyle: {
-          width: 1.4,
-          color: COLOR.amber,
-          type: [5, 4],
-          opacity: 0.9,
-        },
-        itemStyle: { color: COLOR.amber },
-        z: 3,
       },
     ],
   });
@@ -1776,6 +1742,78 @@ function renderDrawdownChart() {
           lineStyle: { color: "rgba(32,201,140,0.3)", type: "dashed" },
           label: { show: false },
           data: [{ yAxis: state.data.portfolio.maxDrawdownPct }],
+        },
+      },
+    ],
+  });
+}
+
+function renderPositionChart() {
+  const chart = getChart("positionChart");
+  const points = state.data.equity;
+  chart.setOption({
+    ...chartBase(),
+    grid: { left: 46, right: 12, top: 8, bottom: 24 },
+    tooltip: {
+      ...chartBase().tooltip,
+      trigger: "axis",
+      formatter(params) {
+        const point = points[params[0].dataIndex];
+        return `
+          <div style="font-family:${FONT_MONO};color:${COLOR.soft};font-size:9px">${point.date}</div>
+          <div style="margin-top:4px;color:${COLOR.amber};font-size:10px">
+            总仓位 <b style="float:right;margin-left:20px">${(point.positionPct ?? 0).toFixed(1)}%</b>
+          </div>
+          <div style="margin-top:3px;color:${COLOR.dim};font-size:9px">
+            在场持仓 <b style="float:right;margin-left:20px;color:${COLOR.soft}">${point.active} 笔</b>
+          </div>`;
+      },
+    },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: points.map((point) => point.date),
+      axisLine: { lineStyle: { color: COLOR.axis } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: COLOR.dim,
+        fontSize: 8,
+        fontFamily: FONT_MONO,
+        formatter: (value) => value.slice(5),
+        hideOverlap: true,
+      },
+    },
+    yAxis: {
+      type: "value",
+      min: 0,
+      max: 100,
+      interval: 50,
+      axisLabel: {
+        color: COLOR.amber,
+        fontSize: 8,
+        fontFamily: FONT_MONO,
+        formatter: (value) => `${Math.round(value)}%`,
+      },
+      splitLine: {
+        lineStyle: { color: COLOR.grid, type: "dashed" },
+      },
+      axisLine: { show: false },
+    },
+    series: [
+      {
+        name: "总仓位",
+        type: "line",
+        data: points.map((point) => point.positionPct ?? 0),
+        symbol: "none",
+        step: "end",
+        lineStyle: { width: 1.4, color: COLOR.amber },
+        itemStyle: { color: COLOR.amber },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "rgba(246,185,75,0.28)" },
+            { offset: 0.7, color: "rgba(246,185,75,0.08)" },
+            { offset: 1, color: "rgba(246,185,75,0.02)" },
+          ]),
         },
       },
     ],

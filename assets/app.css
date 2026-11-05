@@ -1057,6 +1057,38 @@ main {
   font-size: 9px;
 }
 
+.position-mini {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.position-mini-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 2px 0;
+  color: var(--text-soft);
+  font-size: 9px;
+}
+
+.position-mini-head span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.position-mini-head small {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 8px;
+}
+
+.chart-position {
+  width: 100%;
+  height: 92px;
+}
+
 .today-summary {
   display: grid;
   grid-template-columns: 220px 1.2fr minmax(260px, 0.8fr);

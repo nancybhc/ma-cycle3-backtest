@@ -234,7 +234,6 @@
             </div>
             <div class="legend-inline">
               <span><i class="legend-line cyan"></i>组合净值</span>
-              <span><i class="legend-line amber"></i>总仓位</span>
               <span><i class="legend-line dim"></i>1.00 基准</span>
             </div>
           </div>
@@ -259,6 +258,13 @@
               <strong id="testValue">—</strong>
             </div>
             <small>以 2026-07-01 切分，训练/测试平均单笔收益</small>
+          </div>
+          <div class="position-mini">
+            <div class="position-mini-head">
+              <span><i class="legend-line amber"></i>总仓位</span>
+              <small>0%～100%</small>
+            </div>
+            <div class="chart-position" id="positionChart" role="img" aria-label="策略总仓位曲线"></div>
           </div>
         </article>
       </div>
@@ -885,6 +891,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=233674d0f86f"></script>
+  <script src="assets/app.js?v=8b0a636c8f0e"></script>
 </body>
 </html>
