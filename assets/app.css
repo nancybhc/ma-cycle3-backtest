@@ -986,7 +986,7 @@ main {
 
 .performance-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(350px, 0.72fr);
+  grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
   gap: 16px;
 }
 
