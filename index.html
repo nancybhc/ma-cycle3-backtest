@@ -436,7 +436,7 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">买入</span>
-                <h3>七项条件全部满足，才进入<span class="text-cyan">尾盘买入</span>候选</h3>
+                <h3>六项条件全部满足，才进入<span class="text-cyan">尾盘买入</span>候选</h3>
               </div>
             </div>
             <div class="trade-rule-list buy-rule-list">
@@ -457,13 +457,13 @@
                 <div class="buy-rule-card-head">
                   <span class="rule-index">02</span>
                   <span class="rule-title">
-                    <strong class="rule-heading">推演次日平盘完成 5破10</strong>
+                    <strong class="rule-heading">推演次日平盘完成 5破10，且 MA10 向上</strong>
                     <span class="rule-tag">突破阻力</span>
                   </span>
                 </div>
                 <div class="rule-copy buy-rule-detail">
-                  <p><b>定义：</b>把信号日收盘价复制为下一交易日收盘价，重新计算 MA5 / MA10，要求推演后的 MA5 &gt; MA10。</p>
-                  <p><b>说明：</b>不必上涨，只要次日横盘就能完成 5 破 10，说明突破主要来自均线结构改善，对次日涨幅依赖较低。</p>
+                  <p><b>定义：</b>把信号日收盘价复制为下一交易日收盘价，重新计算 MA5 / MA10，要求推演后的 MA5 &gt; MA10，且推演后的 MA10 高于信号日 MA10。</p>
+                  <p><b>说明：</b>次日平盘即可完成 5 破 10，说明突破主要来自均线结构改善；同时要求 MA10 继续向上，过滤结构短暂交叉但中期方向已转弱的信号。</p>
                 </div>
               </article>
               <article class="buy-rule-card">
@@ -520,19 +520,6 @@
                   </div>
                 </article>
               </div>
-              <article class="buy-rule-card">
-                <div class="buy-rule-card-head">
-                  <span class="rule-index">07</span>
-                  <span class="rule-title">
-                    <strong class="rule-heading">推演次日MA10必须向上</strong>
-                    <span class="rule-tag">中期方向</span>
-                  </span>
-                </div>
-                <div class="rule-copy buy-rule-detail">
-                  <p><b>定义：</b>假设次日收盘价等于信号日收盘价，重新计算后的 MA10 必须高于信号日 MA10。</p>
-                  <p><b>说明：</b>在完成 5 破 10 的基础上，进一步确认中期均线方向没有转弱，过滤掉结构短暂交叉但 MA10 已开始走平的信号。</p>
-                </div>
-              </article>
             </div>
             <p class="rule-footnote">尾盘买入可避免盘中分时波动扰乱心态，并以接近收盘的完整信息消除当天不确定性。<br>本策略样本范围包含：AI 硬件（PCB、CPO、光上游、半导体芯片、半导体设备、半导体上游、MLCC、存储、AIDC），以及算力、AI 应用、机器人、药、互金证券、电力、电网设备、储能、固态锂电、商业航天。</p>
           </article>
