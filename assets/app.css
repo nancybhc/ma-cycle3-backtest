@@ -1678,6 +1678,11 @@ main {
     min-width: 92px;
 }
 
+.candidate-table .market-value-col {
+    min-width: 92px;
+    white-space: nowrap;
+}
+
 .candidate-table .prior-high-col {
     min-width: 84px;
     white-space: nowrap;

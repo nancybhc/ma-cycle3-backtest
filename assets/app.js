@@ -913,6 +913,7 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
       <td class="num position-context-col">${positionContextHtml(row)}</td>
+      ${showDailyChange ? `<td class="num market-value-col">${holdingMarketValueHtml(row)}</td>` : ""}
       ${showDailyChange ? `<td class="hold-days-col">${holdingDaysHtml(row)}</td>` : ""}
       <td class="num mfe-col ${
         row.mfePct === null || row.mfePct === undefined
@@ -1151,6 +1152,23 @@ function positionContextHtml(row) {
       </span>`;
   }
   return `<span class="flat">—</span>`;
+}
+
+function holdingMarketValueHtml(row) {
+  const lastEquity = Number(
+    state.data?.equity?.[state.data.equity.length - 1]?.equity
+  );
+  if (!Number.isFinite(lastEquity)) return '<span class="flat">—</span>';
+  const totalAssets = 1000000 * lastEquity;
+  if (row.changeType === "sell") return `¥${formatAmount(0)}`;
+  if (!row.isHolding) return '<span class="flat">—</span>';
+  const weight = Number(
+    row.currentWeightPct ?? row.holdingWeightPct ?? row.weightPct
+  );
+  if (!Number.isFinite(weight) || weight <= 0) {
+    return '<span class="flat">—</span>';
+  }
+  return `¥${formatAmount(totalAssets * weight / 100)}`;
 }
 
 function currentHoldingDays(row) {
