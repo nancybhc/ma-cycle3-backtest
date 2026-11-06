@@ -285,6 +285,21 @@
         <span><b class="legend-red">红色</b>：满足盘中买入条件，仅表示进入候选；<b class="legend-amber">橙色</b>：仅因涨停或涨停且同时仓位不足无法买进；<b class="legend-cyan">青绿色</b>：仅因仓位约束未进入候选（备选）。</span>
       </div>
 
+      <div class="monitor-console" id="monitorConsole">
+        <div class="monitor-state">
+          <span class="monitor-dot" id="monitorStatusDot"></span>
+          <div>
+            <strong id="monitorStatusText">正在读取监控状态</strong>
+            <small id="monitorStatusDetail">计划：交易日 09:15 自动启动，15:00 完成收盘快照后停止</small>
+            <small class="monitor-refresh-rule">刷新规则：本地网页每 10 秒刷新；GitHub 网页每 60 秒同步数据。</small>
+          </div>
+        </div>
+        <div class="monitor-actions">
+          <button class="monitor-button start" id="monitorStartButton" type="button">启动监控</button>
+          <button class="monitor-button stop" id="monitorStopButton" type="button">停止监控</button>
+        </div>
+      </div>
+
       <article class="panel table-panel">
         <div class="table-toolbar">
           <div>
@@ -875,6 +890,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=840a95682986"></script>
+  <script src="assets/app.js?v=773a0f88e15d"></script>
 </body>
 </html>
