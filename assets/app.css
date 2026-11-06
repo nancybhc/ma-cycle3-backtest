@@ -2047,6 +2047,7 @@ main {
   background: rgba(10, 24, 39, 0.54);
   color: var(--text-soft);
   font-size: 10px;
+  text-decoration: none;
   cursor: pointer;
 }
 

@@ -1351,7 +1351,6 @@ function bindInteractions() {
     state.page = 1;
     applyTradeFilters();
   });
-  document.getElementById("exportTrades").addEventListener("click", exportFilteredTrades);
 
   document
     .getElementById("mobileNavToggle")
@@ -2691,58 +2690,6 @@ function renderTradeChart(item) {
       },
     ],
   });
-}
-
-function exportFilteredTrades() {
-  const headers = [
-    "买入日期",
-    "持有天数",
-    "成交日期",
-    "操作",
-    "代码",
-    "名称",
-    "分组",
-    "成本价",
-    "成交价",
-    "买入时仓位%",
-    "收益%",
-    "备注",
-  ];
-  const lines = [headers.join(",")];
-  state.filteredTrades.forEach((row) => {
-    const values = [
-      row.entryDate || row.date,
-      row.holdingDays ?? "",
-      row.date,
-      row.actionLabel,
-      row.code,
-      row.name,
-      row.group,
-      row.entryPrice ?? row.price,
-      row.price,
-      row.weightPct,
-      row.returnPct,
-      tradeReasonText(row.reason),
-    ];
-    lines.push(values.map(csvCell).join(","));
-  });
-  const blob = new Blob([`\ufeff${lines.join("\r\n")}`], {
-    type: "text/csv;charset=utf-8",
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `策略成交记录_${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-  showToast(`已导出 ${state.filteredTrades.length} 条策略成交`);
-}
-
-function csvCell(value) {
-  const text = String(value ?? "");
-  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
 function setupNavigation() {
