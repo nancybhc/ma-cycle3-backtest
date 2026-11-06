@@ -1160,7 +1160,9 @@ function holdingMarketValueHtml(row) {
   );
   if (!Number.isFinite(lastEquity)) return '<span class="flat">—</span>';
   const totalAssets = 1000000 * lastEquity;
-  if (row.changeType === "sell") return `¥${formatAmount(0)}`;
+  if (row.changeType === "sell") {
+    return '<span class="price-pair"><strong>¥0</strong></span>';
+  }
   if (!row.isHolding) return '<span class="flat">—</span>';
   const weight = Number(
     row.currentWeightPct ?? row.holdingWeightPct ?? row.weightPct
@@ -1168,7 +1170,10 @@ function holdingMarketValueHtml(row) {
   if (!Number.isFinite(weight) || weight <= 0) {
     return '<span class="flat">—</span>';
   }
-  return `¥${formatAmount(totalAssets * weight / 100)}`;
+  return `
+    <span class="price-pair">
+      <strong>¥${formatAmount(totalAssets * weight / 100)}</strong>
+    </span>`;
 }
 
 function currentHoldingDays(row) {
