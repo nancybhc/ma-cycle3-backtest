@@ -103,7 +103,7 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成5破10的强度来定义尾盘买入策略。严格执行跌破 MA5、持仓收益触及-8.5%、最高价下移分批止盈、分组降级和早期MFE低于2%等卖出策略。</p>
+        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成5破10的强度来定义尾盘买入策略。严格执行跌破 MA5、持仓收益触及-8%、最高价下移分批止盈和早期MFE低于2%等卖出策略。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -519,7 +519,7 @@
                   <div class="buy-rule-card-head">
                     <span class="rule-index">06</span>
                     <span class="rule-title">
-                      <strong class="rule-heading">综合评分 ≥ 0.275</strong>
+                    <strong class="rule-heading">综合评分 ≥ 0.30</strong>
                       <span class="rule-tag">风险下限</span>
                     </span>
                   </div>
@@ -545,9 +545,9 @@
                 <div class="priority-item priority-1">
                   <span>01</span>
                   <div>
-                    <strong>早期MFE低于2%与持仓触及-8.5%退出</strong>
+                    <strong>早期MFE低于2%与持仓触及-8%退出</strong>
                     <p>买入后第 2 个交易日，前两日最高价形成的最大浮盈仍低于 2%，按当日收盘价卖出。</p>
-                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8.5% 即止损。若跳空低开至止损价下方，按开盘价卖出。</p>
+                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即止损。若跳空低开至止损价下方，按开盘价卖出。</p>
                     <p>此两项皆为早期退出规则，目的是剔除弱趋势与控制回撤。实盘利用条件单，极端情况下竞价挂跌停保证止损成功。</p>
                   </div>
                 </div>
@@ -563,10 +563,9 @@
                 <div class="priority-item priority-3">
                   <span>03</span>
                   <div>
-                    <strong>最高价下移分批止盈与分组降级</strong>
+                    <strong>最高价下移分批止盈</strong>
                     <p>持仓收益超过 8% 后，最高价首次低于前一日时先卖半仓；此后满足连续两天下移条件时清掉剩余半仓。</p>
                     <p>半仓按持仓股数拆分：卖出数量 = 当前持仓数量 ÷ 2（向下取整），再按成交价计算卖出金额和剩余市值。</p>
-                    <p>持仓的判定分组多占比低于 7% 时，按当日收盘价退出。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-3">←</div>
@@ -575,7 +574,7 @@
                   <div><strong>跌破 MA5 清仓</strong><p>收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
                 </div>
               </div>
-              <p class="priority-note">若最高价下移减半与跌破 MA5 同日触发，两半按同一收盘价退出；若盘中 -8.5% 与任何收盘信号重叠，-8.5% 按实际止损成交。</p>
+              <p class="priority-note">若最高价下移减半与跌破 MA5 同日触发，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
             </div>
           </article>
 
@@ -900,6 +899,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=68d9a5442bc7"></script>
+  <script src="assets/app.js?v=e7cf55429c9c"></script>
 </body>
 </html>
