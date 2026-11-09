@@ -936,7 +936,9 @@ function candidateRowHtml(
           ? "持仓未动"
           : row.isBuy
             ? "买入候选"
-            : signalReasonText(row.reason, row.priorHighBreak);
+            : showDailyChange
+              ? holdingReasonText(row.reason)
+              : signalReasonText(row.reason, row.priorHighBreak);
   return `
     <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
       <td class="change-first-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>
@@ -1006,7 +1008,7 @@ function candidateRowHtml(
         showDailyChange
           ? `<td class="change-reason-col">${
               changeType === "sell"
-                ? escapeHtml(signalReasonText(row.reason, row.priorHighBreak))
+                ? escapeHtml(holdingReasonText(row.reason))
                 : '<span class="flat">-</span>'
             }</td>`
           : ""
@@ -1116,6 +1118,16 @@ function isSingleGroupCapReason(value) {
       text
     )
   );
+}
+
+function holdingReasonText(value) {
+  return String(value || "")
+    .replace(/(?:尾盘)?涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
+    .replace(/(\d+(?:\.\d+)?)pp/g, "$1%")
+    .replace(
+      /(?:收盘价?|运行价)[^；;]*?(?:低于|跌破|下穿)\s*MA5[^；;]*/g,
+      "跌破MA5"
+    );
 }
 
 function signalReasonText(value, priorHighBreak) {
