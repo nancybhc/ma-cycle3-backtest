@@ -1701,7 +1701,7 @@ main {
 }
 
 .candidate-table .prior-high-col {
-    min-width: 84px;
+    min-width: 144px;
     white-space: nowrap;
 }
 

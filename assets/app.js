@@ -1119,17 +1119,14 @@ function isSingleGroupCapReason(value) {
 }
 
 function signalReasonText(value, priorHighBreak) {
-  let reason = String(value || "")
+  const priorHighRule = "最高价较前两日高点≥1%";
+  const reason = String(value || "")
     .replace(/(?:尾盘)?涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
-    .replace(/(\d+(?:\.\d+)?)pp/g, "$1%")
-    .replace(
-      /买入日最高价未突破前2日高点(?:超过0(?:\.0+)?%)?/g,
-      "最高价未超前两日"
-    );
-  if (priorHighBreak !== false || reason.includes("最高价未超前两日")) {
+    .replace(/(\d+(?:\.\d+)?)pp/g, "$1%");
+  if (priorHighBreak !== false || reason.includes(priorHighRule)) {
     return reason;
   }
-  return reason ? `最高价未超前两日；${reason}` : "最高价未超前两日";
+  return reason ? `${priorHighRule}；${reason}` : priorHighRule;
 }
 
 function signalStatusHtml(value) {
