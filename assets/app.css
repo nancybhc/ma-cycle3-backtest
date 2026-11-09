@@ -1650,16 +1650,6 @@ main {
   vertical-align: middle;
 }
 
-.candidate-table.changes-view .change-reason-note {
-  margin-top: 3px;
-  color: var(--text-soft);
-  font-size: 9px;
-  font-weight: 400;
-  line-height: 1.35;
-  text-align: left;
-  white-space: normal;
-}
-
 .candidate-table.changes-view th,
 .candidate-table.changes-view td {
   padding: 8px 5px;
@@ -1693,6 +1683,14 @@ main {
     white-space: nowrap;
 }
 
+.candidate-table .change-reason-col {
+  min-width: 132px;
+  max-width: 180px;
+  white-space: normal;
+  text-align: left;
+}
+
+.candidate-table:not(.changes-view) .change-reason-col,
 .candidate-table:not(.changes-view) .market-value-col {
   display: none;
 }

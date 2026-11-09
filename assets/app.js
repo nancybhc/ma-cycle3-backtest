@@ -875,7 +875,11 @@ function renderCandidateTable() {
     state.candidateScope === "changes" ? "当日变动" : "信号判定"
   );
   const body = document.getElementById("candidateTableBody");
-  body.innerHTML = rows.map((row) => candidateRowHtml(row)).join("");
+  body.innerHTML = rows
+    .map((row) =>
+      candidateRowHtml(row, state.candidateScope === "changes")
+    )
+    .join("");
 
   body.querySelectorAll("tr[data-code]").forEach((row) => {
     row.addEventListener("click", () =>
@@ -924,16 +928,7 @@ function candidateRowHtml(row, showDailyChange = true) {
             : signalReasonText(row.reason, row.priorHighBreak);
   return `
     <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
-      <td class="change-first-col">
-        <span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span>
-        ${
-          changeType === "sell"
-            ? `<div class="change-reason-note">${escapeHtml(
-                signalReasonText(row.reason, row.priorHighBreak)
-              )}</div>`
-            : ""
-        }
-      </td>
+      <td class="change-first-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>
       <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
       <td class="sticky-col col-name">
         <span class="name-cell">
@@ -945,6 +940,11 @@ function candidateRowHtml(row, showDailyChange = true) {
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
       <td class="num position-context-col">${positionContextHtml(row)}</td>
+      ${showDailyChange ? `<td class="change-reason-col">${
+        changeType === "sell"
+          ? escapeHtml(signalReasonText(row.reason, row.priorHighBreak))
+          : '<span class="flat">-</span>'
+      }</td>` : ""}
       ${showDailyChange ? `<td class="num market-value-col">${holdingMarketValueHtml(row)}</td>` : ""}
       ${showDailyChange ? `<td class="hold-days-col">${holdingDaysHtml(row)}</td>` : ""}
       <td class="num mfe-col ${
