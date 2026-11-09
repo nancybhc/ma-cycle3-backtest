@@ -948,11 +948,6 @@ function candidateRowHtml(
       <td>${pricePairHtml(row.close, row.changePct)}</td>
       <td class="num position-col">${holdingCostReturnHtml(row)}</td>
       <td class="num position-context-col">${positionContextHtml(row)}</td>
-      ${showDailyChange ? `<td class="change-reason-col">${
-        changeType === "sell"
-          ? escapeHtml(signalReasonText(row.reason, row.priorHighBreak))
-          : '<span class="flat">-</span>'
-      }</td>` : ""}
       ${showDailyChange ? `<td class="num market-value-col">${holdingMarketValueHtml(row)}</td>` : ""}
       ${showDailyChange ? `<td class="hold-days-col">${holdingDaysHtml(row)}</td>` : ""}
       <td class="num mfe-col ${
@@ -1002,6 +997,15 @@ function candidateRowHtml(
       ${
         showSignalJudgment
           ? `<td class="change-last-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>`
+          : ""
+      }
+      ${
+        showDailyChange
+          ? `<td class="change-reason-col">${
+              changeType === "sell"
+                ? escapeHtml(signalReasonText(row.reason, row.priorHighBreak))
+                : '<span class="flat">-</span>'
+            }</td>`
           : ""
       }
     </tr>`;
