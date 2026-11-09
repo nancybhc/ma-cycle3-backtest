@@ -725,14 +725,17 @@ function populateCandidates() {
   renderIntradayJumpTable();
 }
 
+function positionManagementHoldings() {
+  // 今日仓位管理明细只在15:05正式收盘数据生成后更新。
+  // 盘中仍使用上一份正式收盘持仓，其他模块继续使用实时持仓预览。
+  return state.staticCurrentHoldings || state.data.currentHoldings || [];
+}
+
 function populatePositionRules() {
   const signals = state.liveApplied
     ? state.data.signals || []
     : state.staticSignals || state.data.signals || [];
-  const holdings =
-    state.liveApplied
-      ? state.data.currentHoldings || []
-      : state.staticCurrentHoldings || state.data.currentHoldings || [];
+  const holdings = positionManagementHoldings();
   const representative =
     signals.find((row) => row.indexStage) || {};
   const stage = String(representative.indexStage || "");
