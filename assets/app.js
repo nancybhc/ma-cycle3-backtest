@@ -1202,6 +1202,13 @@ function positionContextHtml(row) {
 }
 
 function holdingMarketValueHtml(row) {
+  const actualMarketValue = Number(row.currentMarketValue);
+  if (Number.isFinite(actualMarketValue) && actualMarketValue >= 0) {
+    return `
+      <span class="price-pair">
+        <strong>¥${formatAmount(actualMarketValue)}</strong>
+      </span>`;
+  }
   const lastEquity = Number(
     state.data?.equity?.[state.data.equity.length - 1]?.equity
   );
