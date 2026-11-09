@@ -924,7 +924,16 @@ function candidateRowHtml(row, showDailyChange = true) {
             : signalReasonText(row.reason, row.priorHighBreak);
   return `
     <tr class="clickable ${statusClass}-row" data-code="${escapeAttr(row.code)}">
-      <td class="change-first-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>
+      <td class="change-first-col">
+        <span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span>
+        ${
+          changeType === "sell"
+            ? `<div class="change-reason-note">${escapeHtml(
+                signalReasonText(row.reason, row.priorHighBreak)
+              )}</div>`
+            : ""
+        }
+      </td>
       <td class="sticky-col col-code code-cell">${escapeHtml(row.code)}</td>
       <td class="sticky-col col-name">
         <span class="name-cell">
