@@ -1819,7 +1819,15 @@ main {
 }
 
 .candidate-table tr.hold-row td {
-  background: rgba(72, 225, 209, 0.018);
+  background: rgba(90, 155, 255, 0.045);
+}
+
+.candidate-table tr.hold-row .sticky-col {
+  background: #0b1b2d;
+}
+
+.candidate-table tr.hold-row:hover .sticky-col {
+  background: #102540;
 }
 
 .code-cell {
@@ -1927,9 +1935,9 @@ main {
 }
 
 .status-badge.hold {
-  border-color: rgba(72, 225, 209, 0.24);
-  background: var(--cyan-soft);
-  color: var(--cyan);
+  border-color: rgba(90, 155, 255, 0.34);
+  background: rgba(90, 155, 255, 0.12);
+  color: var(--blue);
 }
 
 .status-badge.skip {
@@ -3878,7 +3886,12 @@ html[data-theme="light"] .candidate-table tr.sell-row .sticky-col {
 }
 
 html[data-theme="light"] .candidate-table tr.hold-row td {
-  background: rgba(11, 143, 134, 0.025);
+  background: rgba(50, 110, 199, 0.045);
+}
+
+html[data-theme="light"] .candidate-table tr.hold-row .sticky-col,
+html[data-theme="light"] .candidate-table tr.hold-row:hover .sticky-col {
+  background: #f4f8ff;
 }
 
 html[data-theme="light"] .rule-footnote,
