@@ -103,7 +103,7 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成5破10的强度来定义尾盘买入策略。严格执行跌破 MA5、持仓收益触及-8%、最高价下移、早期MFE低于2%等卖出策略。</p>
+        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成5破10的强度来定义尾盘买入策略。严格执行跌破 MA5、持仓收益触及-8.5%、最高价下移分批止盈、分组降级和早期MFE低于2%等卖出策略。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -466,13 +466,13 @@
                 <div class="buy-rule-card-head">
                   <span class="rule-index">02</span>
                   <span class="rule-title">
-                    <strong class="rule-heading">推演次日平盘完成5破10且MA10 向上</strong>
+                    <strong class="rule-heading">推演次日平盘完成5破10</strong>
                     <span class="rule-tag">突破阻力</span>
                   </span>
                 </div>
                 <div class="rule-copy buy-rule-detail">
-                  <p><b>定义：</b>把信号日收盘价复制为下一交易日收盘价，重新计算 MA5 / MA10，要求推演后的 MA5 &gt; MA10，且推演后的 MA10 高于信号日 MA10。</p>
-                  <p><b>说明：</b>次日平盘即可完成 5 破 10，说明突破主要来自均线结构改善；同时要求 MA10 继续向上，过滤结构短暂交叉但中期方向已转弱的信号。</p>
+                  <p><b>定义：</b>把信号日收盘价复制为下一交易日收盘价，重新计算 MA5 / MA10，要求推演后的 MA5 &gt; MA10。</p>
+                  <p><b>说明：</b>次日平盘即可完成 5 破 10，说明突破主要来自均线结构改善。MA10 方向继续保留展示，但不再作为额外买入硬门槛。</p>
                 </div>
               </article>
               <article class="buy-rule-card">
@@ -492,13 +492,13 @@
                 <div class="buy-rule-card-head">
                   <span class="rule-index">04</span>
                   <span class="rule-title">
-                    <strong class="rule-heading">最高价突破前两日高点</strong>
+                    <strong class="rule-heading">最高价超前两日高点 ≥1%</strong>
                     <span class="rule-tag">价格确认</span>
                   </span>
                 </div>
                 <div class="rule-copy buy-rule-detail">
-                  <p><b>定义：</b>买入日最高价必须高于前两个交易日各自的最高价。</p>
-                  <p><b>说明：</b>用于确认短线价格已经突破近期两天形成的高点区域，避免均线结构改善但价格仍未突破。</p>
+                  <p><b>定义：</b>买入日最高价相对前两个交易日最高点中的较高者，至少高出 1%。</p>
+                  <p><b>说明：</b>用于确认短线价格已经有效突破近期两天形成的高点区域，避免均线结构改善但价格只是勉强越过前高。</p>
                 </div>
               </article>
               <div class="buy-rule-pair">
@@ -519,7 +519,7 @@
                   <div class="buy-rule-card-head">
                     <span class="rule-index">06</span>
                     <span class="rule-title">
-                      <strong class="rule-heading">综合评分 ≥ 0.25</strong>
+                      <strong class="rule-heading">综合评分 ≥ 0.275</strong>
                       <span class="rule-tag">风险下限</span>
                     </span>
                   </div>
@@ -545,9 +545,9 @@
                 <div class="priority-item priority-1">
                   <span>01</span>
                   <div>
-                    <strong>早期MFE低于2%与持仓触及-8%退出</strong>
+                    <strong>早期MFE低于2%与持仓触及-8.5%退出</strong>
                     <p>买入后第 2 个交易日，前两日最高价形成的最大浮盈仍低于 2%，按当日收盘价卖出。</p>
-                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即止损。若跳空低开至止损价下方，按开盘价卖出。</p>
+                    <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8.5% 即止损。若跳空低开至止损价下方，按开盘价卖出。</p>
                     <p>此两项皆为早期退出规则，目的是剔除弱趋势与控制回撤。实盘利用条件单，极端情况下竞价挂跌停保证止损成功。</p>
                   </div>
                 </div>
@@ -563,8 +563,9 @@
                 <div class="priority-item priority-3">
                   <span>03</span>
                   <div>
-                    <strong>最高价连续两日下移清仓</strong>
-                    <p>持仓收益为正时，最高价连续两日下移，按当日收盘价一次性清仓。</p>
+                    <strong>最高价下移分批止盈与分组降级</strong>
+                    <p>持仓收益超过 8% 后，最高价首次低于前一日时先卖半仓；此后满足连续两天下移条件时清掉剩余半仓。</p>
+                    <p>持仓的判定分组多占比低于 7% 时，按当日收盘价退出。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-3">←</div>
@@ -573,7 +574,7 @@
                   <div><strong>跌破 MA5 清仓</strong><p>收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
                 </div>
               </div>
-              <p class="priority-note">若连续两日下移清仓与跌破 MA5 同日触发，按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
+              <p class="priority-note">若最高价下移减半与跌破 MA5 同日触发，两半按同一收盘价退出；若盘中 -8.5% 与任何收盘信号重叠，-8.5% 按实际止损成交。</p>
             </div>
           </article>
 
@@ -589,7 +590,7 @@
                 <span class="rule-index">01</span>
                 <div>
                   <h3>分组资金上限</h3>
-                  <p>普通分组每组最多 20% 资金、同时最多 2 只股票。已有持仓先占额度和名额，剩余额度再给新候选。</p>
+                  <p>普通分组每组最多 30% 资金、同时最多 2 只股票。已有持仓先占额度和名额，剩余额度再给新候选。</p>
                   <p>总仓位不足时，先按分组多占比从高到低，再按组内综合评分从高到低分配。</p>
                   <p>新买入按买入时组合总资产的 20% 配置；同一分组拆成两只时，评分最高的先买 10%，下一只拿组内剩余额度。资金不足 20% 但足够 10% 时也按这个顺序分配，剩余仓位低于 5% 时不买。主板和创业板按 100 股整数倍下单，科创板最低 200 股，北交所最低 100 股，科创板、北交所达到最低申报数量后可按 1 股递增。</p>
                 </div>
@@ -898,6 +899,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=b42babb77090"></script>
+  <script src="assets/app.js?v=68d9a5442bc7"></script>
 </body>
 </html>

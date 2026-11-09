@@ -1049,7 +1049,7 @@ function groupRatioText(value) {
 
 function isOnlyLimitUpReason(value) {
   const text = String(value || "").trim();
-  return text.includes("尾盘涨停") && !/[；;]/.test(text);
+  return text.includes("涨停") && text.includes("买不进") && !/[；;]/.test(text);
 }
 
 function isLimitUpPositionReason(value, row = {}) {
@@ -1078,10 +1078,9 @@ function passesNonPositionSignalChecks(row = {}) {
   const gapDelta = Number(row.gapDeltaPct);
   if (Number.isFinite(gapDelta) && gapDelta < 1) return false;
   const score = Number(row.score);
-  if (Number.isFinite(score) && score < 0.25) return false;
+  if (Number.isFinite(score) && score < 0.275) return false;
   if (row.projectedSuccess === false) return false;
   if (row.priorHighBreak === false) return false;
-  if (row.projectedMa10Dir && row.projectedMa10Dir !== "向上") return false;
   return true;
 }
 
@@ -1121,7 +1120,7 @@ function isSingleGroupCapReason(value) {
 
 function signalReasonText(value, priorHighBreak) {
   let reason = String(value || "")
-    .replace(/尾盘涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
+    .replace(/(?:尾盘)?涨停(?:\s*[·,，]\s*)买不进/g, "涨停无法买进")
     .replace(/(\d+(?:\.\d+)?)pp/g, "$1%")
     .replace(
       /买入日最高价未突破前2日高点(?:超过0(?:\.0+)?%)?/g,
@@ -2298,7 +2297,7 @@ function renderExitReasonChart() {
     const cleanReason = String(reason)
       .replace("持仓收益>0%且", "")
       .replace("持仓收益＞0%且", "");
-    if (cleanReason.includes("低开")) return "−8% 强制止损（低开）";
+    if (cleanReason.includes("低开")) return "−8.5% 强制止损（低开）";
     if (cleanReason.includes("MFE")) return "前2日 MFE<2% 提前退出";
     if (
       cleanReason.includes("AI硬件") &&
@@ -2322,10 +2321,10 @@ function renderExitReasonChart() {
     }
     if (cleanReason.includes("最高价首次下移")) {
       if (
-        cleanReason.includes("持仓收益≤-8%") ||
-        cleanReason.includes("持仓收益触及-8%")
+        cleanReason.includes("持仓收益≤-8.5%") ||
+        cleanReason.includes("持仓收益触及-8.5%")
       ) {
-        return "最高价下移 · 剩余半仓 −8% 止损";
+        return "最高价下移 · 剩余半仓 −8.5% 止损";
       }
       if (cleanReason.includes("同日原卖出规则")) {
         return "最高价下移 · 同日跌破 MA5 清仓";
@@ -2339,10 +2338,10 @@ function renderExitReasonChart() {
       return "最高价下移 · 剩余半仓跌破 MA5";
     }
     if (
-      cleanReason.includes("持仓收益≤-8%") ||
-      cleanReason.includes("持仓收益触及-8%")
+      cleanReason.includes("持仓收益≤-8.5%") ||
+      cleanReason.includes("持仓收益触及-8.5%")
     ) {
-      return "−8% 强制止损";
+      return "−8.5% 强制止损";
     }
     if (cleanReason === "跌破MA5") return "跌破 MA5";
     return cleanReason;
