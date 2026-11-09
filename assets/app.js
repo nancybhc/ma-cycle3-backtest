@@ -877,7 +877,11 @@ function renderCandidateTable() {
   const body = document.getElementById("candidateTableBody");
   body.innerHTML = rows
     .map((row) =>
-      candidateRowHtml(row, state.candidateScope === "changes")
+      candidateRowHtml(
+        row,
+        state.candidateScope === "changes",
+        true
+      )
     )
     .join("");
 
@@ -888,7 +892,11 @@ function renderCandidateTable() {
   });
 }
 
-function candidateRowHtml(row, showDailyChange = true) {
+function candidateRowHtml(
+  row,
+  showDailyChange = true,
+  showSignalJudgment = true
+) {
   const isHolding = Boolean(row.isHolding);
   const changeType = String(row.changeType || "");
   const limitUpBlocked =
@@ -992,7 +1000,7 @@ function candidateRowHtml(row, showDailyChange = true) {
             )
       }</td>
       ${
-        showDailyChange
+        showSignalJudgment
           ? `<td class="change-last-col"><span class="status-badge ${statusClass}">${signalStatusHtml(statusText)}</span></td>`
           : ""
       }
@@ -1010,7 +1018,7 @@ function renderIntradayJumpTable() {
     return;
   }
   body.innerHTML = rows
-    .map((row) => candidateRowHtml(row, false))
+    .map((row) => candidateRowHtml(row, false, false))
     .join("");
   body.querySelectorAll("tr[data-code]").forEach((row) => {
     row.addEventListener("click", () =>
