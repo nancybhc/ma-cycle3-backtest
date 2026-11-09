@@ -2572,7 +2572,7 @@ main {
 
 .buy-rule-pair .buy-rule-card {
   grid-column: auto;
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(131, 173, 207, 0.10);
 }
 
 .buy-rule-pair .buy-rule-card:first-child {
@@ -2582,7 +2582,7 @@ main {
 .buy-rule-list .buy-rule-card:nth-child(5),
 .buy-rule-list .buy-rule-card:nth-child(6) {
   grid-column: auto;
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(131, 173, 207, 0.10);
 }
 
 .buy-rule-card-head {
@@ -2733,9 +2733,8 @@ main {
 }
 
 .rule-footnote {
-  padding: 13px 22px 16px;
-  border-top: 1px solid var(--line);
-  background: rgba(4, 13, 22, 0.22);
+  margin: 0;
+  padding: 0 20px 18px;
   color: var(--text-dim);
   font-size: 9px;
   line-height: 1.65;
@@ -3474,7 +3473,8 @@ main {
   }
 
   .trade-rule-panel-head,
-  .rule-footnote {
+  .rule-footnote,
+  .priority-note {
     padding-right: 16px;
     padding-left: 16px;
   }
@@ -3894,7 +3894,6 @@ html[data-theme="light"] .candidate-table tr.hold-row:hover .sticky-col {
   background: #f4f8ff;
 }
 
-html[data-theme="light"] .rule-footnote,
 html[data-theme="light"] .raw-summary pre {
   background: rgba(231, 239, 244, 0.72);
 }
