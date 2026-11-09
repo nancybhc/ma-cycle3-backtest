@@ -399,6 +399,25 @@ function applyLiveSignals(live) {
     useLive && Array.isArray(live?.holdingPreview)
       ? live.holdingPreview
       : [];
+  const liveBuyPreview =
+    useLive && Array.isArray(live?.signals)
+      ? live.signals
+          .filter((row) => row?.isBuy && !row?.isHolding)
+          .map((row) => ({
+            ...row,
+            changeType: "buy",
+            actionLabel: "预计买入",
+          }))
+      : [];
+  const seenLiveChangeCodes = new Set();
+  const liveChanges = [...liveBuyPreview, ...liveHoldingPreview].filter(
+    (row) => {
+      const code = String(row?.code || "");
+      if (!code || seenLiveChangeCodes.has(code)) return false;
+      seenLiveChangeCodes.add(code);
+      return true;
+    }
+  );
   const sessionDailyChanges = dailyChangesForSession(
     state.staticDailyChanges
   );
@@ -426,7 +445,7 @@ function applyLiveSignals(live) {
     displayRatios
   );
   state.data.dailyChanges = applyGroupRatios(
-    liveHoldingPreview.length ? liveHoldingPreview : sessionDailyChanges,
+    liveChanges.length ? liveChanges : sessionDailyChanges,
     displayRatios
   );
   state.data.currentHoldings = applyGroupRatios(
