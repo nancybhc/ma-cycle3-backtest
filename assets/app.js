@@ -1051,7 +1051,11 @@ function groupRatioText(value) {
 
 function isOnlyLimitUpReason(value) {
   const text = String(value || "").trim();
-  return text.includes("涨停") && text.includes("买不进") && !/[；;]/.test(text);
+  return (
+    text.includes("涨停") &&
+    (text.includes("买不进") || text.includes("无法买进")) &&
+    !/[；;]/.test(text)
+  );
 }
 
 function isLimitUpPositionReason(value, row = {}) {
@@ -1064,12 +1068,15 @@ function isLimitUpPositionReason(value, row = {}) {
     .filter(Boolean);
   if (!parts.length) return false;
   const hasLimitUp = parts.some(
-    (part) => part.includes("涨停") && part.includes("买不进")
+    (part) =>
+      part.includes("涨停") &&
+      (part.includes("买不进") || part.includes("无法买进"))
   );
   if (!hasLimitUp) return false;
   return parts.every(
     (part) =>
-      (part.includes("涨停") && part.includes("买不进")) ||
+      (part.includes("涨停") &&
+        (part.includes("买不进") || part.includes("无法买进"))) ||
       isOnlyGroupCapReason(part)
   );
 }
