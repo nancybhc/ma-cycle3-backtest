@@ -423,6 +423,12 @@ function applyLiveSignals(live) {
   );
   state.liveApplied = useLive;
   state.liveData = live;
+  if (live?.chartBars && typeof live.chartBars === "object") {
+    state.data.chartBars = {
+      ...(state.data.chartBars || {}),
+      ...live.chartBars,
+    };
+  }
   const displayRatios = useLive
     ? groupRatioMapFromRows(
         [...(live.signals || []), ...(live.intradayJumps || [])],
@@ -471,6 +477,12 @@ async function refreshLiveSignals() {
   ) {
     // 收盘后到下一交易日首次扫描前，持续保留同一交易日的最后一份信号。
     state.liveData = live;
+    if (live?.chartBars && typeof live.chartBars === "object") {
+      state.data.chartBars = {
+        ...(state.data.chartBars || {}),
+        ...live.chartBars,
+      };
+    }
     updateMarketSyncDetail(live);
     const staticRatios =
       state.data.groupRatioDate === live.marketDate
@@ -2636,7 +2648,9 @@ function syncPageScrollLock() {
 }
 
 function renderTradeChart(item) {
-  const bars = state.data.chartBars[item.code];
+  const bars =
+    state.data.chartBars?.[item.code] ||
+    state.liveData?.chartBars?.[item.code];
   const element = document.getElementById("tradeChart");
   if (!bars || !bars.dates.length) {
     element.innerHTML =
