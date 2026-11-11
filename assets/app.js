@@ -750,14 +750,23 @@ function populatePositionRules() {
   const holdings = positionManagementHoldings();
   const representative =
     signals.find((row) => row.indexStage) || {};
-  const stage = String(representative.indexStage || "");
-  const progress = Number(representative.indexProgress || 0);
+  const liveStage = state.liveApplied
+    ? String(state.liveData?.indexStage || "")
+    : "";
+  const stage = liveStage || String(representative.indexStage || "");
+  const progress = liveStage
+    ? Number(state.liveData?.indexProgress || 0)
+    : Number(representative.indexProgress || 0);
   const stageKey =
     stage === "多" || stage === "空"
       ? stage
       : stage
         ? `${stage}${progress}`
         : "";
+  const liveAiTargetRaw = Number(state.liveData?.aiTargetPct);
+  const liveAiTarget = Number.isFinite(liveAiTargetRaw)
+    ? liveAiTargetRaw
+    : null;
   const currentTotalRaw = holdings.reduce(
     (sum, row) => sum + Number(row.weightPct || 0),
     0
@@ -776,6 +785,7 @@ function populatePositionRules() {
   const plannedTotal = Math.min(100, currentTotal + pendingTotal);
   const stageTarget =
     POSITION_STAGE_TARGETS[stageKey] ??
+    liveAiTarget ??
     Number(representative.aiTargetPct || 0);
 
   setText("positionPendingTotal", `${formatNumber(pendingTotal, 1)}%`);
@@ -801,7 +811,7 @@ function populatePositionRules() {
         currentNames: [],
         candidates: new Map(),
         fundCap: AI_HARDWARE_GROUPS.has(key)
-          ? Number(representative.aiTargetPct || 30)
+          ? (liveAiTarget ?? Number(representative.aiTargetPct || 30))
           : 20,
         candidateCount: 0,
         stageKey,
