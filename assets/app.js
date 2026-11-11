@@ -750,7 +750,12 @@ function populatePositionRules() {
   const holdings = positionManagementHoldings();
   const representative =
     signals.find((row) => row.indexStage) || {};
-  const liveStage = state.liveApplied
+  const liveDate = String(state.liveData?.marketDate || "");
+  const formalDate = String(state.data.meta?.candidateDate || "");
+  const useLiveRegime =
+    state.liveApplied ||
+    Boolean(liveDate && formalDate && liveDate === formalDate);
+  const liveStage = useLiveRegime
     ? String(state.liveData?.indexStage || "")
     : "";
   const stage = liveStage || String(representative.indexStage || "");
@@ -763,7 +768,9 @@ function populatePositionRules() {
       : stage
         ? `${stage}${progress}`
         : "";
-  const liveAiTargetRaw = Number(state.liveData?.aiTargetPct);
+  const liveAiTargetRaw = useLiveRegime
+    ? Number(state.liveData?.aiTargetPct)
+    : Number.NaN;
   const liveAiTarget = Number.isFinite(liveAiTargetRaw)
     ? liveAiTargetRaw
     : null;
