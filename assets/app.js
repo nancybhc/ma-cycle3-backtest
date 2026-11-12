@@ -758,10 +758,16 @@ function populatePositionRules() {
   const liveStage = useLiveRegime
     ? String(state.liveData?.indexStage || "")
     : "";
-  const stage = liveStage || String(representative.indexStage || "");
+  const formalStage = String(state.data.meta?.indexStage || "");
+  const stage =
+    liveStage || String(representative.indexStage || "") || formalStage;
   const progress = liveStage
     ? Number(state.liveData?.indexProgress || 0)
-    : Number(representative.indexProgress || 0);
+    : Number(
+        representative.indexProgress ||
+          state.data.meta?.indexProgress ||
+          0
+      );
   const stageKey =
     stage === "多" || stage === "空"
       ? stage
@@ -774,6 +780,13 @@ function populatePositionRules() {
   const liveAiTarget = Number.isFinite(liveAiTargetRaw)
     ? liveAiTargetRaw
     : null;
+  const formalAiTargetRaw = Number(state.data.meta?.aiTargetPct);
+  const formalAiTarget = Number.isFinite(formalAiTargetRaw)
+    ? formalAiTargetRaw
+    : null;
+  const indexBelowMa5 = useLiveRegime
+    ? state.liveData?.indexBelowMa5
+    : state.data.meta?.indexBelowMa5;
   const currentTotalRaw = holdings.reduce(
     (sum, row) => sum + Number(row.weightPct || 0),
     0
@@ -793,6 +806,7 @@ function populatePositionRules() {
   const stageTarget =
     POSITION_STAGE_TARGETS[stageKey] ??
     liveAiTarget ??
+    formalAiTarget ??
     Number(representative.aiTargetPct || 0);
 
   setText("positionPendingTotal", `${formatNumber(pendingTotal, 1)}%`);
@@ -811,9 +825,8 @@ function populatePositionRules() {
         const valueNode = node.querySelector("strong");
         if (valueNode) {
           valueNode.textContent =
-            useLiveRegime &&
             stage === "多转空" &&
-            state.liveData?.indexBelowMa5 === false
+            indexBelowMa5 === false
               ? "不强平"
               : "0%";
         }
