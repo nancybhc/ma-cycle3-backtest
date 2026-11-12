@@ -2379,7 +2379,7 @@ function renderExitReasonChart() {
     ) {
       return cleanReason.includes("最高价首次下移")
         ? "最高价下移 · AI 硬件强平"
-        : "指数多转空 · AI 硬件强平";
+        : "指数多转空且跌破MA5，AI硬件强平";
     }
     if (
       cleanReason.includes("指数空转多") &&
