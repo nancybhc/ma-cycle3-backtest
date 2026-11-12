@@ -827,7 +827,7 @@ function populatePositionRules() {
           valueNode.textContent =
             stage === "多转空" &&
             indexBelowMa5 === false
-              ? "不强平"
+              ? "不新增"
               : "0%";
         }
       }
