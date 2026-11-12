@@ -317,7 +317,7 @@ function shouldUseLiveSignals(live) {
   if (
     !live ||
     !live.available ||
-    live.status !== "scanning" ||
+    !["scanning", "closed"].includes(String(live.status || "")) ||
     !Array.isArray(live.signals) ||
     !live.marketDate
   ) {
@@ -330,7 +330,7 @@ function shouldUseLiveSignals(live) {
     // 即使监控随后又被手动启动，也不能把持仓状态回退到盘中。
     return false;
   }
-  // 正式收盘数据生成前，保留同一交易日最后一份盘中信号。
+  // 正式收盘数据生成前，保留同一交易日最后一份盘中或收盘扫描。
   return clock.date === live.marketDate;
 }
 
