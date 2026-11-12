@@ -805,7 +805,19 @@ function populatePositionRules() {
   document
     .querySelectorAll("#positionStageLadder .position-stage")
     .forEach((node) => {
-      node.classList.toggle("current", node.dataset.stageKey === stageKey);
+      const nodeStageKey = String(node.dataset.stageKey || "");
+      node.classList.toggle("current", nodeStageKey === stageKey);
+      if (nodeStageKey.startsWith("多转空")) {
+        const valueNode = node.querySelector("strong");
+        if (valueNode) {
+          valueNode.textContent =
+            useLiveRegime &&
+            stage === "多转空" &&
+            state.liveData?.indexBelowMa5 === false
+              ? "不强平"
+              : "0%";
+        }
+      }
     });
 
   const groups = new Map();
