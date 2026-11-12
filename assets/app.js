@@ -824,11 +824,15 @@ function populatePositionRules() {
       if (nodeStageKey.startsWith("多转空")) {
         const valueNode = node.querySelector("strong");
         if (valueNode) {
-          valueNode.textContent =
+          const noForceNoAdd =
             stage === "多转空" &&
-            indexBelowMa5 === false
-              ? "不新增"
-              : "0%";
+            indexBelowMa5 === false;
+          valueNode.textContent =
+            noForceNoAdd ? "不强平不新增" : "0%";
+          valueNode.classList.toggle(
+            "no-force-no-add",
+            noForceNoAdd
+          );
         }
       }
     });

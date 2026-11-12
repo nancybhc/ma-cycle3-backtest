@@ -2411,6 +2411,10 @@ main {
   font-weight: 500;
 }
 
+.position-stage strong.no-force-no-add {
+  font-size: 10px;
+}
+
 .position-stage.current {
   border-color: rgba(72, 225, 209, 0.5);
   background: rgba(72, 225, 209, 0.1);
