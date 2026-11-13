@@ -2364,7 +2364,12 @@ function renderExitReasonChart() {
     if (reason.includes("强制卖出（低开）")) return COLOR.amber;
     if (reason.includes("MFE")) return COLOR.amber;
     if (reason.includes("强制卖出")) return COLOR.green;
-    if (reason === "跌破MA5") return COLOR.cyan;
+    if (
+      reason === "跌破MA5" ||
+      reason.includes("低于MA5上方")
+    ) {
+      return COLOR.cyan;
+    }
     return COLOR.dim;
   };
   const compactLabel = (reason) => {

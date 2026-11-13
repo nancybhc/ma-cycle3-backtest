@@ -17,7 +17,7 @@
   </script>
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=21bbd36fd5e5">
+  <link rel="stylesheet" href="assets/app.css?v=a26dff1ee0d3">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -103,7 +103,7 @@
     <section class="hero section" id="overview">
       <div class="hero-copy">
         <h1>5破10 <span>推演量化策略</span></h1>
-        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成5破10的强度来定义尾盘买入策略。严格执行跌破 MA5、持仓收益触及-8%、最高价下移分批止盈和早期MFE低于2%等卖出策略。</p>
+        <p class="hero-desc">空转多进度3首次出现后，通过推演次日平盘完成5破10的强度来定义尾盘买入策略。严格执行分档MA5离场、持仓收益触及-8%、最高价下移分批止盈和早期MFE低于2%等卖出策略。</p>
         <div class="hero-meta">
           <span><b>信号区间</b><strong id="heroRange">—</strong></span>
           <span><b>最近更新</b><strong id="heroUpdated">—</strong></span>
@@ -571,10 +571,10 @@
                 <div class="priority-arrow arrow-3">←</div>
                 <div class="priority-item priority-4">
                   <span>04</span>
-                  <div><strong>跌破 MA5 清仓</strong><p>收盘价跌破 MA5，清掉当时仍持有的仓位。</p></div>
+                  <div><strong>分档 MA5 离场</strong><p>持仓收益低于3%时，收盘跌破MA5离场；持仓收益达到3%后，收盘低于MA5×1.02即离场。</p></div>
                 </div>
               </div>
-              <p class="priority-note">若最高价下移减半与跌破 MA5 同日触发，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
+              <p class="priority-note">若最高价下移减半与分档MA5离场同日触发，两半按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
             </div>
           </article>
 
@@ -902,6 +902,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=21bbd36fd5e5"></script>
+  <script src="assets/app.js?v=a26dff1ee0d3"></script>
 </body>
 </html>
