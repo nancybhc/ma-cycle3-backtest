@@ -2587,6 +2587,10 @@ main {
   border-right: 1px solid rgba(131, 173, 207, 0.10);
 }
 
+.sell-rule-list .buy-rule-pair:last-child .buy-rule-card {
+  border-bottom: 0;
+}
+
 .buy-rule-list .buy-rule-card:nth-child(5),
 .buy-rule-list .buy-rule-card:nth-child(6) {
   grid-column: auto;
