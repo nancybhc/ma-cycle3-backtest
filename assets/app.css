@@ -2782,13 +2782,8 @@ main {
 
 .priority-flow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
-  grid-template-rows: auto 52px auto;
-  grid-template-areas:
-    "p1 a1 p2"
-    ". . a2"
-    "p4 a3 p3";
-  gap: 10px 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: stretch;
   padding: 18px 20px 12px;
 }
@@ -2802,22 +2797,6 @@ main {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: rgba(4, 13, 22, 0.34);
-}
-
-.priority-1 {
-  grid-area: p1;
-}
-
-.priority-2 {
-  grid-area: p2;
-}
-
-.priority-3 {
-  grid-area: p3;
-}
-
-.priority-4 {
-  grid-area: p4;
 }
 
 .priority-item > span {
@@ -2845,27 +2824,9 @@ main {
   justify-self: center;
   color: rgba(72, 225, 209, 0.34);
   font-family: var(--mono);
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1;
-}
-
-@media (min-width: 901px) {
-  .priority-arrow.arrow-1,
-  .priority-arrow.arrow-3 {
-    transform: scaleX(1.35);
-  }
-}
-
-.arrow-1 {
-  grid-area: a1;
-}
-
-.arrow-2 {
-  grid-area: a2;
-}
-
-.arrow-3 {
-  grid-area: a3;
+  padding: 4px 0;
 }
 
 .priority-note {

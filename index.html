@@ -17,7 +17,7 @@
   </script>
   <title>5破10推演量化策略 · 回测面板</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111d'/%3E%3Cpath d='M14 45V29l9-8 9 8v16M35 45V19l8 7 7-7v26' fill='none' stroke='%2348e1d1' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/app.css?v=a26dff1ee0d3">
+  <link rel="stylesheet" href="assets/app.css?v=24ab5938c2b6">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
@@ -537,7 +537,7 @@
             <div class="trade-rule-panel-head">
               <div>
                 <span class="rule-kicker">卖出</span>
-                <h3>四类离场规则，按顺序触发</h3>
+                <h3>六条离场规则，按触发时点排序</h3>
               </div>
             </div>
             <div class="sell-priority-section">
@@ -545,37 +545,52 @@
                 <div class="priority-item priority-1">
                   <span>01</span>
                   <div>
-                    <strong>早期MFE低于2%与持仓触及-8%退出</strong>
-                    <p>买入后第 2 个交易日，前两日最高价形成的最大浮盈仍低于 2%，按当日收盘价卖出。</p>
+                    <strong>持仓收益触及 -8% 强制止损</strong>
                     <p>从买入后的下一交易日起，盘中最低价触及持仓收益 -8% 即止损。若跳空低开至止损价下方，按开盘价卖出。</p>
-                    <p>此两项皆为早期退出规则，目的是剔除弱趋势与控制回撤。实盘利用条件单，极端情况下竞价挂跌停保证止损成功。</p>
+                    <p>这是唯一的盘中强制成交规则。实盘利用条件单，极端情况下竞价挂跌停保证止损成功。</p>
                   </div>
                 </div>
-                <div class="priority-arrow arrow-1">→</div>
+                <div class="priority-arrow arrow-1">↓</div>
                 <div class="priority-item priority-2">
                   <span>02</span>
                   <div>
-                    <strong>指数多转空AI 硬件强平</strong>
-                    <p>上证指数进入多转空且收盘跌破自身 MA5 时，AI 硬件剩余仓位当日按收盘价强制清仓；若仍在 MA5 上方则不强平。多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此在指数确认跌破 MA5 后再清掉已有持仓，避免把一次尚未确认的趋势转弱直接拖成深度回撤。</p>
+                    <strong>早期趋势失败：MFE 低于 2%</strong>
+                    <p>买入后第 2 个交易日，前两日最高价形成的最大浮盈仍低于 2%，按当日收盘价卖出，用于尽快剔除弱趋势。</p>
                   </div>
                 </div>
                 <div class="priority-arrow arrow-2">↓</div>
                 <div class="priority-item priority-3">
                   <span>03</span>
                   <div>
-                    <strong>分组过热与最高价下移离场</strong>
+                    <strong>指数多转空，AI 硬件强平</strong>
+                    <p>上证指数进入多转空且收盘跌破自身 MA5 时，AI 硬件剩余仓位当日按收盘价强制清仓；若仍在 MA5 上方则不强平。多转空代表 MA5 开始向下、上涨结构首次被破坏。此时虽然尚未进入完整空头，但高位筹码松动、回撤速度通常最快。AI 硬件属于高波动方向且与指数强关联，因此在指数确认跌破 MA5 后再清掉已有持仓，避免把一次尚未确认的趋势转弱直接拖成深度回撤。</p>
+                  </div>
+                </div>
+                <div class="priority-arrow arrow-3">↓</div>
+                <div class="priority-item priority-4">
+                  <span>04</span>
+                  <div>
+                    <strong>分组过热：多占比达到 90%</strong>
                     <p>持仓分组的收盘多占比首次达到 90% 时，按当日收盘价清仓该分组全部持仓。</p>
+                    <p>该规则用于在分组一致性达到极值后主动兑现，避免继续吃趋势末端的回撤。</p>
+                  </div>
+                </div>
+                <div class="priority-arrow arrow-4">↓</div>
+                <div class="priority-item priority-5">
+                  <span>05</span>
+                  <div>
+                    <strong>最高价下移分批止盈</strong>
                     <p>持仓收益超过 8% 后，最高价首次低于前一日时先卖半仓；此后满足连续两天下移条件时清掉剩余半仓。</p>
                     <p>半仓按持仓股数拆分：卖出数量 = 当前持仓数量 ÷ 2（向下取整），再按成交价计算卖出金额和剩余市值。</p>
                   </div>
                 </div>
-                <div class="priority-arrow arrow-3">←</div>
-                <div class="priority-item priority-4">
-                  <span>04</span>
+                <div class="priority-arrow arrow-5">↓</div>
+                <div class="priority-item priority-6">
+                  <span>06</span>
                   <div><strong>分档 MA5 离场</strong><p>持仓收益低于3%时，收盘跌破MA5离场；持仓收益达到3%后，收盘低于MA5×1.02即离场。</p></div>
                 </div>
               </div>
-              <p class="priority-note">若分组多占比≥90%、最高价下移减半或分档MA5离场同日触发，按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
+              <p class="priority-note">01 为盘中止损，02～06 均在收盘确认。若 02～06 同日触发，统一按同一收盘价退出；若盘中 -8% 与任何收盘信号重叠，-8% 按实际止损成交。</p>
             </div>
           </article>
 
@@ -903,6 +918,6 @@
 
   <div class="toast" id="toast"></div>
   <script src="assets/echarts.min.js"></script>
-  <script src="assets/app.js?v=a26dff1ee0d3"></script>
+  <script src="assets/app.js?v=24ab5938c2b6"></script>
 </body>
 </html>
