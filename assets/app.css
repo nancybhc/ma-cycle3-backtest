@@ -2737,6 +2737,21 @@ main {
   line-height: 1.75;
 }
 
+.allocation-detail-list {
+  display: grid;
+  gap: 2px;
+  margin: 4px 0 0;
+  padding: 0;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.7;
+  list-style: none;
+}
+
+.allocation-detail-list li {
+  padding-left: 2px;
+}
+
 .rule-copy p b {
   color: rgba(220, 233, 242, 0.82);
   font-weight: 600;
