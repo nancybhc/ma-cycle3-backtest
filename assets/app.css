@@ -2738,7 +2738,8 @@ main {
   font-weight: 600;
 }
 
-.buy-rule-panel .rule-copy p b {
+.buy-rule-panel .rule-copy p b,
+.sell-rule-panel .rule-copy p b {
   color: inherit;
   font-size: inherit;
   font-weight: 400;
