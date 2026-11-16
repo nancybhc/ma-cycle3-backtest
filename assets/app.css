@@ -2752,6 +2752,52 @@ main {
   padding-left: 2px;
 }
 
+.allocation-rule-list,
+.allocation-sub-list {
+  display: grid;
+  margin: 4px 0 0;
+  padding: 0;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1.7;
+  list-style: none;
+}
+
+.allocation-rule-list {
+  gap: 5px;
+}
+
+.allocation-rule-list > li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.allocation-rule-list > li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--text-soft);
+  content: "➢";
+}
+
+.allocation-sub-list {
+  gap: 1px;
+  margin-top: 2px;
+}
+
+.allocation-sub-list li {
+  position: relative;
+  padding-left: 14px;
+}
+
+.allocation-sub-list li::before {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  color: var(--text-dim);
+  content: "-";
+}
+
 .rule-copy p b {
   color: rgba(220, 233, 242, 0.82);
   font-weight: 600;
