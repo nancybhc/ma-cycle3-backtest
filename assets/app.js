@@ -275,10 +275,13 @@ function displayDateTime(value) {
 function updateMarketSyncDetail(live = state.liveData) {
   const syncedAt = displayDateTime(live?.generatedAt);
   const marketTime = String(live?.marketTime || "");
+  const ratioAsOf = String(live?.groupRatioAsOf || "");
   setText(
     "marketSyncDetail",
     `本地行情同步：${syncedAt}${
       marketTime ? ` · 行情快照：${marketTime}` : ""
+    }${
+      ratioAsOf ? ` · 分组占比：${ratioAsOf}` : ""
     }`
   );
 }
@@ -346,11 +349,16 @@ function groupRatioMapFromRows(rows, explicitRatios = {}) {
   return ratios;
 }
 
-function applyGroupRatios(rows, ratios) {
+function applyGroupRatios(rows, ratios, ratioAsOf = "") {
   return (rows || []).map((row) => {
     const ratio = Number(ratios[row.group]);
     return Number.isFinite(ratio)
-      ? { ...row, groupManyRatioPct: ratio }
+      ? {
+          ...row,
+          groupManyRatioPct: ratio,
+          "分组多占比%": ratio,
+          groupRatioAsOf: ratioAsOf || row.groupRatioAsOf || "",
+        }
       : { ...row };
   });
 }
@@ -444,21 +452,25 @@ function applyLiveSignals(live) {
       );
   state.data.intradayJumps = applyGroupRatios(
     Array.isArray(live?.intradayJumps) ? live.intradayJumps : [],
-    displayRatios
+    displayRatios,
+    live?.groupRatioAsOf
   );
   state.data.signals = applyGroupRatios(
     useLive ? live.signals : state.staticSignals,
-    displayRatios
+    displayRatios,
+    live?.groupRatioAsOf
   );
   state.data.dailyChanges = applyGroupRatios(
     liveChanges.length ? liveChanges : sessionDailyChanges,
-    displayRatios
+    displayRatios,
+    live?.groupRatioAsOf
   );
   state.data.currentHoldings = applyGroupRatios(
     liveHoldingPreview.length
       ? liveHoldingPreview.filter((row) => row.isHolding)
       : state.staticCurrentHoldings || [],
-    displayRatios
+    displayRatios,
+    live?.groupRatioAsOf
   );
   updateMarketSyncDetail(live);
   return useLive;
@@ -494,20 +506,25 @@ async function refreshLiveSignals() {
     );
     state.data.signals = applyGroupRatios(
       state.data.signals,
-      displayRatios
+      displayRatios,
+      live.groupRatioAsOf
     );
     state.data.intradayJumps = applyGroupRatios(
       Array.isArray(live.intradayJumps) ? live.intradayJumps : [],
-      displayRatios
+      displayRatios,
+      live.groupRatioAsOf
     );
     state.data.dailyChanges = applyGroupRatios(
       state.data.dailyChanges,
-      displayRatios
+      displayRatios,
+      live.groupRatioAsOf
     );
     state.data.currentHoldings = applyGroupRatios(
       state.data.currentHoldings,
-      displayRatios
+      displayRatios,
+      live.groupRatioAsOf
     );
+    renderCandidateTable();
     renderIntradayJumpTable();
     updateCandidateRunHeader();
     return;
