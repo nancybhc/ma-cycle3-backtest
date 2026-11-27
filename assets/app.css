@@ -845,9 +845,14 @@ main {
   display: flex;
   gap: 8px;
   flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .monitor-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 12px;
   border: 1px solid var(--line-strong);
   border-radius: 7px;
@@ -855,6 +860,9 @@ main {
   color: var(--text-soft);
   font-size: 10px;
   cursor: pointer;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .monitor-button.start:not(:disabled):hover {
@@ -865,6 +873,11 @@ main {
 .monitor-button.stop:not(:disabled):hover {
   border-color: rgba(246, 185, 75, 0.45);
   color: var(--amber);
+}
+
+.monitor-button.tool:not(:disabled):hover {
+  border-color: rgba(99, 170, 255, 0.48);
+  color: #8dbdff;
 }
 
 .monitor-button:disabled {
@@ -3624,10 +3637,12 @@ main {
 
   .monitor-actions {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .monitor-button {
     flex: 1;
+    min-width: 112px;
   }
 
   .segmented {
